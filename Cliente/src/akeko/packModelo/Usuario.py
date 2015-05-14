@@ -30,7 +30,7 @@ class Usuario(object):
 
     @usuario.setter
     def usuario(self, un_usuario):
-        self.__usuario == un_usuario
+        self.__usuario = un_usuario
 
     @property
     def contrasena(self):
