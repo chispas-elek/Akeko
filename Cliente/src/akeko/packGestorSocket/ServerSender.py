@@ -39,7 +39,7 @@ class ServerSender(object):
                 return result.decode_json()
             except socket.gaierror:
                 # No se puede conectar al servidor. No gethostname.
-                print "No se ha podido conectar al servidor. Intento: %s", intento
+                print "No se ha podido conectar al servidor. Intento: ", intento
                 intento += 1
                 self.enviar_datos(intento)
             except socket.error as msg:
@@ -51,4 +51,5 @@ class ServerSender(object):
             # Después de 10 intentos no ha sido posible enviar el socket
             # Devolvemos un None para indicar el error.
             print "El envío del socket ha excedido el número de intentos"
+            self.s.close()
             return None
