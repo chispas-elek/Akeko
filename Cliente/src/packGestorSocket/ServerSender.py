@@ -9,8 +9,9 @@ un archivo de configuración
 """
 
 import json
-import Decoder
 import socket
+
+from Cliente.src.packGestorSocket import Decoder
 
 
 class ServerSender(object):
