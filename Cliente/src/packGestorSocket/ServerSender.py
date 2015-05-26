@@ -11,11 +11,13 @@ un archivo de configuración
 import json
 import socket
 import Decoder
+import time
 
 
 class ServerSender(object):
     # Definimos dos constantes y encapsulamos en privativo.
-    __SERVER_NAME = "localhost"
+    # todo Definir un archivo para cambiar el valor del server name
+    __SERVER_NAME = '192.168.0.10'
     __PORT = 13373
 
     def __init__(self, p_datos_enviar):
@@ -37,15 +39,11 @@ class ServerSender(object):
                 # Correcto, cerramos y devolvemos.
                 self.s.close()
                 return result.decode_json()
-            except socket.gaierror:
-                # No se puede conectar al servidor. No gethostname.
-                print "No se ha podido conectar al servidor. Intento: ", intento
-                intento += 1
-                self.enviar_datos(intento)
             except socket.error as msg:
                 # Se ha producido un error con el socket
-                print msg
+                print msg, "Intento número", intento
                 intento += 1
+                time.sleep(5)
                 self.enviar_datos(intento)
         else:
             # Después de 10 intentos no ha sido posible enviar el socket

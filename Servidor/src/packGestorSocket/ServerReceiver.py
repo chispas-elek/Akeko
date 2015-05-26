@@ -10,6 +10,7 @@ import SocketServer
 import json
 import socket
 import Decoder
+from Servidor.src.packControladoras import GestorUsuario
 
 class MyTCPServer(SocketServer.ThreadingTCPServer):
     allow_reuse_address = True
@@ -22,16 +23,18 @@ class MyTCPServerHandler(SocketServer.BaseRequestHandler):
             reciv = Decoder.Decoder(self.request.recv(1024).strip())
             data = reciv.decode_json()
             # Programamos el diccionario para elegir las acciones a realizar.
-            operaciones = {'GestorAlumno': self.mi_gestor_alumno,
+            # TODO hacer métodos personalizados basados en las acciones que se van a realizar
+            # TODO y que Gestores van a ser necesarios.
+            operaciones = {'iniciar_sesion': self.iniciar_sesion,
                            'GestorTag': 'NombreMetodo2',
                            'GestorScript': 'NombreMetodo3',
                            'GestorUsuario': 'NombreMetodo4',
-                           'GestorGrupos': 'NombreMetodo5',
+                           'GestorGrupo': 'NombreMetodo5',
                            }
 
             print "Hay que llamar a al gestor %s" % data[0]['clase']
             # operaciones[seleccion](datos_entrada_del_metodo_elegido)
-            resultado_operacion = operaciones[data[0]['clase']](data)
+            resultado_operacion = operaciones[data[0]['metodo']](data)
             # devolvemos el resultado obtenido al cliente
             # self.request.sendall(json.dumps(resultado_operacion))
 
@@ -50,12 +53,13 @@ class MyTCPServerHandler(SocketServer.BaseRequestHandler):
 
     # Definimos los métodos para ejecutar cada necesidad recibida por el socket.
 
-    def mi_gestor_alumno(self, datos):
-        # Crear el gestor
-
-        # Leemos los datos de entrada y ejecutamos el método necesario
-        metodos = {'activar_usuario' : 'TipoClase.metodo_ejecutar(parametros)'}
-        return None
+    def iniciar_sesion(self, p_data):
+        # Comprobamos si el usuario y contraseña son correctos
+        gestor_usu = GestorUsuario.GestorUsuario()
+        usuario = p_data[1]['usuario']
+        contrasena = p_data[1]['contrasena']
+        resultado = gestor_usu.obtener_credenciales(usuario, contrasena)
+        return resultado
 
 
 # Configuracion de los datos de escucha y ejecucion infinita del servidor.

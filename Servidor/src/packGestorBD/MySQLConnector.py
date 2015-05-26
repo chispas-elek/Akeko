@@ -29,10 +29,10 @@ class MySQLConnector(object):
     def conexion(self):
         try:
             # Nos conectamos a la BD
-            db = MySQLdb.connect(host="localhost", # El host de la máquina
-                                 user="akeko", # El usuario de la BD
-                                 passwd="akekomolamazoquetecagas", # la password de la BD
-                                 db="Akeko") # el nombre de la base de datos a usar
+            db = MySQLdb.connect(host="localhost",  # El host de la máquina
+                                 user="akeko",  # El usuario de la BD
+                                 passwd="akekohola123",  # la password de la BD
+                                 db="AkekoProject")  # el nombre de la base de datos a usar
             # Es necesario crear un objeto de tipo cursor
             # será indispenbale para hacer los execute necesarios.
             return db
