@@ -14,18 +14,15 @@ class Singleton(type):
             cls.__instance = type.__call__(cls, *args, **kw)
         return cls.__instance
 
-class GestorUsuario(object):
+class GestorTag(object):
     __metaclass__ = Singleton
     # Hemos creado el patrón de la MAE
     # Definimos el código que deseamos en la clase.
 
-    def obtener_credenciales(self, p_usuario, p_contrasena):
-        existe = False
+    def obtener_tagss(self, p_id_grupo):
         bd = MySQLConnector.MySQLConnector()
-        consulta = "SELECT IdUsuario FROM Usuario WHERE Usuario=%s AND Contrasena=%s;", (p_usuario, p_contrasena)
-        # Comprobamos el valor de la consulta
+        consulta = """SELECT IdTag,NombreTag,Descripcion,Fecha FROM Tag
+                    WHERE  IdTag IN (SELECT IdTag FROM Tag_Grupo WHERE IdGrupo=%s);
+                    """, p_id_grupo
         respuesta_bd = bd.execute(consulta)
-        if len(respuesta_bd) != 0:
-            # El usuario y contraseña son correctos
-            existe = True
-        return existe
+        return respuesta_bd

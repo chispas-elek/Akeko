@@ -11,6 +11,9 @@ import json
 import socket
 import Decoder
 from Servidor.src.packControladoras import GestorUsuario
+from Servidor.src.packControladoras import GestorGrupo
+from Servidor.src.packControladoras import GestorScript
+from Servidor.src.packControladoras import GestorTag
 
 class MyTCPServer(SocketServer.ThreadingTCPServer):
     allow_reuse_address = True
@@ -23,30 +26,21 @@ class MyTCPServerHandler(SocketServer.BaseRequestHandler):
             reciv = Decoder.Decoder(self.request.recv(1024).strip())
             data = reciv.decode_json()
             # Programamos el diccionario para elegir las acciones a realizar.
-            # TODO hacer métodos personalizados basados en las acciones que se van a realizar
-            # TODO y que Gestores van a ser necesarios.
             operaciones = {'iniciar_sesion': self.iniciar_sesion,
-                           'GestorTag': 'NombreMetodo2',
-                           'GestorScript': 'NombreMetodo3',
-                           'GestorUsuario': 'NombreMetodo4',
-                           'GestorGrupo': 'NombreMetodo5',
+                           'obtener_grupos': self.obtener_grupos,
+                           'obtener_alumnos': self.obtener_alumnos,
+                           'obtener_scripts': self.obtener_scripts,
+                           'obtener_tags': self.obtener_tags,
                            }
 
-            print "Hay que llamar a al gestor %s" % data[0]['clase']
+            print "Hay que llamar a al gestor %s" % data[0]['metodo']
             # operaciones[seleccion](datos_entrada_del_metodo_elegido)
             resultado_operacion = operaciones[data[0]['metodo']](data)
             # devolvemos el resultado obtenido al cliente
-            # self.request.sendall(json.dumps(resultado_operacion))
+            self.request.sendall(json.dumps(resultado_operacion))
 
-            """
-            for i in range(1, len(data)):
-                # Creamos un objeto de tipo persona y lo imprimimos.
-                print "Hey"
-                # una_persona = Persona.Persona(data[i]['nombre'], data[i]['apellido'])
-                # print una_persona.ImprimirDatos()
-            """
             # send some 'ok' back
-            self.request.sendall(json.dumps({'return':'ok'}))
+            #self.request.sendall(json.dumps({'return':'ok'}))
         except Exception, e:
             print "Exception al recibir el mensaje del cliente: ", e
             self.request.sendall(json.dumps({'return':'fail'}))
@@ -60,6 +54,35 @@ class MyTCPServerHandler(SocketServer.BaseRequestHandler):
         contrasena = p_data[1]['contrasena']
         resultado = gestor_usu.obtener_credenciales(usuario, contrasena)
         return resultado
+
+    def obtener_grupos(self, p_data):
+        # Obtenemos los grupos de un usuario
+        gestor_grupo = GestorGrupo.GestorGrupo()
+        id_usuario = p_data[1]['id_usuario']
+        resultado = gestor_grupo.obtener_grupos(id_usuario)
+        return resultado
+
+    def obtener_alumnos(self, p_data):
+        # Obtenemos la lista de alumnos de un grupo
+        gestor_grupo = GestorGrupo.GestorGrupo()
+        id_grupo = p_data[1]['id_grupo']
+        resultado = gestor_grupo.obtener_alumnos(id_grupo)
+        return resultado
+
+    def obtener_scripts(self, p_data):
+        # Obtener la lista de los scripts aplicados en un grupo
+        gestor_script = GestorScript.GestorScript()
+        id_grupo = p_data[1]['id_grupo']
+        resultado = gestor_script.obtener_scripts(id_grupo)
+        return resultado
+
+    def obtener_tags(self, p_data):
+        # Obtener la lista de los tags aplicados en un grupo
+        gestor_tag = GestorTag.GestorTag()
+        id_grupo = p_data[1]['id_grupo']
+        resultado = gestor_tag.obtener_tagss(id_grupo)
+        return resultado
+
 
 
 # Configuracion de los datos de escucha y ejecucion infinita del servidor.

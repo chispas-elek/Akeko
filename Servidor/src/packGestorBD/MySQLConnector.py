@@ -6,19 +6,24 @@ import MySQLdb
 
 class MySQLConnector(object):
 
+    def __init__(self):
+        pass
+
     # Definimos un método de ejecución de consultas estático
     def execute(self, p_consulta):
         devolver = None
-        database = self.conexion
+        database = self.__conexion()
         if database is not None:
             cur = database.cursor()
             # Si nos conectamos correctamente, ejecutamos Consulta
             try:
-                result = cur.execute(p_consulta)
+                cur.execute(*p_consulta)
+                devolver = cur.fetchall()
                 # Cerramos el cursor y la conexión a la BD
-                cur.close
+                # Hacemos commit y cerramos los cursores y la BD
+                database.commit()
+                cur.close()
                 database.close()
-                devolver = result
             except MySQLdb.Error, e:
                 try:
                     print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
@@ -26,7 +31,7 @@ class MySQLConnector(object):
                     print "MySQL Error: %s" % str(e)
         return devolver
 
-    def conexion(self):
+    def __conexion(self):
         try:
             # Nos conectamos a la BD
             db = MySQLdb.connect(host="localhost",  # El host de la máquina

@@ -14,27 +14,32 @@ class Singleton(type):
             cls.__instance = type.__call__(cls, *args, **kw)
         return cls.__instance
 
-class CMain(object):
+class CGestionarScript(object):
     __metaclass__ = Singleton
     # Hemos creado el patrón de la MAE
     # Definimos el código que deseamos en la clase.
 
-    def obtener_grupos(self, p_id_usuario):
-        # Preparamos los datos y los enviamos.
+    def obtener_scripts(self, p_id_grupo):
         lista_envio = []
-        # Cabecera de envío para saber que método hay que ejecutar en el server
-        lista_envio.append({'metodo': 'obtener_grupos'})
-        # Los datos asociados
-        lista_envio.append({'id_usuario': p_id_usuario})
-        socket = ServerSender.ServerSender(lista_envio)
-        resultado = socket.enviar_datos()
-        return resultado
-
-    def obtener_alumnos(self, p_id_grupo):
-        lista_envio = []
-        lista_envio.append({'metodo': 'obtener_alumnos'})
+        lista_envio.append({'metodo': 'obtener_scripts'})
         lista_envio.append({'id_grupo': p_id_grupo})
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
         return resultado
 
+    def obtener_tags(self, p_id_grupo):
+        lista_envio = []
+        lista_envio.append({'metodo': 'obtener_tags'})
+        lista_envio.append({'id_grupo': p_id_grupo})
+        socket = ServerSender.ServerSender(lista_envio)
+        resultado = socket.enviar_datos()
+        return resultado
+
+    # todo hacer éste método
+    def obtener_scripts_disponibles(self, p_id_grupo):
+        lista_envio = []
+        lista_envio.append({'metodo': 'obtener_tags'})
+        lista_envio.append({'id_grupo': p_id_grupo})
+        socket = ServerSender.ServerSender(lista_envio)
+        resultado = socket.enviar_datos()
+        return resultado

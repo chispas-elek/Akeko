@@ -35,7 +35,3 @@ class CLogin(object):
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
         return resultado
-
-# todo probar esto
-test = CLogin()
-test.iniciar_sesion('rmulero001', '12345')

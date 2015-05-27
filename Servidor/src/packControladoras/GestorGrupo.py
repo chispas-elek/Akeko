@@ -14,18 +14,21 @@ class Singleton(type):
             cls.__instance = type.__call__(cls, *args, **kw)
         return cls.__instance
 
-class GestorUsuario(object):
+class GestorGrupo(object):
     __metaclass__ = Singleton
     # Hemos creado el patrón de la MAE
     # Definimos el código que deseamos en la clase.
 
-    def obtener_credenciales(self, p_usuario, p_contrasena):
-        existe = False
+    def obtener_grupos(self, p_id_usuario):
         bd = MySQLConnector.MySQLConnector()
-        consulta = "SELECT IdUsuario FROM Usuario WHERE Usuario=%s AND Contrasena=%s;", (p_usuario, p_contrasena)
-        # Comprobamos el valor de la consulta
+        consulta = "SELECT IdGrupo,NombreGrupo FROM Grupo WHERE IdUsuario=%s", p_id_usuario
         respuesta_bd = bd.execute(consulta)
-        if len(respuesta_bd) != 0:
-            # El usuario y contraseña son correctos
-            existe = True
-        return existe
+        return respuesta_bd
+
+    def obtener_alumnos(self, p_id_grupo):
+        bd = MySQLConnector.MySQLConnector()
+        consulta = """SELECT Dni,Nombre,Apellido,Email
+                    FROM Alumno WHERE Dni IN (
+                    SELECT Dni FROM Alumno_Grupo WHERE IdGrupo=%s);""", p_id_grupo
+        respuesta_bd = bd.execute(consulta)
+        return respuesta_bd
