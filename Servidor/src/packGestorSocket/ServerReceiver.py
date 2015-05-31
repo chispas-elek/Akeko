@@ -130,29 +130,7 @@ class MyTCPServerHandler(SocketServer.BaseRequestHandler):
         :param p_data: Contiene el id del grupo y el usuario
         :return:
         """
-        gestor_alumno = GestorAlumno.GestorAlumno()
-        gestor_grupo = GestorGrupo.GestorGrupo()
-        gestor_script = GestorScript.GestorScript()
-        gestor_tag = GestorTag.GestorTag()
-
-        id_grupo = p_data[1]['id_grupo']
-
-        # Obtenemos los alumnos que pertenecen al grupo
-        lista_alumnos = gestor_alumno.obtener_alumnos(id_grupo)
-        # Obtener los identificadores de los scripts del grupo
-        # Para hacer el rollback en el sistema
-        lista_scripts = gestor_script.obtener_scripts(id_grupo)
-
-        # Obtenemos los tags que contiene un grupo
-        lista_tags = gestor_tag.obtener_tagss(id_grupo)
-        lista_scrips_del_tag = []
-        for tag in lista_tags:
-            # todo revisar que ésto sea correcto
-            lista_scrips_del_tag.append(gestor_script.obtener_scripts_tag(tag))
-
-
-        # Borramos el grupo del sistema en cascada
-        # Lo cual borra todas las referencias
+        pass
 
 # Configuracion de los datos de escucha y ejecucion infinita del servidor.
 if __name__ == "__main__":
