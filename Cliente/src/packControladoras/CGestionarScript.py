@@ -35,10 +35,17 @@ class CGestionarScript(object):
         resultado = socket.enviar_datos()
         return resultado
 
-    # todo hacer éste método
     def obtener_scripts_disponibles(self, p_id_grupo):
         lista_envio = []
-        lista_envio.append({'metodo': 'obtener_tags'})
+        lista_envio.append({'metodo': 'obtener_scripts_disponibles'})
+        lista_envio.append({'id_grupo': p_id_grupo})
+        socket = ServerSender.ServerSender(lista_envio)
+        resultado = socket.enviar_datos()
+        return resultado
+
+    def obtener_tags_disponibles(self, p_id_grupo):
+        lista_envio = []
+        lista_envio.append({'metodo': 'obtener_tags_disponibles'})
         lista_envio.append({'id_grupo': p_id_grupo})
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()

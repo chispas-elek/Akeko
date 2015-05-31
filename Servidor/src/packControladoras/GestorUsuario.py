@@ -20,6 +20,12 @@ class GestorUsuario(object):
     # Definimos el código que deseamos en la clase.
 
     def obtener_credenciales(self, p_usuario, p_contrasena):
+        """
+        Obtiene las credenciales de acceso de un usuario
+        :param p_usuario: El usuario
+        :param p_contrasena: Su contraseña
+        :return: True o False dependiendo de si las credenciales introducidas son correctas.
+        """
         existe = False
         bd = MySQLConnector.MySQLConnector()
         consulta = "SELECT IdUsuario FROM Usuario WHERE Usuario=%s AND Contrasena=%s;", (p_usuario, p_contrasena)
