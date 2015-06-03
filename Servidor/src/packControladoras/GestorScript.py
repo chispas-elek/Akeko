@@ -1,4 +1,6 @@
 # -*- encoding: utf-8 -*-
+from Servidor.src.packGestorBD.MySQLConnector import MySQLConnector
+
 __author__ = 'Rubén Mulero'
 
 from Servidor.src.packGestorBD import MySQLConnector

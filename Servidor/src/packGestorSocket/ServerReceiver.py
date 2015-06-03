@@ -6,21 +6,53 @@ ServerReceiver es una clase de escucha de sockets, la cual recibe un Socket dete
 y manda la acción necesaria para usar los gestores necesarios y llamar a la BD.
 """
 
-import SocketServer
+from SocketServer import TCPServer, ThreadingMixIn, StreamRequestHandler
 import json
 import socket
 import Decoder
+import ssl
 from Servidor.src.packControladoras import GestorUsuario
 from Servidor.src.packControladoras import GestorGrupo
 from Servidor.src.packControladoras import GestorScript
 from Servidor.src.packControladoras import GestorTag
 from Servidor.src.packControladoras import GestorAlumno
 
-class MyTCPServer(SocketServer.ThreadingTCPServer):
-    allow_reuse_address = True
+
+class MySSLTCPServer(TCPServer):
+    # Sobreescribimos TCPServer para admitir conexiones SSL
+    def __init__(self,
+                 server_address,
+                 request_handler_class,
+                 certfile,
+                 keyfile,
+                 ssl_version=ssl.PROTOCOL_TLSv1,
+                 bind_and_activate=True):
+        # Inicializamos la clase padre
+        TCPServer.__init__(self, server_address, request_handler_class, bind_and_activate)
+        self.certfile = certfile
+        self.keyfile = keyfile
+        self.ssl_version = ssl_version
+
+    def get_request(self):
+        # Sobreescribimos get_request de la clase padre para crear el socket
+        newsocket, fromaddr = self.socket.accept()
+        connstream = ssl.wrap_socket(newsocket,
+                                     server_side=True,
+                                     certfile=self.certfile,
+                                     keyfile=self.keyfile,
+                                     ssl_version=self.ssl_version)
+        return connstream, fromaddr
 
 
-class MyTCPServerHandler(SocketServer.BaseRequestHandler):
+class MySSLThreadingTCPServer(ThreadingMixIn, MySSLTCPServer):
+    """
+    Hereda de dos clases. Una permite conexiónes asícronas y la otra me permite sobreescribir
+    los méotdos de TCPServer para crear el socket ssl de la parte servidor
+    """
+    pass
+
+
+class ServerHandler(StreamRequestHandler):
     # Gestiona las conexiones que recibe de cada cliente y elige lo que debe hacer.
     def handle(self):
         try:
@@ -138,7 +170,10 @@ if __name__ == "__main__":
     try:
         # obtenemos la ip local de la máquina y ejecutamos el servidor en escucha.
         HOST = socket.gethostbyname(socket.gethostname())
-        server = MyTCPServer((HOST, PORT), MyTCPServerHandler)
+        server = MySSLThreadingTCPServer((HOST, PORT), ServerHandler,
+                                         "../../../ssl/cacert.pem",
+                                         "../../../ssl/private/key.pem")
+        # Se queda en ejecución infinita
         server.serve_forever()
     except socket.error:
         print "Ha ocurrido un error a la hora de obtener" \
