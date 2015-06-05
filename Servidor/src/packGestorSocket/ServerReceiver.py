@@ -69,6 +69,8 @@ class ServerHandler(StreamRequestHandler):
                            'obtener_tags_usuario': self.obtener_tags_usuario,
                            'obtener_scripts_tag': self.obtener_scripts_tag,
                            'borrar_grupo': self.borrar_grupo,
+                           'cambiar_nombre': self.cambiar_nombre,
+                           'anadir_tag': self.anadir_tag,
                            }
 
             print "Hay que llamar a al gestor %s" % data[0]['metodo']
@@ -153,6 +155,16 @@ class ServerHandler(StreamRequestHandler):
         resultado = gestor_script.obtener_scripts_tag(id_tag)
         return resultado
 
+    def crear_grupo(self, p_data):
+        """
+        Crear un nuevo grupo en el sistema
+        :param p_data: El identificador del usuario, el nombre del grupo y
+                        los alumnos asociados
+        :return: True o False dependiendo si se ha creado correctamente
+        """
+        pass
+        # Todo hacer la creación del grupo. Mira las notas del controaldor!!!
+
     def borrar_grupo(self, p_data):
         """ Elimina un grupo seleccionado por el usuario
 
@@ -163,6 +175,33 @@ class ServerHandler(StreamRequestHandler):
         :return:
         """
         pass
+
+    def cambiar_nombre(self, p_data):
+        """
+        Cambiamos el nombre de un grupo a otro diferente
+        :param p_data: El identificador del grupo y el nueevo nombre
+        :return: True o False dependiendo de si ha sido posible o no cambiar el nombre
+        """
+        gestor_grupo = GestorGrupo.GestorGrupo()
+        id_grupo = p_data[1]['id_grupo']
+        nombre_grupo = p_data[1]['nombre_gruo']
+        resultado = gestor_grupo.cambiar_nombre(id_grupo, nombre_grupo)
+        return resultado
+
+    def anadir_tag(self, p_data):
+        """
+        Añade un nuevo Tag en el sistema
+        :param p_data: Los datos necesarios para crear un TAG
+        :return: True o False dependiendo del exito
+        """
+        gestor_tag = GestorTag.GestorTag()
+        nombre_tag = p_data[1]['nombre_tag']
+        id_usuario = p_data[1]['id_usuario']
+        descripcion = p_data[1]['descripcion']
+        lista_script = p_data[1]['lista_script']
+        resultado = gestor_tag.anadir_tag(nombre_tag, id_usuario, descripcion, lista_script)
+        return resultado
+
 
 # Configuracion de los datos de escucha y ejecucion infinita del servidor.
 if __name__ == "__main__":

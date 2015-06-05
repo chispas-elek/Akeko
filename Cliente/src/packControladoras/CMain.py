@@ -45,3 +45,12 @@ class CMain(object):
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
         return resultado
+
+    def cambiar_nombre(self, p_id_grupo, p_nombre_grupo):
+        lista_envio = []
+        lista_envio.append({'metodo': 'cambiar_nombre'})
+        lista_envio.append({'id_grupo': p_id_grupo, 'nombre_grupo': p_nombre_grupo})
+        socket = ServerSender.ServerSender(lista_envio)
+        resultado = socket.enviar_datos()
+        return resultado
+

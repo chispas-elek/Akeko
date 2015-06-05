@@ -41,3 +41,25 @@ class GestorGrupo(object):
         consulta = "DELETE FROM Grupo WHERE IdGrupo=%s", p_id_grupo
         respuesta_bd = bd.execute(consulta)
         return respuesta_bd
+
+    def cambiar_nombre(self, p_id_grupo, p_nombre_grupo):
+        """
+        Cambiamos el nombre de un grupo si es posible
+        :param p_id_grupo: El identificador del grupo
+        :param p_nombre_grupo: EL nuevo nombre del grupo
+        :return: True o False dependiendo del cambio exitoso
+        """
+        bd = MySQLConnector.MySQLConnector()
+        exito = False
+        # Primero vamos a comprobar si el nombre ya existe en la BD
+        consulta1 = "SELECT IdGrupo FROM Grupo WHERE NombreGrupo=%s", p_nombre_grupo
+        respuesta_bd_1 = bd.execute(consulta1)
+        if len(respuesta_bd_1) == 0:
+            # No existe ninguna entrada en la BD con dicho nombre
+            # Cambiamos el nombre sin problemas
+            consulta2 = "UPDATE Grupo SET NombreGrupo=%s WHERE IdGrupo=%s", (p_nombre_grupo, p_id_grupo)
+            respuesta_bd_2 = bd.execute(consulta2)
+            # todo comprobar si el update devuelve 1
+            if respuesta_bd_2 == 1:
+                exito = True
+        return exito

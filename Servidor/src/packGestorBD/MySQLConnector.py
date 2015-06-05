@@ -17,7 +17,7 @@ class MySQLConnector(object):
             cur = database.cursor(MySQLdb.cursors.DictCursor)
             # Si nos conectamos correctamente, ejecutamos Consulta
             try:
-                cur.execute(*p_consulta)
+                devolver = cur.execute(*p_consulta)
                 # Si la consulta es un SELECT obtenemos todos los datos
                 # Si es UPDATE o DELETE hacemos un commit.
                 if p_consulta[0].upper().startswith('SELECT'):
