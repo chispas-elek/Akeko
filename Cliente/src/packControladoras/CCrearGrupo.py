@@ -2,6 +2,7 @@
 __author__ = 'Rubén Mulero'
 
 from Cliente.src.packGestorSocket import ServerSender
+from Cliente.src.packModelo import Alumno, ListaAlumno, ListaGrupo
 
 class Singleton(type):
 
@@ -33,7 +34,7 @@ class CCrearGrupo(object):
 
         :param p_id_usuario: El identificador del usuario
         :param p_nombre_grupo: El nombre del grupo dado por el usuairo
-        :param p_lista_alumnos: La lista que contiene los alumnos del nuevo grupo
+        :param p_lista_alumnos: El diccionario que contiene los alumnos del nuevo grupo
         :return: None -> Si el grupo ya existe en el sistema
                 0 -> Si existe un error en la BD a la hora de insertar el grupo
                 1 -> Si todo ha ido bien

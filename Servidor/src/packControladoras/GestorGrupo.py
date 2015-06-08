@@ -31,6 +31,31 @@ class GestorGrupo(object):
         respuesta_bd = bd.execute(consulta)
         return respuesta_bd
 
+    def anadir_grupo(self, p_nombre_grupo, p_id_usuario, p_lista_alumnos):
+        """
+        Creamos un nuevo grupo en el sistema
+        :param p_nombre_grupo: El nombre del grupo
+        :param p_id_usuario: El identificador del usuario
+        :param p_lista_alumnos: La lista de alumnos que va a contener el nuevo grupo
+        :return: True o False dependiendo si la operación ha sido un éxito
+        """
+        devolver = False
+        bd = MySQLConnector.MySQLConnector()
+        consulta1 = "INSERT INTO Grupo(NombreGrupo,IdUsuario) VALUES(%s,%s);", (p_nombre_grupo, p_id_usuario)
+        respuesta_bd = bd.execute(consulta1)
+        # Obtenemos el identificador del grupo
+        consulta2 = "SELECT IdGrupo FROM Grupo WHERE NombreGrupo=%s;", p_nombre_grupo
+        respuesta_bd_2 = bd.execute(consulta2)
+        # Insertamos la relación entre alumno y grupo
+        for alumno in p_lista_alumnos:
+            consulta3 = "INSERT INTO Alumno_Grupo(Dni,IdGrupo) VALUES(%s,%s);", \
+                        (alumno['Dni', respuesta_bd_2['IdGrupo']])
+            respuesta_bd_3 = bd.execute(consulta3)
+        if len(respuesta_bd) != 0 and len(respuesta_bd_2) != 0 and len(respuesta_bd_3) != 0:
+            # Todo ha ido bien
+            devolver = True
+        return devolver
+
     def borrar_grupo(self, p_id_grupo):
         """
         Borra un grupo del sistema dado su identificador

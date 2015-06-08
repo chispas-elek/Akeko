@@ -8,3 +8,5 @@ class ListaAlumno(object):
         self.lista = []
 
     # Definición de los métodos necesarios
+    def anadir(self, p_elemento):
+        self.lista.append(p_elemento)

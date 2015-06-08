@@ -71,6 +71,7 @@ class ServerHandler(StreamRequestHandler):
                            'borrar_grupo': self.borrar_grupo,
                            'cambiar_nombre': self.cambiar_nombre,
                            'anadir_tag': self.anadir_tag,
+                           'crear_grupo': self.crear_grupo,
                            }
 
             print "Hay que llamar a al gestor %s" % data[0]['metodo']
@@ -162,8 +163,45 @@ class ServerHandler(StreamRequestHandler):
                         los alumnos asociados
         :return: True o False dependiendo si se ha creado correctamente
         """
-        pass
-        # Todo hacer la creación del grupo. Mira las notas del controaldor!!!
+        gestor_alumno = GestorAlumno.GestorAlumno()
+        gestor_grupo = GestorGrupo.GestorGrupo()
+        id_usuario = p_data[1]['id_usuario']
+        nombre_grupo = p_data[1]['nombre_grupo']
+        lista_alumnos = p_data[1]['lista_alumnos']
+        lista_alumnos_nuevos = []
+        puedo_insertar = True
+        # Vamos a comprobar que los alumnos estén correctos
+        for alumno in lista_alumnos:
+            existe = gestor_alumno.buscar_alumno(alumno['Dni'])
+            if existe is None:
+                # El alumno no existe, añadimos la intención
+                lista_alumnos_nuevos.append(alumno)
+            else:
+                # El alumno existe en el sistema, vamos a ver si sus datos
+                # Son correctos
+                try:
+                    if alumno['Nombre'] != existe['Nombre'] or alumno['Apellido'] != existe['Apellido'] \
+                            or alumno['Email'] != existe['Email']:
+                        # Existe un error con los datos del alumno. Lanzamos excepción
+                        raise ErrorAlumno(alumno['Dni'])
+                except ErrorAlumno, e:
+                    print e
+                    puedo_insertar = False
+                    break
+        # Ahora comprobamos si podemos o no insertar datos
+        if puedo_insertar:
+            # Insertamos los nuevos alumnos en el sistema
+            for alumno_nuevo in lista_alumnos_nuevos:
+                gestor_alumno.anadir_alumno(alumno_nuevo['Dni'], alumno_nuevo['Nombre'],
+                                              alumno_nuevo['Apellido'], alumno_nuevo['Email'])
+            # Agregamos el nuevo grupo, con sus alumnos asociados
+            # Si ésta función devuelve True es que las cosas han ido bien
+            resultado = gestor_grupo.anadir_grupo(nombre_grupo, id_usuario, lista_alumnos)
+        else:
+            # Algo ha fallado y debemos retornar un error
+            resultado = {'return': 'Los datos de un alumno no son corretos'}  # Especificar qué alumno por sus Dni
+
+        return resultado
 
     def borrar_grupo(self, p_data):
         """ Elimina un grupo seleccionado por el usuario
@@ -202,6 +240,14 @@ class ServerHandler(StreamRequestHandler):
         resultado = gestor_tag.anadir_tag(nombre_tag, id_usuario, descripcion, lista_script)
         return resultado
 
+
+# Programamos los errores personalizados
+class ErrorAlumno(Exception):
+    def __init__(self, p_valor):
+        self.valor = p_valor
+
+    def __str__(self):
+        return "Los datos del Alumno no son correcto. Dni: " + str(self.valor)
 
 # Configuracion de los datos de escucha y ejecucion infinita del servidor.
 if __name__ == "__main__":

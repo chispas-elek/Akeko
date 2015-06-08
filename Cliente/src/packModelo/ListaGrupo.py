@@ -13,7 +13,7 @@ class ListaGrupo(object):
     def buscar_nombre(self, p_nombre_grupo):
         """
         Busca si existe o no el nombre de un grupo
-        :param p_nombre_grupo:
+        :param p_nombre_grupo: El nombre del grupo
         :return: True o False
         """
         encontrado = False
