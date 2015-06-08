@@ -204,15 +204,37 @@ class ServerHandler(StreamRequestHandler):
         return resultado
 
     def borrar_grupo(self, p_data):
-        """ Elimina un grupo seleccionado por el usuario
+        """
+        Elimina un grupo seleccionado por el usuario
 
         Si algún alumno se queda huérfano(sin grupo alguno)
         sus datos serán eliminados del sistema.
 
-        :param p_data: Contiene el id del grupo y el usuario
+        :param p_data: Contiene el identificador del usuario, del grupo y la lista de alumnos
         :return:
         """
-        pass
+        gestor_alumno = GestorAlumno.GestorAlumno()
+        gestor_grupo = GestorGrupo.GestorGrupo()
+        gestor_tag = GestorTag.GestorTag()
+        gestor_script = GestorScript.GestorScript()
+        id_usuario = p_data[1]['id_usuario']
+        id_grupo = p_data[1]['id_grupo']
+        lista_alumnos = p_data[1]['lista_alumnos']
+        # Obtenemos los scripts que tiene el grupo
+        # ¿Podria enviarse por el SOCKET?????
+        lista_scripts = gestor_script.obtener_scripts(id_grupo)
+        lista_tags = gestor_tag.obtener_tagss(id_grupo)
+        # Por cada alumno, eliminamos el script
+        for alumno in lista_alumnos:
+            # Eliminamos el script
+            # TODO falta implementar los métodos de eliminar script y acabar ésta parte
+            # Eliminamos los TAGS
+            # TODO falta implementar los métodos de eliminar tag y acabar ésta parte
+            # Eliminamos al alumno
+            rdo = gestor_alumno.borrar_alumno(alumno['Dni'])
+
+        # Por último eliminamos el grupo del sistema.
+        resultado = gestor_grupo.borrar_grupo(id_grupo)
 
     def cambiar_nombre(self, p_data):
         """

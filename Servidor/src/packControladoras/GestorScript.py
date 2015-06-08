@@ -59,3 +59,17 @@ class GestorScript(object):
                     AND Activo=%s;""", (p_id_tag, True)
         respuesta_bd = bd.execute(consulta)
         return respuesta_bd
+
+    def eliminar_script(self, p_id_script, p_id_alumno, p_id_usuario, p_id_grupo):
+        """
+        Dado un alumno, comrpueba si tiene un script aplicado por otros profesores y grupos.
+
+        En caso de estar en otro grupo -> Elimina la intención.
+        En caso de no estar en ninguno otro -> Elimina la intención y revoca el script
+        :param p_id_script: El identificador del scriot
+        :param p_id_alumno: El identificador del alumno
+        :param p_id_usuario: El identificador del usuario
+        :param p_id_grupo:  El identificador del grupo
+        :return:
+        """
+        pass

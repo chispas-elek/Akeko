@@ -60,7 +60,7 @@ class GestorGrupo(object):
         """
         Borra un grupo del sistema dado su identificador
         :param p_id_grupo:
-        :return:
+        :return: Resultado de la BD
         """
         bd = MySQLConnector.MySQLConnector()
         consulta = "DELETE FROM Grupo WHERE IdGrupo=%s", p_id_grupo

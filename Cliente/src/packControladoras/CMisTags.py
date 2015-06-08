@@ -68,10 +68,11 @@ class CMisTags(object):
         resultado = socket.enviar_datos()
         return resultado
 
-    def eliminar_tag(self, p_id_tag):
+    def eliminar_tag(self, p_id_tag, p_id_usuario):
         """
         Elimina el tag seleccionado del sistema
         :param p_id_tag: El identificador del Tag
+        :param p_id_usuario: El identificador del usuario
         :return:
         """
         # TODO Si el usuario elimina el TAG, elimino los scripts asociados bajo todos sus alumnos?????

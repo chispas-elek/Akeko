@@ -50,14 +50,23 @@ class GestorAlumno(object):
 
     def borrar_alumno(self, p_dni):
         """
-        Borar el alumno del sistema.
-        :param p_dni: Dni del alumno
-        :return:None
+        La función verifica si el alumno pertenece a algún grupo. De no pertenecer
+        lo borra del sistema.
+
+        :param p_dni: El Dni del alumno
+        :return: True o False indicando el exito de la operación
         """
+        exito = False
         bd = MySQLConnector.MySQLConnector()
-        consulta = "DELETE FROM Alumno WHERE Dni=%s;", p_dni
-        respuesta_bd = bd.execute(consulta)
-        return respuesta_bd
+        # Verificar si el alumno está en un grupo
+        consulta1 = "SELECT IdGrupo FROM Alumno_Grupo WHERE Dni=%s;", p_dni
+        respuesta_bd = bd.execute(consulta1)
+        if len(respuesta_bd) == 0:
+            # El alumno no pertenece a ningún grupo, podemos eliminarlo del sistema
+            consulta2 = "DELETE FROM Alumno WHERE Dni=%s;", p_dni
+            respuesta_bd2 = bd.execute(consulta2)
+            exito = True
+        return exito
 
     def buscar_alumno(self, p_dni):
         """

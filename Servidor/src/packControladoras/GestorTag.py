@@ -88,3 +88,13 @@ class GestorTag(object):
                     bd.execute(consulta4)
                 exito = True
         return exito
+
+    def eliminar_tag_usuario(self, p_id_tag, p_id_usuario):
+        """
+        Eliminamos un Tag del sistema y revocamos los scripts aplicados a todos los alumnos por éste TAG
+        :param p_id_tag: El identificador del TAG
+        :param p_id_usuario: El identificador del usuario
+        :return:
+        """
+        # TODO Se eliminan los scripts de TODOS los alumnos afectados por el y se elimina del sistema
+        bd = MySQLConnector.MySQLConnector()

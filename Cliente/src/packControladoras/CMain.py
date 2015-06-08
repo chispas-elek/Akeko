@@ -38,10 +38,25 @@ class CMain(object):
         resultado = socket.enviar_datos()
         return resultado
 
-    def borrar_grupo(self, p_id_usuario, p_id_grupo):
+    def borrar_grupo(self, p_id_usuario, p_id_grupo, p_lista_alumno):
+        """
+        Borra un grupo del sistema y por cada alumno que compone el grupo
+        el sistema revoca todos los scripts y Tags que tuvieran aplicados.
+
+
+        Además, si por alguna razón algún alumno se queda huérfano el programa
+        lo elimina del sistema
+
+        :param p_id_usuario: El identificador del usuario
+        :param p_id_grupo: El identificador del grupo
+        :param p_lista_alumno: La lista de los alumnos que componen el grupo
+        :return:
+        """
+        # todo revisar si haría falta reconvertir la lista de alumnos a JSON aquí o en alguna función
         lista_envio = []
         lista_envio.append({'metodo': 'borrar_grupo'})
-        lista_envio.append({'id_usuario': p_id_usuario, 'id_grupo': p_id_grupo})
+        lista_envio.append({'id_usuario': p_id_usuario, 'id_grupo': p_id_grupo,
+                            'lista_alumnos': p_lista_alumno})
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
         return resultado
