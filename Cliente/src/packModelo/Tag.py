@@ -20,7 +20,7 @@ class Tag(object):
 
     @id_tag.setter
     def id_tag(self, un_id_tag):
-        self.id_tag = un_id_tag
+        self.__id_tag = un_id_tag
 
     @property
     def nombre_tag(self):

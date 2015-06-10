@@ -8,3 +8,6 @@ class ListaTag(object):
         self.lista = []
 
     # Definición de los métodos necesarios
+
+    def _obtener_iterador(self):
+        return iter(self.lista)
