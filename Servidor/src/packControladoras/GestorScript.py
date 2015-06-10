@@ -3,6 +3,8 @@ from Servidor.src.packGestorBD.MySQLConnector import MySQLConnector
 
 __author__ = 'Rubén Mulero'
 
+import subprocess as sub
+import shlex
 from Servidor.src.packGestorBD import MySQLConnector
 
 class Singleton(type):
@@ -73,3 +75,26 @@ class GestorScript(object):
         :return:
         """
         pass
+
+    def apply_script(self, p_id_script, p_id_alumno):
+        """
+        Aplicamos un script
+        :param p_id_script: El identificador del Script
+        :param p_id_alumno: El identificador del alumno
+        :return:
+        """
+
+        # Obtener el path del script(LLamaba BD o tipo de objeto)
+
+        # Ejecutar el script enviando los datos del alumno
+        p = sub.Popen(shlex.split('sh /home/administrador/ex11-7.generarlist.sh'),  stdout=sub.PIPE, stderr=sub.PIPE)
+        salida, errores = p.communicate()
+        if len(salida) != 0:
+            print salida
+        else:
+            # Ha habido errores lanzamos una excepción
+            print errores
+        # Si las cosas han ido bien,a ctualizar los datos en la BD
+
+a = GestorScript()
+a.apply_script(3, 4)
