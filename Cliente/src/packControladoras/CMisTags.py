@@ -68,6 +68,9 @@ class CMisTags(object):
         resultado = socket.enviar_datos()
         return resultado
 
+    def modificar_tag(self):
+        pass
+
     def eliminar_tag(self, p_id_tag, p_id_usuario):
         """
         Elimina el tag seleccionado del sistema

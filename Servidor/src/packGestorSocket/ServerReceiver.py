@@ -72,6 +72,7 @@ class ServerHandler(StreamRequestHandler):
                            'cambiar_nombre': self.cambiar_nombre,
                            'anadir_tag': self.anadir_tag,
                            'crear_grupo': self.crear_grupo,
+                           'aplicar_cambios': self.aplicar_cambios,
                            }
 
             print "Hay que llamar a al gestor %s" % data[0]['metodo']
@@ -89,7 +90,12 @@ class ServerHandler(StreamRequestHandler):
     # Definimos los métodos para ejecutar cada necesidad recibida por el socket.
 
     def iniciar_sesion(self, p_data):
-        # Comprobamos si el usuario y contraseña son correctos
+        """
+        Comprobamos si el usuario y contraseña son correctos
+
+        :param p_data: El usuario y la contraseña
+        :return: True o False dependiendo de si todo ha ido bien
+        """
         gestor_usu = GestorUsuario.GestorUsuario()
         usuario = p_data[1]['usuario']
         contrasena = p_data[1]['contrasena']
@@ -97,49 +103,84 @@ class ServerHandler(StreamRequestHandler):
         return resultado
 
     def obtener_grupos(self, p_data):
-        # Obtenemos los grupos de un usuario
+        """
+        Obtenemos los grupos de un usuario
+
+        :param p_data: El identificador del usuario
+        :return: Los grupos que tiene
+        """
         gestor_grupo = GestorGrupo.GestorGrupo()
         id_usuario = p_data[1]['id_usuario']
         resultado = gestor_grupo.obtener_grupos(id_usuario)
         return resultado
 
     def obtener_alumnos(self, p_data):
-        # Obtenemos la lista de alumnos de un grupo
+        """
+        Obtenemos la lista de alumnos de un grupo
+
+        :param p_data: El identificador del grupò
+        :return: La lista de alumnos del grupo
+        """
         gestor_alumno = GestorAlumno.GestorAlumno()
         id_grupo = p_data[1]['id_grupo']
         resultado = gestor_alumno.obtener_alumnos(id_grupo)
         return resultado
 
     def obtener_scripts(self, p_data):
-        # Obtener la lista de los scripts aplicados en un grupo
+        """
+        Obtener la lista de los scripts aplicados en un grupo
+
+        :param p_data: El identificador del grupo
+        :return: La lista de los scripts actualmente aplicados
+        """
         gestor_script = GestorScript.GestorScript()
         id_grupo = p_data[1]['id_grupo']
         resultado = gestor_script.obtener_scripts(id_grupo)
         return resultado
 
     def obtener_tags(self, p_data):
-        # Obtener la lista de los tags aplicados en un grupo
+        """
+        Obtener la lista de los tags aplicados en un grupo
+
+        :param p_data: El identificador del grupo
+        :return: La lista de los tags actualmente aplicados
+        """
         gestor_tag = GestorTag.GestorTag()
         id_grupo = p_data[1]['id_grupo']
         resultado = gestor_tag.obtener_tagss(id_grupo)
         return resultado
 
     def obtener_scripts_disponibles(self, p_data):
-        # Obtener los scripts disponibles para un grupo
+        """
+        Obtener los scripts disponibles para un grupo
+
+        :param p_data: El identificador del grupo
+        :return: La lista de los scripts DISPONIBLES y No aplicados
+        """
         gestor_script = GestorScript.GestorScript()
         id_grupo = p_data[1]['id_grupo']
         resultado = gestor_script.obtener_scripts_disponibles(id_grupo)
         return resultado
 
     def obtener_tags_disponibles(self, p_data):
-        # Obtener los tags disponibles para un grupo
+        """
+        Obtener los tags disponibles para un grupo
+
+        :param p_data: El identificador del grupo
+        :return: La lista de los tags DISPONIBLES y No aplicados
+        """
         gestor_tag = GestorTag.GestorTag()
         id_grupo = p_data[1]['id_grupo']
         resultado = gestor_tag.obtener_tags_disponibles(id_grupo)
         return resultado
 
     def obtener_tags_usuario(self, p_data):
-        # Obtener los tags que posee un usuario. "Mis TAGS"
+        """
+        Obtener los tags que posee un usuario. "Mis TAGS"
+
+        :param p_data: El identificador del usuario
+        :return: La lista de sus tags
+        """
         gestor_tag = GestorTag.GestorTag()
         id_usuario = p_data[1]['id_usuario']
         resultado = gestor_tag.obtener_tags_usuario(id_usuario)
@@ -261,6 +302,49 @@ class ServerHandler(StreamRequestHandler):
         lista_script = p_data[1]['lista_script']
         resultado = gestor_tag.anadir_tag(nombre_tag, id_usuario, descripcion, lista_script)
         return resultado
+
+    def aplicar_cambios(self, p_data):
+        """
+        Aplica los cambios a una serie de alumnos que pertenecen a un grupo
+
+        Dichos cambios son la adición o no de scripts y tags.
+
+        :param p_data: Contiene los siguientes elementos:
+                        -> id_usuario: El identificador del usuario
+                        -> id_grupo: El identificador del grupo
+                        -> lista_cambios_s: Una lista que contiene los cambios en los scripts que se realizarán
+                        -> lista_cambios_t: Una lista que contiene los cambios en los tags que se realizarán.
+                        -> lista_alumnos: La lista de los alumnos afectados
+        :return:
+        """
+        gestor_script = GestorScript.GestorScript()
+        gesto_tag = GestorTag.GestorTag()
+        id_usuario = p_data[1]['id_usuario']
+        id_grupo = p_data[1]['id_grupo']
+        lista_cambios_s = p_data[1]['lista_cambios_s']
+        lista_cambios_t = p_data[1]['lista_cambios_t']
+        lista_alumnos = p_data[1]['lista_alumnos']
+        # Por cada alumno realizamos la lista de cambios necesaria
+        for alumno in lista_alumnos:
+            # Modificamos los scripts
+            for cambio_s in lista_cambios_s:
+                if cambio_s['accion'] == 'anadir_script':
+                    # añadimos script al alumno actual
+                    # usamos la función de aplicar_script y le pasamos todos los parámetros
+                    # Para que luego active o no si es necesario y registre la intención
+                    pass
+                else:
+                    # Eliminamos script al alumno actual
+                    # Mismo caso que arriba pero eliminando
+                    pass
+            # Modificamos los Tags
+            for cambio_t in lista_cambios_t:
+                if cambio_t['accion'] == 'anadir_tag':
+                    # Añadimos el tag de la misma forma que con el script
+                    pass
+                else:
+                    # Eliminamos el tag
+                    pass
 
 
 # Programamos los errores personalizados
