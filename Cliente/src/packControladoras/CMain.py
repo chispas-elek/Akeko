@@ -52,7 +52,7 @@ class CMain(object):
         :param p_lista_alumno: La lista de los alumnos que componen el grupo
         :return:
         """
-        # todo revisar si haría falta reconvertir la lista de alumnos a JSON aquí o en alguna función
+        # todo reconvertir las listas a tipos de datos usando las funciones propias de las listas.
         lista_envio = []
         lista_envio.append({'metodo': 'borrar_grupo'})
         lista_envio.append({'id_usuario': p_id_usuario, 'id_grupo': p_id_grupo,

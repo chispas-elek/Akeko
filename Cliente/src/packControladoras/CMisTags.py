@@ -20,6 +20,12 @@ class CMisTags(object):
     # Definimos el código que deseamos en la clase.
 
     def obtener_tags_usuario(self, p_id_usuario):
+        """
+        Obtiene los tags del usuario en "MIS TAGS"
+
+        :param p_id_usuario: El identificador del usuario
+        :return: La lista que contiene los tags
+        """
         lista_envio = []
         lista_envio.append({'metodo': 'obtener_tags_usuario'})
         lista_envio.append({'id_usuario': p_id_usuario})
@@ -68,7 +74,21 @@ class CMisTags(object):
         resultado = socket.enviar_datos()
         return resultado
 
-    def modificar_tag(self):
+    def modificar_tag(self, p_id_usuario, p_nombre_tag, p_lista_vieja_s,
+                      p_lista_nueva_s, p_owner, p_descripcion):
+        """
+        Modifica los scripts de un Tag.
+
+        :param p_id_usuario: El identificador de un usuario
+        :param p_nombre_tag: El nuevo nombre del Tag
+        :param p_lista_vieja_s: La lista antigua de scripts
+        :param p_lista_nueva_s: La lista nueva de scripts
+        :param p_owner: El nuevo owner del grupo
+        :param p_descripcion: La nueva descripción del tag
+        :return:
+        """
+
+        # TODO si se modifica un tag se modifican los scripts ya aplicados? SI
         pass
 
     def eliminar_tag(self, p_id_tag, p_id_usuario):
@@ -78,5 +98,5 @@ class CMisTags(object):
         :param p_id_usuario: El identificador del usuario
         :return:
         """
-        # TODO Si el usuario elimina el TAG, elimino los scripts asociados bajo todos sus alumnos?????
+        # TODO Si el usuario elimina el TAG, elimino los scripts asociados bajo todos sus alumnos????? SI
         pass

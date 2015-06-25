@@ -52,7 +52,7 @@ class GestorGrupo(object):
                         (alumno['Dni', respuesta_bd_2['IdGrupo']])
             respuesta_bd_3 = bd.execute(consulta3)
         if len(respuesta_bd) != 0 and len(respuesta_bd_2) != 0 and len(respuesta_bd_3) != 0:
-            # Todo ha ido bien
+            # han ido bien las cosas
             devolver = True
         return devolver
 

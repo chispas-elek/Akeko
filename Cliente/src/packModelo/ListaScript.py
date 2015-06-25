@@ -9,7 +9,7 @@ class ListaScript(object):
 
     # Definición de los métodos necesarios
 
-    def cotejar_lista(self, p_lista_script):
+    def cotejar_lista_s(self, p_lista_script):
         """
         Cotejamos la lista de scripts con otra lista de scripts para saber qué scripts NO
         están en la lista que le hemos pasado como parámetro de entrada
@@ -39,3 +39,7 @@ class ListaScript(object):
         else:
             return False
 
+    # todo definir método que transforme la lista en una diccionario para envitar por JSON
+    # def deconstruir(self):
+    # todo definir un método que transforme un diccionario en la lista y añada todo
+    # def construir(self, p_lista_diccionario):

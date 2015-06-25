@@ -13,9 +13,8 @@ import Decoder
 import ssl
 from Servidor.src.packControladoras import GestorUsuario
 from Servidor.src.packControladoras import GestorGrupo
-from Servidor.src.packControladoras import GestorScript
-from Servidor.src.packControladoras import GestorTag
 from Servidor.src.packControladoras import GestorAlumno
+from Servidor.src.packControladoras import GestorTagScript
 
 
 class MySSLTCPServer(TCPServer):
@@ -133,9 +132,9 @@ class ServerHandler(StreamRequestHandler):
         :param p_data: El identificador del grupo
         :return: La lista de los scripts actualmente aplicados
         """
-        gestor_script = GestorScript.GestorScript()
+        gestor_tag_script = GestorTagScript.GestorTagScript()
         id_grupo = p_data[1]['id_grupo']
-        resultado = gestor_script.obtener_scripts(id_grupo)
+        resultado = gestor_tag_script.obtener_scripts(id_grupo)
         return resultado
 
     def obtener_tags(self, p_data):
@@ -145,9 +144,9 @@ class ServerHandler(StreamRequestHandler):
         :param p_data: El identificador del grupo
         :return: La lista de los tags actualmente aplicados
         """
-        gestor_tag = GestorTag.GestorTag()
+        gestor_tag_script = GestorTagScript.GestorTagScript()
         id_grupo = p_data[1]['id_grupo']
-        resultado = gestor_tag.obtener_tagss(id_grupo)
+        resultado = gestor_tag_script.obtener_tags(id_grupo)
         return resultado
 
     def obtener_scripts_disponibles(self, p_data):
@@ -157,9 +156,9 @@ class ServerHandler(StreamRequestHandler):
         :param p_data: El identificador del grupo
         :return: La lista de los scripts DISPONIBLES y No aplicados
         """
-        gestor_script = GestorScript.GestorScript()
+        gestor_tag_script = GestorTagScript.GestorTagScript()
         id_grupo = p_data[1]['id_grupo']
-        resultado = gestor_script.obtener_scripts_disponibles(id_grupo)
+        resultado = gestor_tag_script.obtener_scripts_disponibles(id_grupo)
         return resultado
 
     def obtener_tags_disponibles(self, p_data):
@@ -169,9 +168,9 @@ class ServerHandler(StreamRequestHandler):
         :param p_data: El identificador del grupo
         :return: La lista de los tags DISPONIBLES y No aplicados
         """
-        gestor_tag = GestorTag.GestorTag()
+        gestor_tag_script = GestorTagScript.GestorTagScript()
         id_grupo = p_data[1]['id_grupo']
-        resultado = gestor_tag.obtener_tags_disponibles(id_grupo)
+        resultado = gestor_tag_script.obtener_tags_disponibles(id_grupo)
         return resultado
 
     def obtener_tags_usuario(self, p_data):
@@ -181,9 +180,9 @@ class ServerHandler(StreamRequestHandler):
         :param p_data: El identificador del usuario
         :return: La lista de sus tags
         """
-        gestor_tag = GestorTag.GestorTag()
+        gestor_tag_script = GestorTagScript.GestorTagScript()
         id_usuario = p_data[1]['id_usuario']
-        resultado = gestor_tag.obtener_tags_usuario(id_usuario)
+        resultado = gestor_tag_script.obtener_tags_usuario(id_usuario)
         return resultado
 
     def obtener_scripts_tag(self, p_data):
@@ -192,9 +191,9 @@ class ServerHandler(StreamRequestHandler):
         :param p_data: el identificador del tag
         :return:
         """
-        gestor_script = GestorScript.GestorScript()
+        gestor_tag_script = GestorTagScript.GestorTagScript()
         id_tag = p_data[1]['id_tag']
-        resultado = gestor_script.obtener_scripts_tag(id_tag)
+        resultado = gestor_tag_script.obtener_scripts_tag(id_tag)
         return resultado
 
     def crear_grupo(self, p_data):
@@ -256,15 +255,14 @@ class ServerHandler(StreamRequestHandler):
         """
         gestor_alumno = GestorAlumno.GestorAlumno()
         gestor_grupo = GestorGrupo.GestorGrupo()
-        gestor_tag = GestorTag.GestorTag()
-        gestor_script = GestorScript.GestorScript()
+        gestor_tag_script = GestorTagScript.GestorTagScript()
         id_usuario = p_data[1]['id_usuario']
         id_grupo = p_data[1]['id_grupo']
         lista_alumnos = p_data[1]['lista_alumnos']
         # Obtenemos los scripts que tiene el grupo
         # ¿Podria enviarse por el SOCKET?????
-        lista_scripts = gestor_script.obtener_scripts(id_grupo)
-        lista_tags = gestor_tag.obtener_tagss(id_grupo)
+        lista_scripts = gestor_tag_script.obtener_scripts(id_grupo)
+        lista_tags = gestor_tag_script.obtener_tags(id_grupo)
         # Por cada alumno, eliminamos el script
         for alumno in lista_alumnos:
             # Eliminamos el script
@@ -295,12 +293,12 @@ class ServerHandler(StreamRequestHandler):
         :param p_data: Los datos necesarios para crear un TAG
         :return: True o False dependiendo del exito
         """
-        gestor_tag = GestorTag.GestorTag()
+        gestor_tag_script = GestorTagScript.GestorScript()
         nombre_tag = p_data[1]['nombre_tag']
         id_usuario = p_data[1]['id_usuario']
         descripcion = p_data[1]['descripcion']
         lista_script = p_data[1]['lista_script']
-        resultado = gestor_tag.anadir_tag(nombre_tag, id_usuario, descripcion, lista_script)
+        resultado = gestor_tag_script.anadir_tag(nombre_tag, id_usuario, descripcion, lista_script)
         return resultado
 
     def aplicar_cambios(self, p_data):
@@ -317,8 +315,7 @@ class ServerHandler(StreamRequestHandler):
                         -> lista_alumnos: La lista de los alumnos afectados
         :return:
         """
-        gestor_script = GestorScript.GestorScript()
-        gesto_tag = GestorTag.GestorTag()
+        gesto_tag_script = GestorTagScript.GestorTagScript()
         id_usuario = p_data[1]['id_usuario']
         id_grupo = p_data[1]['id_grupo']
         lista_cambios_s = p_data[1]['lista_cambios_s']
@@ -330,8 +327,8 @@ class ServerHandler(StreamRequestHandler):
             for cambio_s in lista_cambios_s:
                 if cambio_s['accion'] == 'anadir_script':
                     # añadimos script al alumno actual
-                    # usamos la función de aplicar_script y le pasamos todos los parámetros
-                    # Para que luego active o no si es necesario y registre la intención
+
+                    # todo hay que modificar la relacion entre grupo y script para añadir éste nuevo script
                     pass
                 else:
                     # Eliminamos script al alumno actual
@@ -341,9 +338,13 @@ class ServerHandler(StreamRequestHandler):
             for cambio_t in lista_cambios_t:
                 if cambio_t['accion'] == 'anadir_tag':
                     # Añadimos el tag de la misma forma que con el script
+                    # Recorremos la lista de los scrips que contiene el tag e insertamos.
+                    # todo no se considera el tag introducido hasta que no estén todos sus scripts aplicados.
+                    # todo hay que añadir éste nuevo tag en la lista de tag_scriot
                     pass
                 else:
                     # Eliminamos el tag
+                    # todo no se considera el tag eliminado hasta que no se borren todos los scripts
                     pass
 
 

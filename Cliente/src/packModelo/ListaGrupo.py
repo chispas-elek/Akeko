@@ -30,3 +30,8 @@ class ListaGrupo(object):
 
     def _obtener_iterador(self):
         return iter(self.lista)
+
+    # todo definir método que transforme la lista en una diccionario para envitar por JSON
+    # def deconstruir(self):
+    # todo definir un método que transforme un diccionario en la lista y añada todo
+    # def construir(self, p_lista_diccionario):
