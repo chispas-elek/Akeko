@@ -73,20 +73,17 @@ class CGestionarScript(object):
 
         lista_envio = []
         # Vamos a crear un diccionario de cambios que va a ser enviada
-        lista_cambios_s = []
-        lista_cambios_t = []
         # Primero vamos a crear la lista de cambios de los scripts
-        lista_cambios_s.append(self._crear_lista_cambios(p_lista_vieja_s, p_lista_nueva_s_filtrado, True))
+        lista_cambios_s = self._crear_lista_cambios(p_lista_vieja_s, p_lista_nueva_s_filtrado, True)
         # A continuación repetimos para los TAGS
-        lista_cambios_t.append(self._crear_lista_cambios(p_lista_vieja_t, p_lista_nueva_t, False))
+        lista_cambios_t = self._crear_lista_cambios(p_lista_vieja_t, p_lista_nueva_t, False)
         # Creamos el diccionario y enviamos los datos por socket
         lista_envio.append({'metodo': 'aplicar_cambios'})
-        lista_envio.append({'id_usuario': p_id_usuario})
-        lista_envio.append({'id_grupo': p_id_grupo})
-        lista_envio.append({'lista_cambios_s': lista_cambios_s})
-        lista_envio.append({'lista_cambios_t': lista_cambios_t})
-        # Tansformamos la lista de alumnos en un diccionario compatible
-        lista_envio.append({'lista_alumnos': p_lista_alumnos.deconstruir()})
+        lista_envio.append({'id_usuario': p_id_usuario,
+                            'id_grupo': p_id_grupo,
+                            'lista_cambios_s': lista_cambios_s,
+                            'lista_cambios_t': lista_cambios_t,
+                            'lista_alumnos': p_lista_alumnos.deconstruir()})
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
         return resultado

@@ -286,6 +286,7 @@ class GestorTagScript(object):
     def anadir_tag(self, p_nombre_tag, p_id_usuario, p_descripcion, p_lista_scrip):
         """
         Añadimos un nuevo tag en el sistema
+
         :param p_nombre_tag: El nombre del Tag
         :param p_id_usuario: El identificador del usuario
         :param p_descripcion: La descripción del Tag
@@ -315,16 +316,6 @@ class GestorTagScript(object):
                 exito = True
         return exito
 
-    def eliminar_tag_usuario(self, p_id_tag, p_id_usuario):
-        """
-        Eliminamos un Tag del sistema y revocamos los scripts aplicados a todos los alumnos por éste TAG
-        :param p_id_tag: El identificador del TAG
-        :param p_id_usuario: El identificador del usuario
-        :return:
-        """
-        # TODO Se eliminan los scripts de TODOS los alumnos afectados por el y se elimina del sistema
-        bd = MySQLConnector.MySQLConnector()
-
     def aplicar_tag(self, p_id_tag, p_dni, p_id_usuario, p_id_grupo):
         """
         Dado un tag, llama a añadir intencion y actualiza la tablas de Tag-Grupo e
@@ -338,29 +329,71 @@ class GestorTagScript(object):
         """
         # Dado el tag, tenemos que obtener sus scripts asociados
         lista_scripts = self.obtener_scripts_tag(p_id_tag)
+        bd = MySQLConnector.MySQLConnector()
         for script in lista_scripts:
             actualizar_datos = self._anadir_intencion(script['IdScript'], p_dni, p_id_usuario, p_id_grupo)
             if actualizar_datos:
                 # La intención del script se ha registrado correctamente
-                bd = MySQLConnector.MySQLConnector()
                 consulta_1 = "INSERT INTO Tag_Grupo(IdGrupo,IdTag) VALUES (%s,%s);", (p_id_grupo, p_id_tag)
                 respuesta_bd_1 = bd.execute(consulta_1)
-                # Insertamos el Historial de lo sucedido
-                consulta_2 = """INSERT INTO Historial VALUES(IdTag,Dni,IdUsuario,IdGrupo,Accion,Informacion)
-                                VALUES(%s,%s,%s,%s,'anadir','Se ha anadido un tag');
-                                """, (p_id_tag, p_dni, p_id_usuario, p_id_grupo)
-                respuesta_bd_2 = bd.execute(consulta_2)
-
             else:
                 # Ha existido algun error serio a la hora de intentar añadir la intención
                 # O ejecutar el script. Revisar qué ha sucedido
                 # Añadir exception
-                pass
+                break
+        # Insertamos el Historial de lo sucedido
+        consulta_2 = """INSERT INTO Historial VALUES(IdTag,Dni,IdUsuario,IdGrupo,Accion,Informacion)
+                        VALUES(%s,%s,%s,%s,'anadir','Se ha anadido un tag');
+                        """, (p_id_tag, p_dni, p_id_usuario, p_id_grupo)
+        respuesta_bd_2 = bd.execute(consulta_2)
 
-# For other purposes. Code reserved
+    def eliminar_tag(self, p_id_tag, p_dni, p_id_usuario, p_id_grupo):
+        """
+        Dado un tag, llama a eliminar intención y actualiza las tablas de Tag-Grupo e
+        Historial para dejar patente que un alumno se le ha eliminado un Tag.
 
-"""
+        :param p_id_tag: El identificador del Tag
+        :param p_dni: El identificador del alumno
+        :param p_id_usuario: El identificador del usuario
+        :param p_id_grupo: El identificador del grupo
+        :return:
+        """
+        # Obtenemos los scripts asociados al tag
+        lista_scripts = self.obtener_scripts_tag(p_id_tag)
+        for script in lista_scripts:
+            actualizar_datos = self._eliminar_intencion(script['IdScript'], p_dni, p_id_usuario, p_id_grupo)
+            if actualizar_datos:
+                # La eliminación de la intención se ha revocado correctamente.
+                bd = MySQLConnector.MySQLConnector()
+                consulta_1 = "DELETE FROM Tag_Grupo WHERE IdGrupo=%s AND IdTag=%s;", (p_id_grupo, p_id_tag)
+                respuesta_bd_1 = bd.execute(consulta_1)
+                # Insertamos el historial de los cambios
+                consulta_2 = """INSERT INTO Historial VALUES(IdTag,Dni,IdUsuario,IdGrupo,Accion,Informacion)
+                                VALUES(%s,%s,%s,%s,'eliminar','Se ha eliminado un tag');
+                                """, (p_id_tag, p_dni, p_id_usuario, p_id_grupo)
+                respuesta_bd_2 = bd.execute(consulta_2)
+            else:
+                # Ha ocurrido algún tipo de error serio, raisear una exception personalizada
+                break
 
+    def borrar_tag(self, p_id_tag):
+        """
+        Borra un Tag del sistema.
+
+        :param p_id_tag: El identificador del TAG
+        :return: True o False dependiendo del éxito de la operación
+        """
+        bd = MySQLConnector.MySQLConnector()
+        consulta = "DELETE FROM Tag WHERE IdTag=%s;", p_id_tag
+        respuesta_bd = bd.execute(consulta)
+        if len(respuesta_bd) != 0:
+            return True
+        else:
+            return False
+
+class Solitario(object):
+
+    # For other purposes. Code reserved
 
     def testing(self):
         correcto = False
@@ -375,4 +408,3 @@ class GestorTagScript(object):
             print errores
         return correcto
 
-"""

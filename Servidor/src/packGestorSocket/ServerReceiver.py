@@ -72,6 +72,8 @@ class ServerHandler(StreamRequestHandler):
                            'anadir_tag': self.anadir_tag,
                            'crear_grupo': self.crear_grupo,
                            'aplicar_cambios': self.aplicar_cambios,
+                           'eliminar_tag_usuario': self.eliminar_tag_usuario,
+                           'modificar_tag': self.modificar_tag,
                            }
 
             print "Hay que llamar a al gestor %s" % data[0]['metodo']
@@ -293,7 +295,8 @@ class ServerHandler(StreamRequestHandler):
         :param p_data: Los datos necesarios para crear un TAG
         :return: True o False dependiendo del exito
         """
-        gestor_tag_script = GestorTagScript.GestorScript()
+        # todo habrá que cambiar el nombre de éste método a crear_tag_usuario
+        gestor_tag_script = GestorTagScript.GestorTagScript()
         nombre_tag = p_data[1]['nombre_tag']
         id_usuario = p_data[1]['id_usuario']
         descripcion = p_data[1]['descripcion']
@@ -347,6 +350,65 @@ class ServerHandler(StreamRequestHandler):
                     # todo no se considera el tag eliminado hasta que no se borren todos los scripts
                     pass
 
+    def eliminar_tag_usuario(self, p_data):
+        """
+        Elimina un Tag del usuario del sistema y se revocan de los alumnos afectados los scripts
+        que hayan sido aplicados con anterioridad.
+
+        :param p_data: Cotiene el identificador del TAG y del usuario
+        :return: True o False dependiendo del éxito de la operación
+        """
+        # todo pensar cómo vas a constorlar las excepciones
+        gestor_grupo = GestorGrupo.GestorGrupo()
+        gesto_tag_script = GestorTagScript.GestorTagScript()
+        gestor_alumno = GestorAlumno.GestorAlumno()
+        id_tag = p_data[1]['id_tag']
+        id_usuario = p_data[1]['id_usuario']
+        lista_s = p_data[1]['lista_s']
+        resultado = False
+        actualibar_bd = False
+        # obtenemos los grupso donde el tag está aplicado
+        lista_grupo = gestor_grupo.obtener_grupos_tag(id_tag)
+        # Meter ésto e un Try Catch?
+        # En caso de que el for se complete bien, se cambia a True actualizar_bd
+        for grupo in lista_grupo:
+            #Obtenemos la lista de alumnos del grupo actual
+            lista_alumno = gestor_alumno.obtener_alumnos(grupo['IdGrupo'])
+            for alumno in lista_alumno:
+                # Eliminamos los scripts de este TAG
+                exito = gesto_tag_script.eliminar_tag(id_tag, alumno['Dni'], id_usuario, grupo['IdGrupo'])
+                # Deberiamos meter exceptions en éste punto
+
+        if actualibar_bd:
+            # ha ido bien, vamos a elininar el TAG
+            resultado = gesto_tag_script.borrar_tag(id_tag)
+
+        return resultado
+
+    def modificar_tag(self, p_data):
+        """
+        Modifica los scripts contenidos en un TAg por otros nuevos y se reaplican/eliminan los
+        actuales
+
+        :param p_data: Contiene los siguientes elementos:
+                                    -> Id_Usuario: El identificador del usuario actual.
+                                    -> Nombre_Tag: El nuevo nombre del Tag.
+                                    -> Owner: El identificador del nuevo usuario
+                                    -> Descripción: Una nueva descripción del TAG
+                                    -> lista_cambios: La lista de los cambios a realizar.
+
+        :return: True o False dependiendo del resultado de la actualización
+        """
+        gestor_tag_script = GestorTagScript.GestorTagScript()
+        gestor_grupo = GestorGrupo.GestorGrupo()
+        gestor_alumno = GestorAlumno.GestorAlumno()
+        id_usuario = p_data[1]['id_usuario']
+        nombre_tag = p_data[1]['nombre_tag']
+        owner = p_data[1]['owner']
+        descripcion = p_data[1]['descripcion']
+        lista_cambios = p_data[1]['lista_cambios']
+        # todo hacer ésta parte
+        pass
 
 # Programamos los errores personalizados
 class ErrorAlumno(Exception):

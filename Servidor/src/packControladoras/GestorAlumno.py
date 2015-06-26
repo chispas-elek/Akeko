@@ -83,4 +83,3 @@ class GestorAlumno(object):
             # El alumno eexiste en la BD
             existe = respuesta_bd
         return existe
-

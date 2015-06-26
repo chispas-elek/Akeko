@@ -88,3 +88,16 @@ class GestorGrupo(object):
             if respuesta_bd_2 == 1:
                 exito = True
         return exito
+
+    def obtener_grupos_tag(self, p_id_tag):
+        """
+        Dado el identificador de un tag, obtenemos la información de los grupos en los que ha sido aplicado
+
+        :param p_id_tag: El identificador de un tag
+        :return: La lista de los grupos donde está aplicado dicho Tag.
+        """
+        bd = MySQLConnector.MySQLConnector()
+        consulta = """SELECT IdGrupo,NombreGrupo,FechaCreacion,IdUsuario FROM Grupo WHERE IdGrupo IN (
+                    SELECT IdGrupo FROM Tag_Grupo WHERE IdTag=%s);""""", p_id_tag
+        respuesta_bd = bd.execute(consulta)
+        return respuesta_bd
