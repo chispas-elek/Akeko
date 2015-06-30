@@ -15,6 +15,7 @@ from Servidor.src.packControladoras import GestorUsuario
 from Servidor.src.packControladoras import GestorGrupo
 from Servidor.src.packControladoras import GestorAlumno
 from Servidor.src.packControladoras import GestorTagScript
+from Servidor.src.packControladoras import GestorHistorial
 
 
 class MySSLTCPServer(TCPServer):
@@ -74,6 +75,7 @@ class ServerHandler(StreamRequestHandler):
                            'aplicar_cambios': self.aplicar_cambios,
                            'eliminar_tag_usuario': self.eliminar_tag_usuario,
                            'modificar_tag': self.modificar_tag,
+                           'obtener_historial': self.obtener_historial,
                            }
 
             print "Hay que llamar a al gestor %s" % data[0]['metodo']
@@ -262,15 +264,18 @@ class ServerHandler(StreamRequestHandler):
         id_grupo = p_data[1]['id_grupo']
         lista_alumnos = p_data[1]['lista_alumnos']
         # Obtenemos los scripts que tiene el grupo
-        # ¿Podria enviarse por el SOCKET?????
         lista_scripts = gestor_tag_script.obtener_scripts(id_grupo)
         lista_tags = gestor_tag_script.obtener_tags(id_grupo)
         # Por cada alumno, eliminamos el script
         for alumno in lista_alumnos:
             # Eliminamos el script
-            # TODO falta implementar los métodos de eliminar script y acabar ésta parte
+            for script in lista_scripts:
+                gestor_tag_script.eliminar_script(script['IdScript'], alumno['Dni'], id_usuario, id_grupo)
             # Eliminamos los TAGS
-            # TODO falta implementar los métodos de eliminar tag y acabar ésta parte
+            for tag in lista_tags:
+                gestor_tag_script.eliminar_tag(tag['IdTag'], alumno['Dni'], id_usuario, id_grupo)
+
+            # Si las cosas han ido bien
             # Eliminamos al alumno
             rdo = gestor_alumno.borrar_alumno(alumno['Dni'])
 
@@ -292,6 +297,7 @@ class ServerHandler(StreamRequestHandler):
     def anadir_tag(self, p_data):
         """
         Añade un nuevo Tag en el sistema
+
         :param p_data: Los datos necesarios para crear un TAG
         :return: True o False dependiendo del exito
         """
@@ -330,25 +336,17 @@ class ServerHandler(StreamRequestHandler):
             for cambio_s in lista_cambios_s:
                 if cambio_s['accion'] == 'anadir_script':
                     # añadimos script al alumno actual
-
-                    # todo hay que modificar la relacion entre grupo y script para añadir éste nuevo script
-                    pass
+                    gesto_tag_script.aplicar_script(cambio_s['id_script'], alumno['Dni'], id_usuario, id_grupo)
                 else:
                     # Eliminamos script al alumno actual
-                    # Mismo caso que arriba pero eliminando
-                    pass
+                    gesto_tag_script.eliminar_script(cambio_s['id_script'], alumno['Dni'], id_usuario, id_grupo)
             # Modificamos los Tags
             for cambio_t in lista_cambios_t:
                 if cambio_t['accion'] == 'anadir_tag':
-                    # Añadimos el tag de la misma forma que con el script
-                    # Recorremos la lista de los scrips que contiene el tag e insertamos.
-                    # todo no se considera el tag introducido hasta que no estén todos sus scripts aplicados.
-                    # todo hay que añadir éste nuevo tag en la lista de tag_scriot
-                    pass
+                    gesto_tag_script.aplicar_tag(cambio_t['id_tag'], alumno['Dni'], id_usuario, id_grupo)
                 else:
                     # Eliminamos el tag
-                    # todo no se considera el tag eliminado hasta que no se borren todos los scripts
-                    pass
+                    gesto_tag_script.eliminar_tag(cambio_t['id_tag'], alumno['Dni'], id_usuario, id_grupo)
 
     def eliminar_tag_usuario(self, p_data):
         """
@@ -372,7 +370,7 @@ class ServerHandler(StreamRequestHandler):
         # Meter ésto e un Try Catch?
         # En caso de que el for se complete bien, se cambia a True actualizar_bd
         for grupo in lista_grupo:
-            #Obtenemos la lista de alumnos del grupo actual
+            # Obtenemos la lista de alumnos del grupo actual
             lista_alumno = gestor_alumno.obtener_alumnos(grupo['IdGrupo'])
             for alumno in lista_alumno:
                 # Eliminamos los scripts de este TAG
@@ -403,12 +401,65 @@ class ServerHandler(StreamRequestHandler):
         gestor_grupo = GestorGrupo.GestorGrupo()
         gestor_alumno = GestorAlumno.GestorAlumno()
         id_usuario = p_data[1]['id_usuario']
+        id_tag = p_data[1]['id_tag']
         nombre_tag = p_data[1]['nombre_tag']
         owner = p_data[1]['owner']
         descripcion = p_data[1]['descripcion']
         lista_cambios = p_data[1]['lista_cambios']
-        # todo hacer ésta parte
-        pass
+
+        resultado = False
+        # Lo primero, actualizar los datos referentes al TAG.
+        exito = gestor_tag_script.modificar_tag(id_tag, nombre_tag, descripcion, owner)
+        if exito:
+            # Se han cambiado los datos de forma correcta
+            # Comprobamos si se ha cambiado el owner
+            if id_usuario is not owner:
+                # Se ha cambiado de owner, deshabilitamos el TAg en todos los grupos del user actual
+                lista_grupo = gestor_grupo.obtener_grupos_tag(id_tag)
+                for grupo in lista_grupo:
+                    #Obtenemos la lista de alumnos del grupo actual
+                    lista_alumno = gestor_alumno.obtener_alumnos(grupo['IdGrupo'])
+                    for alumno in lista_alumno:
+                        # Eliminamos los scripts de este TAG
+                        exito = gestor_tag_script.eliminar_tag(id_tag, alumno['Dni'], id_usuario, grupo['IdGrupo'])
+                        # Deberiamos meter exceptions en éste punto
+            else:
+                # El usuario es el mismo, debemos reestructurar los cambios
+                # Por cada grupo, debemos hacer los cambios
+                lista_grupo = gestor_grupo.obtener_grupos_tag(id_tag)
+                for grupo in lista_grupo:
+                    #Obtenemos la lista de alumnos del grupo actual
+                    lista_alumno = gestor_alumno.obtener_alumnos(grupo['IdGrupo'])
+                    for alumno in lista_alumno:
+                        for cambio in lista_cambios:
+                            if cambio['accion'] is 'borrar_script':
+                                # Se elimina el script del TAG y del alumno actual
+                                gestor_tag_script.modificar_scripts_del_tag(id_tag, cambio['IdScript'], alumno['Dni'],
+                                                                            id_usuario, grupo['IdGrupo'],
+                                                                            cambio['accion'])
+                            else:
+                                # Se añade el Script al TAG y se reorganiza si es necesario
+                                gestor_tag_script.modificar_scripts_del_tag(id_tag, cambio['IdScript'], alumno['Dni'],
+                                                                            id_usuario, grupo['IdGrupo'],
+                                                                            cambio['accion'])
+        else:
+            # Raisemos exception
+            pass
+
+        return resultado
+
+    def obtener_historial(self, p_data):
+        """
+        Obtiene el historial del usuario actual
+
+        :param p_data: Contiene el identificador del usuario
+        :return: El historial completo del usuario
+        """
+        gestor_historial = GestorHistorial.GestorHistorial()
+        id_usuario = p_data[1]['id_usuario']
+        resultado = gestor_historial.obtener_historial(id_usuario)
+        return resultado
+
 
 # Programamos los errores personalizados
 class ErrorAlumno(Exception):

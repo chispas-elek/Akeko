@@ -1,6 +1,16 @@
 # -*- encoding: utf-8 -*-
 __author__ = 'Rubén Mulero'
 
+"""
+MySQLConnector es una clase que facilita la conexión y envío de comandos SQL a la base de datos.
+Ésta programada para pedir datos en forma de Diccionarios en caso de recibir una sentencia SELECT o
+realizar un COMMIT si la sentencia es un INSERT, UPDATE o DELETE.
+
+Si por alguna razón, ocurre algún error serio. El escript fuerza un rollback para dejar la BD en un estado estable.
+
+"""
+
+
 import MySQLdb
 
 

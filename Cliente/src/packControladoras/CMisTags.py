@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 __author__ = 'Rubén Mulero'
 
+import collections
 from Cliente.src.packGestorSocket import ServerSender
 
 
@@ -77,29 +78,40 @@ class CMisTags(object):
         resultado = socket.enviar_datos()
         return resultado
 
-    def modificar_tag(self, p_id_usuario, p_nombre_tag, p_lista_vieja_s,
+    def modificar_tag(self, p_id_usuario, p_id_tag, p_nombre_tag, p_lista_vieja_s,
                       p_lista_nueva_s, p_owner, p_descripcion):
         """
         Modifica los scripts de un Tag.
 
         :param p_id_usuario: El identificador de un usuario
+        :param p_id_tag: El identificador del tag a modificar
         :param p_nombre_tag: El nuevo nombre del Tag
         :param p_lista_vieja_s: La lista antigua de scripts
         :param p_lista_nueva_s: La lista nueva de scripts
-        :param p_owner: El nuevo owner del grupo (Propietario)
+        :param p_owner: El nuevo owner del grupo (El identificador del nuevo propietario
         :param p_descripcion: La nueva descripción del tag
         :return:
         """
         # Lo primero es crear una lista de cambios con los scripts
         lista_envio = []
-        lista_cambios = self._crear_lista_cambios(p_lista_vieja_s, p_lista_nueva_s)
+        # Primero comaramos si los scripts son iguales
+        comparar = lambda x, y: collections.Counter(x) == collections.Counter(y)
+        if comparar(p_lista_vieja_s, p_lista_nueva_s):
+            # Las listas son iguales
+            lista_cambios = None
+        else:
+            # La lista de scritps es distinta
+            lista_cambios = self._crear_lista_cambios(p_lista_vieja_s, p_lista_nueva_s)
+
         lista_envio.append({'metodo': 'modificar_tag'})
         lista_envio.append({'id_usuario': p_id_usuario,
+                            'id_tag': p_id_tag,
                             'nombre_tag': p_nombre_tag,
                             'owner': p_owner,
                             'descripcionn': p_descripcion,
                             'lista_cambios': lista_cambios
                             })
+
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
         return resultado
@@ -147,6 +159,7 @@ class CMisTags(object):
                 lista_cambios.append({'accion': 'anadir_script',
                                       'id_script': anadir.id_script})
         else:
+            # Esto podria no producirse nunca.
             # Agregamos directamente la nueva lista
             for nueva in p_lista_nueva:
                 lista_cambios.append({'accion': 'anadir_script',

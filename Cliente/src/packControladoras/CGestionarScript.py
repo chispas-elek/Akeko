@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 __author__ = 'Rubén Mulero'
 
+import collections
 from Cliente.src.packGestorSocket import ServerSender
 
 
@@ -72,20 +73,34 @@ class CGestionarScript(object):
         p_lista_nueva_s_filtrado = p_lista_nueva_t.filtrado_script(p_lista_nueva_s)
 
         lista_envio = []
-        # Vamos a crear un diccionario de cambios que va a ser enviada
-        # Primero vamos a crear la lista de cambios de los scripts
-        lista_cambios_s = self._crear_lista_cambios(p_lista_vieja_s, p_lista_nueva_s_filtrado, True)
-        # A continuación repetimos para los TAGS
-        lista_cambios_t = self._crear_lista_cambios(p_lista_vieja_t, p_lista_nueva_t, False)
-        # Creamos el diccionario y enviamos los datos por socket
-        lista_envio.append({'metodo': 'aplicar_cambios'})
-        lista_envio.append({'id_usuario': p_id_usuario,
-                            'id_grupo': p_id_grupo,
-                            'lista_cambios_s': lista_cambios_s,
-                            'lista_cambios_t': lista_cambios_t,
-                            'lista_alumnos': p_lista_alumnos.deconstruir()})
-        socket = ServerSender.ServerSender(lista_envio)
-        resultado = socket.enviar_datos()
+        # Primero vamos a controlar que no estemos aplicando las mismas listas
+        comparar = lambda x, y: collections.Counter(x) == collections.Counter(y)
+        if comparar(p_lista_vieja_s, p_lista_nueva_s) is not True or comparar(p_lista_vieja_t, p_lista_nueva_t) is not True:
+            # Vamos a crear un diccionario de cambios que va a ser enviada
+            # Primero vamos a crear la lista de cambios de los scripts
+            if comparar(p_lista_vieja_s, p_lista_nueva_s):
+                # La lista de scripts no ha cambiado
+                lista_cambios_s = None
+            else:
+                lista_cambios_s = self._crear_lista_cambios(p_lista_vieja_s, p_lista_nueva_s_filtrado, True)
+            # A continuación repetimos para los TAGS
+            if comparar(p_lista_vieja_t, p_lista_nueva_t):
+                # La lista de TAgs no ha cambiado
+                lista_cambios_t = None
+            else:
+                lista_cambios_t = self._crear_lista_cambios(p_lista_vieja_t, p_lista_nueva_t, False)
+            # Creamos el diccionario y enviamos los datos por socket
+            lista_envio.append({'metodo': 'aplicar_cambios'})
+            lista_envio.append({'id_usuario': p_id_usuario,
+                                'id_grupo': p_id_grupo,
+                                'lista_cambios_s': lista_cambios_s,
+                                'lista_cambios_t': lista_cambios_t,
+                                'lista_alumnos': p_lista_alumnos.deconstruir()})
+            socket = ServerSender.ServerSender(lista_envio)
+            resultado = socket.enviar_datos()
+        else:
+            # El usuario no ha hecho ningún cambio Raise exception
+            resultado = None
         return resultado
 
     def _crear_lista_cambios(self, p_lista_vieja, p_lista_nueva, p_es_script):
@@ -111,7 +126,6 @@ class CGestionarScript(object):
                 # Ahora cotejamos la lista nueva con la vieja para saber cuáles son los scripts nuevos
                 lista_anadir = p_lista_nueva.cotejar_lista_t(p_lista_vieja)
             # Creamos la lista de cambios
-            # todo poner todos los datos, no sólo los identificadores. Crear dicts de dicts.
             for borrado in lista_borrado:
                 if p_es_script:
                     lista_cambios.append({'accion': 'borrar_script',
@@ -129,7 +143,7 @@ class CGestionarScript(object):
                 else:
                     lista_cambios.append({'acccion': 'anadir_tag',
                                           'id_tag': anadir.id_tag,
-                                          'lista_s': anadir.lista_s
+                                          # 'lista_s': anadir.lista_s
                                           })
         else:
             # Agregamos directamente la nueva lista
@@ -140,6 +154,6 @@ class CGestionarScript(object):
                 else:
                     lista_cambios.append({'accion': 'anadir_tag',
                                           'id_tag': nueva.id_tag,
-                                          'lista_s': nueva.lista_s
+                                          # 'lista_s': nueva.lista_s
                                           })
         return lista_cambios
