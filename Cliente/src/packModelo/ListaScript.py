@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 __author__ = 'Rubén Mulero'
 
+import Script
+
 
 class ListaScript(object):
 
@@ -39,7 +41,29 @@ class ListaScript(object):
         else:
             return False
 
-    # todo definir método que transforme la lista en una diccionario para envitar por JSON
-    # def deconstruir(self):
-    # todo definir un método que transforme un diccionario en la lista y añada todo
-    # def construir(self, p_lista_diccionario):
+    def deconstruir(self):
+        """
+        Transformamos la lista en un array de diccionarios
+        :return: Un array de diccionarios con los elementos de la lista
+        """
+        lista_dic = []
+        for elemento in self.lista:
+            lista_dic.append({'IdScript': elemento.id_script,
+                              'NombreS': elemento.nombre_s,
+                              'Descripcion': elemento.descripcion,
+                              'Activo': elemento.activo,
+                              'Ruta': elemento.ruta,
+                              })
+        return lista_dic
+
+    def construir(self, p_lista_diccionario):
+        """
+        Construimos la lista a partir de los datos que nos trae un diccionario
+        :param p_lista_diccionario: Un diccionario con los datos
+        :return:
+        """
+        for diccionario in p_lista_diccionario:
+            un_script = Script.Script(diccionario['IdScript'], diccionario['NombreS'],
+                                            diccionario['Descripcion'], diccionario['Activo'],
+                                            diccionario['Ruta'])
+            self.lista.append(un_script)

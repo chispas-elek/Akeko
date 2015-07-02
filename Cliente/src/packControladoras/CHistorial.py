@@ -3,6 +3,8 @@ __author__ = 'Rubén Mulero'
 
 from Cliente.src.packGestorSocket import ServerSender
 
+from Cliente.src.packModelo import ListaHistorial, Historial
+
 class Singleton(type):
 
     def __init__(cls, name, bases, dct):
@@ -31,14 +33,15 @@ class CHistorial(object):
         lista_envio.append({'id_usuario': p_id_usuario})
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
+        # todo recuerda que con ésto solo obtienes las entradas con los identificadores, si quieres los datos tienes que realizar más llamadas
+        # Por ejemplo, el nombre del TAG, el nombre del script, etc etc....
         return resultado
 
-    def filtrar_historial(self, p_nombre_profesor, p_nombre_alumno, p_id_script,
+    def filtrar_historial(self, p_nombre_alumno, p_id_script,
                           p_fecha_ini, p_fecha_fin, p_lista_historial):
         """
         Realiza un filtrado del historial que se muestra en pantalla
 
-        :param p_nombre_profesor: El nombre del profesor a filtrar
         :param p_nombre_alumno: El nombre del alumno a filtrar
         :param p_id_script: El identificador del script
         :param p_fecha_ini: La fecha de inicio
@@ -46,5 +49,5 @@ class CHistorial(object):
         :param p_historial: El historial completo obtenido anteriormente desde "obtener_historial"
         :return: La lista del historial filtrada con todos los valores
         """
-        # todo es necesario crear un tipo de dato llamado historial y lista_historial para manejar lso valores de hist.
-        pass
+        historial_filtrado = []
+        # todo hacer el filtrado del historial
