@@ -10,3 +10,14 @@ Thanks of this tool one professor can save more of his time and do something mor
 
 
 In development.....
+
+
+This projects is licensed under GNU GPL v3 License. See the LICENSE file inside the package for more information.
+
+Breeze Icons are licensed under the [LGPLv3](http://opensource.org/licenses/lgpl-3.0.html).
+
+Original author is [Nitux S.A.](http://nitrux.in/)
+
+You can download it from this [link.](https://github.com/NitruxSA/plasma-next-icons.git)
+
+Thanks for the authors for this awesome icons.

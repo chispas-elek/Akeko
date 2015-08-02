@@ -30,6 +30,24 @@ class ListaGrupo(object):
                 break
         return encontrado
 
+    def obtener_grupo(self, p_n_pos):
+        """
+        Dado un número de posición, obtiene el grupo
+
+        :param p_n_pos: El número de posición
+        :return: El grupo que esté en dicha posición de la lista
+        """
+        return self.lista[p_n_pos]
+
+    def obtener_tamano_lista(self):
+        """
+        Obtiene el tamaño de la lista
+
+        :return: El número de elementos que tiene la lista
+        """
+
+        return len(self.lista)
+
     def _obtener_iterador(self):
         return iter(self.lista)
 
@@ -55,7 +73,7 @@ class ListaGrupo(object):
         """
         for diccionario in p_lista_diccionario:
             un_grupo = Grupo.Grupo(diccionario['IdGrupo'], diccionario['NombreGrupo'],
-                                   diccionario['FechaCreacion'], None, None, None,
-                                   diccionario['IdUsuario'])
+                                   None, None, None, None,
+                                   int(diccionario['IdUsuario']))
 
             self.lista.append(un_grupo)

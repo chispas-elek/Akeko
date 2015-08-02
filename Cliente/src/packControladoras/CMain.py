@@ -2,6 +2,7 @@
 __author__ = 'Rubén Mulero'
 
 from Cliente.src.packGestorSocket import ServerSender
+from Cliente.src.packModelo import ListaGrupo, ListaAlumno
 
 class Singleton(type):
 
@@ -28,7 +29,9 @@ class CMain(object):
         lista_envio.append({'id_usuario': p_id_usuario})
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
-        return resultado
+        lista_grupo = ListaGrupo.ListaGrupo()
+        lista_grupo.construir(resultado)
+        return lista_grupo
 
     def obtener_alumnos(self, p_id_grupo):
         lista_envio = []
@@ -36,7 +39,9 @@ class CMain(object):
         lista_envio.append({'id_grupo': p_id_grupo})
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
-        return resultado
+        lista_alumno = ListaAlumno.ListaAlumno()
+        lista_alumno.construir(resultado)
+        return lista_alumno
 
     def borrar_grupo(self, p_id_usuario, p_id_grupo, p_lista_alumno):
         """

@@ -224,8 +224,8 @@ class ServerHandler(StreamRequestHandler):
                 # El alumno existe en el sistema, vamos a ver si sus datos
                 # Son correctos
                 try:
-                    if alumno['Nombre'] != existe['Nombre'] or alumno['Apellido'] != existe['Apellido'] \
-                            or alumno['Email'] != existe['Email']:
+                    if alumno['Nombre'] != existe[0]['Nombre'] or alumno['Apellido'] != existe[0]['Apellido'] \
+                            or alumno['Email'] != existe[0]['Email']:
                         # Existe un error con los datos del alumno. Lanzamos excepción
                         raise ErrorAlumno(alumno['Dni'])
                 except ErrorAlumno, e:

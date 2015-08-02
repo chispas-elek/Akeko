@@ -50,4 +50,4 @@ class CHistorial(object):
         :return: La lista del historial filtrada con todos los valores
         """
         historial_filtrado = []
-        # todo hacer el filtrado del historial
+        # todo hacer el filtrado del historial Revisar pagima 86 del manual para usar MATCH

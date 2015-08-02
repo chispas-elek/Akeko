@@ -48,8 +48,7 @@ class CCrearGrupo(object):
             lista_envio.append({'metodo': 'crear_grupo'})
             lista_envio.append({'id_usuario': p_id_usuario,
                                 'nombre_grupo': p_nombre_grupo,
-                                'lista_alumnos': p_lista_alumnos # Comprobar si enviar un tipo de dato da problemas
-                                                                  # Puede ser necesario convertir ésto en un dict.
+                                'lista_alumnos': p_lista_alumnos.deconstruir()
                                 })
             socket = ServerSender.ServerSender(lista_envio)
             resultado = socket.enviar_datos()

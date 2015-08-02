@@ -26,6 +26,15 @@ class CLogin(object):
     # Definimos el código que deseamos en la clase.
     
     def iniciar_sesion(self, p_usuario, p_contrasena):
+        """
+        Comprueba las credenciales del usuario
+
+        :param p_usuario: El usuario del sistema
+        :param p_contrasena: La contraseña del usuario
+        :return: None -> Si los datos no están correctamente introducidos
+                fail -> Si ha ocurrido un error serio en la BD
+                id_usuario -> Identificador del usuario si todo ha ido bien.
+        """
         # Preparamos los datos y los enviamos.
         lista_envio = []
         # Cabecera de envío para saber que método hay que ejecutar en el server
@@ -34,4 +43,6 @@ class CLogin(object):
         lista_envio.append({'usuario': p_usuario, 'contrasena': p_contrasena})
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
+        if resultado == {'return': 'fail'}:
+            resultado = 'fail'
         return resultado

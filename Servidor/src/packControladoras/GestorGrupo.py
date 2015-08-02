@@ -27,7 +27,7 @@ class GestorGrupo(object):
         :return: La lista de los grupos que contiene el usuario
         """
         bd = MySQLConnector.MySQLConnector()
-        consulta = "SELECT IdGrupo,NombreGrupo FROM Grupo WHERE IdUsuario=%s", p_id_usuario
+        consulta = "SELECT IdGrupo,NombreGrupo,IdUsuario FROM Grupo WHERE IdUsuario=%s;", (p_id_usuario, )
         respuesta_bd = bd.execute(consulta)
         return respuesta_bd
 
@@ -44,15 +44,21 @@ class GestorGrupo(object):
         consulta1 = "INSERT INTO Grupo(NombreGrupo,IdUsuario) VALUES(%s,%s);", (p_nombre_grupo, p_id_usuario)
         respuesta_bd = bd.execute(consulta1)
         # Obtenemos el identificador del grupo
-        consulta2 = "SELECT IdGrupo FROM Grupo WHERE NombreGrupo=%s;", p_nombre_grupo
+        consulta2 = "SELECT IdGrupo FROM Grupo WHERE NombreGrupo=%s;", (p_nombre_grupo, )
         respuesta_bd_2 = bd.execute(consulta2)
+        id_grupo = int(respuesta_bd_2[0]['IdGrupo'])
+        respuesta_bd_3 = 0
         # Insertamos la relación entre alumno y grupo
         for alumno in p_lista_alumnos:
-            consulta3 = "INSERT INTO Alumno_Grupo(Dni,IdGrupo) VALUES(%s,%s);", \
-                        (alumno['Dni', respuesta_bd_2['IdGrupo']])
+            consulta3 = "INSERT INTO Alumno_Grupo(IdGrupo,Dni) VALUES(%s,%s);", \
+                        (id_grupo, alumno['Dni'])
             respuesta_bd_3 = bd.execute(consulta3)
-        if len(respuesta_bd) != 0 and len(respuesta_bd_2) != 0 and len(respuesta_bd_3) != 0:
-            # han ido bien las cosas
+            if respuesta_bd_3 == 0:
+                # todo, deberiamos hacer una excepción en éste punto, indicando un fallo en la inserción.
+                break
+        if respuesta_bd == 1 and len(respuesta_bd_2) != 0 and respuesta_bd_3 == 1:
+            # Los dos inserts han devuelvo 1 por lo que se han realizado correctamente y el SELECT devolvio datos
+            # Como han ido bien las cosas. Damos por éxito la operación.
             devolver = True
         return devolver
 
@@ -63,7 +69,7 @@ class GestorGrupo(object):
         :return: Resultado de la BD
         """
         bd = MySQLConnector.MySQLConnector()
-        consulta = "DELETE FROM Grupo WHERE IdGrupo=%s", p_id_grupo
+        consulta = "DELETE FROM Grupo WHERE IdGrupo=%s", (p_id_grupo, )
         respuesta_bd = bd.execute(consulta)
         return respuesta_bd
 
@@ -77,14 +83,14 @@ class GestorGrupo(object):
         bd = MySQLConnector.MySQLConnector()
         exito = False
         # Primero vamos a comprobar si el nombre ya existe en la BD
-        consulta1 = "SELECT IdGrupo FROM Grupo WHERE NombreGrupo=%s", p_nombre_grupo
+        consulta1 = "SELECT IdGrupo FROM Grupo WHERE NombreGrupo=%s", (p_nombre_grupo, )
         respuesta_bd_1 = bd.execute(consulta1)
         if len(respuesta_bd_1) == 0:
             # No existe ninguna entrada en la BD con dicho nombre
             # Cambiamos el nombre sin problemas
             consulta2 = "UPDATE Grupo SET NombreGrupo=%s WHERE IdGrupo=%s", (p_nombre_grupo, p_id_grupo)
             respuesta_bd_2 = bd.execute(consulta2)
-            # todo comprobar si el update devuelve 1
+
             if respuesta_bd_2 == 1:
                 exito = True
         return exito
@@ -98,6 +104,6 @@ class GestorGrupo(object):
         """
         bd = MySQLConnector.MySQLConnector()
         consulta = """SELECT IdGrupo,NombreGrupo,FechaCreacion,IdUsuario FROM Grupo WHERE IdGrupo IN (
-                    SELECT IdGrupo FROM Tag_Grupo WHERE IdTag=%s);""""", p_id_tag
+                    SELECT IdGrupo FROM Tag_Grupo WHERE IdTag=%s);""""", (p_id_tag, )
         respuesta_bd = bd.execute(consulta)
         return respuesta_bd

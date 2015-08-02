@@ -24,14 +24,14 @@ class GestorUsuario(object):
         Obtiene las credenciales de acceso de un usuario
         :param p_usuario: El usuario
         :param p_contrasena: Su contraseña
-        :return: True o False dependiendo de si las credenciales introducidas son correctas.
+        :return: Devuelve el IdUsuario en cuestión si los datos son correctos o None si no lo son.
         """
-        existe = False
+        id_usuario = None
         bd = MySQLConnector.MySQLConnector()
         consulta = "SELECT IdUsuario FROM Usuario WHERE Usuario=%s AND Contrasena=%s;", (p_usuario, p_contrasena)
         # Comprobamos el valor de la consulta
         respuesta_bd = bd.execute(consulta)
         if len(respuesta_bd) != 0:
             # El usuario y contraseña son correctos
-            existe = True
-        return existe
+            id_usuario = int(respuesta_bd[0]['IdUsuario'])
+        return id_usuario

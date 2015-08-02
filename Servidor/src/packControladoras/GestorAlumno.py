@@ -29,7 +29,7 @@ class GestorAlumno(object):
         bd = MySQLConnector.MySQLConnector()
         consulta = """SELECT Dni,Nombre,Apellido,Email
                     FROM Alumno WHERE Dni IN (
-                    SELECT Dni FROM Alumno_Grupo WHERE IdGrupo=%s);""", p_id_grupo
+                    SELECT Dni FROM Alumno_Grupo WHERE IdGrupo=%s);""", (p_id_grupo, )
         respuesta_bd = bd.execute(consulta)
         return respuesta_bd
 
@@ -59,11 +59,11 @@ class GestorAlumno(object):
         exito = False
         bd = MySQLConnector.MySQLConnector()
         # Verificar si el alumno está en un grupo
-        consulta1 = "SELECT IdGrupo FROM Alumno_Grupo WHERE Dni=%s;", p_dni
+        consulta1 = "SELECT IdGrupo FROM Alumno_Grupo WHERE Dni=%s;", (p_dni, )
         respuesta_bd = bd.execute(consulta1)
         if len(respuesta_bd) == 0:
             # El alumno no pertenece a ningún grupo, podemos eliminarlo del sistema
-            consulta2 = "DELETE FROM Alumno WHERE Dni=%s;", p_dni
+            consulta2 = "DELETE FROM Alumno WHERE Dni=%s;", (p_dni, )
             respuesta_bd2 = bd.execute(consulta2)
             exito = True
         return exito
@@ -77,7 +77,7 @@ class GestorAlumno(object):
         """
         existe = None
         bd = MySQLConnector.MySQLConnector()
-        consulta = "SELECT * FROM Alumno WHERE Dni=%s;", p_dni
+        consulta = "SELECT * FROM Alumno WHERE Dni=%s;", (p_dni, )
         respuesta_bd = bd.execute(consulta)
         if len(respuesta_bd) != 0:
             # El alumno eexiste en la BD

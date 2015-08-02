@@ -13,8 +13,50 @@ class ListaAlumno(object):
     def anadir(self, p_elemento):
         self.lista.append(p_elemento)
 
+    def eliminar(self, p_elemento):
+        self.lista.remove(p_elemento)
+
     def _obtener_iterador(self):
         return iter(self.lista)
+
+    def obtener_alumno(self, p_n_pos):
+        """
+        Dada una posición, obtiere el alumno
+
+        :param p_n_pos: El número de la posición en la lista
+        :return: Tipo de dato Alumno asociado a la posición pedida
+        """
+        return self.lista[p_n_pos]
+
+    def obtener_tamano_lista(self):
+        """
+        Obtiene el tamaño de la lista
+
+        :return: El número de elementos que tiene la lista
+        """
+
+        return len(self.lista)
+
+    def exite_alumno(self, p_un_dni):
+        """
+        Comprueba si dentro de la lista existe un alumno basado en su DNI
+
+        :param p_un_dni: El dni de un alumno
+        :return: None si no existe un alumno, o un alumno en caso de existir.
+        """
+        alumno_encontrado = None
+        encontrado = False
+        it = self._obtener_iterador()
+        while not encontrado:
+            try:
+                alumno = it.next()
+                if p_un_dni == alumno.dni_a:
+                    # El alumno existe
+                    alumno_encontrado = alumno
+                    encontrado = True
+            except StopIteration:
+                break
+        return alumno_encontrado
 
     def deconstruir(self):
         """

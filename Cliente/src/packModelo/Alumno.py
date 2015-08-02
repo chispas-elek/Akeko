@@ -5,7 +5,7 @@ __author__ = 'Rubén Mulero'
 class Alumno(object):
 
     def __init__(self, p_dni_a, p_nombre_a, p_apellido_a, p_email_a):
-        self.dni_a_a = p_dni_a
+        self.dni_a = p_dni_a
         self.nombre_a = p_nombre_a
         self.apellido_a = p_apellido_a
         self.email_a = p_email_a
