@@ -36,8 +36,8 @@ class CCrearGrupo(object):
         :param p_nombre_grupo: El nombre del grupo dado por el usuairo
         :param p_lista_alumnos: El diccionario que contiene los alumnos del nuevo grupo
         :return: None -> Si el grupo ya existe en el sistema
-                0 -> Si existe un error en la BD a la hora de insertar el grupo
-                1 -> Si todo ha ido bien
+                False -> Si existe un error en la BD a la hora de insertar el grupo
+                True -> Si todo ha ido bien
         """
         resultado = None
         # Primero comprobamos que el nombre no exista en mis grupos.

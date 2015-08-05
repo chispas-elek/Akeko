@@ -7,7 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QLineEdit
+from PyQt5.QtWidgets import QMessageBox
 from sys import argv
 from Cliente.src.packControladoras import CLogin
 import re
@@ -122,6 +122,12 @@ class Principal(QtWidgets.QMainWindow):
         if len(usuario) == 0 or len(contrasena) == 0:
             # Faltan datos, mostramos error
             print "Los datos son incorrectos"
+            msg_box_w = QMessageBox()
+            msg_box_w.setIcon(2)
+            msg_box_w.setWindowTitle("Login Aviso")
+            msg_box_w.setText("¡Atención!")
+            msg_box_w.setInformativeText("Introduce un usuario y una contraseña. Revisa los datos.")
+            msg_box_w.exec_()
         else:
             # Tenemos un posible usuario y contraseña válidos, vamos a validarlos
             if self.__mascara_filtrado(usuario) and self.__mascara_filtrado(contrasena):
@@ -140,8 +146,20 @@ class Principal(QtWidgets.QMainWindow):
                 else:
                     # Usuario y contraseña incorrectos.
                     print "Error, Usuario y contraseña mal introducida."
+                    msg_box_e = QMessageBox()
+                    msg_box_e.setIcon(3)
+                    msg_box_e.setWindowTitle("Login Error")
+                    msg_box_e.setText("ERROR")
+                    msg_box_e.setInformativeText("El usuario y contraseña introducidos no son correctos.")
+                    msg_box_e.exec_()
             else:
                 print "Los caracteres introducidos son incorrectos"
+                msg_box_w_2 = QMessageBox()
+                msg_box_w_2.setIcon(2)
+                msg_box_w_2.setWindowTitle("Login Aviso")
+                msg_box_w_2.setText("¡Atención!")
+                msg_box_w_2.setInformativeText("Los datos introducidos tienen muy poco sentido.")
+                msg_box_w_2.exec_()
 
     def __mascara_filtrado(self, p_texto):
         """

@@ -65,7 +65,8 @@ class GestorAlumno(object):
             # El alumno no pertenece a ningún grupo, podemos eliminarlo del sistema
             consulta2 = "DELETE FROM Alumno WHERE Dni=%s;", (p_dni, )
             respuesta_bd2 = bd.execute(consulta2)
-            exito = True
+            if respuesta_bd2 == 1:
+                exito = True
         return exito
 
     def buscar_alumno(self, p_dni):

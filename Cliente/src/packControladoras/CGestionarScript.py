@@ -3,6 +3,7 @@ __author__ = 'Rubén Mulero'
 
 import collections
 from Cliente.src.packGestorSocket import ServerSender
+from Cliente.src.packModelo import ListaScript, ListaTag
 
 
 class Singleton(type):
@@ -22,36 +23,68 @@ class CGestionarScript(object):
     # Definimos el código que deseamos en la clase.
 
     def obtener_scripts(self, p_id_grupo):
+        """
+        Obtenemos la lista de los scripts aplicados en el grupo
+
+        :param p_id_grupo: El identificador del grupo
+        :return: La lista con los scripts aplicados
+        """
         lista_envio = []
         lista_envio.append({'metodo': 'obtener_scripts'})
         lista_envio.append({'id_grupo': p_id_grupo})
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
-        return resultado
+        lista_script = ListaScript.ListaScript()
+        lista_script.construir(resultado)
+        return lista_script
 
     def obtener_tags(self, p_id_grupo):
+        """
+        Obtenemos la lista de Tags aplicados en el grupo
+
+        :param p_id_grupo: El identificador del grupo
+        :return: La lista con los tags aplicados
+        """
         lista_envio = []
         lista_envio.append({'metodo': 'obtener_tags'})
         lista_envio.append({'id_grupo': p_id_grupo})
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
-        return resultado
+        lista_tag = ListaTag.ListaTag()
+        lista_tag.construir(resultado)
+        return lista_tag
 
     def obtener_scripts_disponibles(self, p_id_grupo):
+        """
+        Obtenemos la lista de scripts que estén disponibles para el grupo
+
+        :param p_id_grupo: El identificador del grupo
+        :return: La lista con los scripts disponibles
+        """
         lista_envio = []
         lista_envio.append({'metodo': 'obtener_scripts_disponibles'})
         lista_envio.append({'id_grupo': p_id_grupo})
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
-        return resultado
+        lista_script_dispo = ListaScript.ListaScript()
+        lista_script_dispo.construir(resultado)
+        return lista_script_dispo
 
     def obtener_tags_disponibles(self, p_id_grupo):
+        """
+        Obtenemos la lista de Tags disponibles para el grupo
+
+        :param p_id_grupo: El identificador del grupo
+        :return: La lista con los tags disponibles
+        """
         lista_envio = []
         lista_envio.append({'metodo': 'obtener_tags_disponibles'})
         lista_envio.append({'id_grupo': p_id_grupo})
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
-        return resultado
+        lista_tag_dispo = ListaTag.ListaTag()
+        lista_tag_dispo.construir(resultado)
+        return lista_tag_dispo
 
     def aplicar_cambios(self, p_id_usuario, p_id_grupo,
                         p_lista_vieja_s, p_lista_nueva_s,

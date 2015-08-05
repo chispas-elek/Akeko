@@ -7,9 +7,9 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QHeaderView
+from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QHeaderView, QMessageBox
 from Cliente.src.packControladoras import CMain
-import IU_CREAR_GRUPO
+import IU_CREAR_GRUPO, IU_CAMBIAR_NOMBRE_GRUPO, IU_GESTIONAR_SCRIPT
 
 
 class Ui_MainWindow(object):
@@ -167,24 +167,26 @@ class Main(QtWidgets.QMainWindow):
         # Cargamos la controladora del main
         self.controladora_main = CMain.CMain()
 
-        # todo delegar éste bloque a la generación del combo box.
-        # Obtenemos los grupos del usuario actual
-        self.lista_grupos = self.controladora_main.obtener_grupos(p_id_usuario)
+        # Declaramos la lista de grupos
+        self.lista_grupos = None
+        self.lista_alumnos_grupo = None
 
-        if self.lista_grupos.obtener_tamano_lista() == 0:
-            # El usuario actual no tiene grupos, llenamos el combo box con éstos datos
-            self.ventana.cSelecionarGrupo.addItem("No hay grupos disponibles")
-            # todo delegar ésto en la generación de la tabla
-            self.ventana.lNumeroAlumnos.setText("Número de alumnos en el grupo: 0")
-        else:
-            # Cargamos la lista de grupos en el combobox. Y mostramos los alumnos del primer elemento
-            self.generar_combo_box()
-            self.seleccionar_item()
+        # Deshabilitamos en un principio los botones de gestión de los grupos
+        self.ventana.bGestionarScripts.setDisabled(True)
+        self.ventana.bCambiarNombre.setDisabled(True)
+        self.ventana.bEliminarGrupo.setDisabled(True)
+
+        # Generamos el combobox y seleccionamos el item
+        self.generar_combo_box()
+        self.seleccionar_item()
 
         # Programamos los conectores de cada botón, lista, etc....
         # self.ventana.bLogin.clicked.connect(self.login)
         self.ventana.cSelecionarGrupo.currentIndexChanged.connect(self.seleccionar_item)
         self.ventana.actionAnadirGrupo.triggered.connect(self.crear_grupo)
+        self.ventana.bCambiarNombre.clicked.connect(self.cambiar_nombre_grupo)
+        self.ventana.bEliminarGrupo.clicked.connect(self.eliminar_grupo)
+        self.ventana.bGestionarScripts.clicked.connect(self.gestionar_script)
 
         # Iniciamos las variables de las nuevas ventanas
         self.window_gestionar_script = None
@@ -202,6 +204,51 @@ class Main(QtWidgets.QMainWindow):
             self.window_crear_grupo = IU_CREAR_GRUPO.CrearGrupo(self, self.id_usuario, self.lista_grupos)
         self.window_crear_grupo.show()
 
+    def eliminar_grupo(self):
+        """
+        Lanza la interfaz de interrogación para eliminar el grupo que está actualmente seleccionado
+
+        :return:
+        """
+        # todo pensar en la limitación que haga que el botón funcione o no.
+        id_grupo = self.ventana.cSelecionarGrupo.itemData(self.ventana.cSelecionarGrupo.currentIndex())
+
+        # Generamos un QmeesageBox para gestionar la pregunta al usuario
+        warm_box = QMessageBox()
+        warm_box.setIcon(2)
+        warm_box.setWindowTitle("Borrado de un grupo")
+        warm_box.setText("¡¡Atención!!")
+        warm_box.setInformativeText("¿Estás seguro que deseas eliminar el grupo?")
+        warm_box.setDetailedText("Al eliminar un grupo, todos los scripts de los alumnos asociados al mismo son "
+                                 "eliminados de forma automática. Es recomendable revisar bien a quién afecta el "
+                                 "borrado del grupo.")
+        # Creamos los botones de aceptar y cancelar.
+        warm_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        warm_box.setDefaultButton(QMessageBox.Cancel)
+        # Ejectuamos la interfaz y recogemos el resultado de la decisión
+        seleccion = warm_box.exec_()
+        if seleccion == QMessageBox.Ok:
+            # Si el usuario ha pulsado a aceptar, procedemos a borrar el grupo
+            resultado = self.controladora_main.borrar_grupo(self.id_usuario, id_grupo, self.lista_alumnos_grupo)
+            if resultado is True:
+                # Mostramos un mensaje indicando que las cosas han ido bien.
+                msg_box = QMessageBox()
+                msg_box.setIcon(1)
+                msg_box.setWindowTitle("Borraddo de un grupo")
+                msg_box.setText("CORRECTO")
+                msg_box.setInformativeText("El grupo ha sido borrado corretamente")
+                msg_box.exec_()
+                # Regeneramos el combo box.
+                self.generar_combo_box()
+            else:
+                print "Existe algún error a la hora de borrar el alumno"
+                msg_box_e = QMessageBox()
+                msg_box_e.setIcon(3)
+                msg_box_e.setWindowTitle("Borraddo de un grupo")
+                msg_box_e.setText("ERROR")
+                msg_box_e.setInformativeText("Ha ocurrido algún error a la hora de borrar el grupo. Inténtelo de nuevo.")
+                msg_box_e.exec_()
+
     def seleccionar_item(self):
         """
         Cuando el usuario selecciona un elemento en el combobox. Ésta funnción se encarga de rellenar la lista de los
@@ -211,34 +258,57 @@ class Main(QtWidgets.QMainWindow):
         """
         # Obtenemos el elemento actualmente seleccionado
         id_grupo = self.ventana.cSelecionarGrupo.itemData(self.ventana.cSelecionarGrupo.currentIndex())
-        lista_alumnos_grupo = self.controladora_main.obtener_alumnos(id_grupo)
-        numero_alumnos = lista_alumnos_grupo.obtener_tamano_lista()
+        self.lista_alumnos_grupo = self.controladora_main.obtener_alumnos(id_grupo)
+        numero_alumnos = self.lista_alumnos_grupo.obtener_tamano_lista()
         if numero_alumnos != 0:
             # Las cosas han ido bien, creamos la tabla
-            self._generar_tabla(lista_alumnos_grupo)
-            self.ventana.lNumeroAlumnos.setText("Número de alumnos en el grupo: %s"
-                                                % numero_alumnos)
+            self._generar_tabla()
         else:
             # Ha pasado algo a la hora de obtener los alumnos. Damos un error
             print "Error serio a la hora de obtener los alumnos de un Grupo"
 
-    def _generar_tabla(self, p_lista_alumnos_grupo):
+    def cambiar_nombre_grupo(self):
         """
-        Genera una tabla a aprtir de una lista de alumnos del grupo actualmente selecccionado
+        Dado el grupo actualmente seleccionado, cambiamos el nombre por uno nuevo.
 
-        :param p_lista_alumnos_grupo: La lista de alumnos.
         :return:
+        """
+        # Obtenemos el elemento actualmente seleccionado
+        id_grupo = self.ventana.cSelecionarGrupo.itemData(self.ventana.cSelecionarGrupo.currentIndex())
+        nombre_grupo = self.ventana.cSelecionarGrupo.currentText()
+        # Pasar todos los datos a la nueva interfaz
+        if self.window_cambiar_nombre_grupo is None:
+                self.window_cambiar_nombre_grupo = IU_CAMBIAR_NOMBRE_GRUPO.CambiarNombreGrupo\
+                    (self, id_grupo, nombre_grupo, self.lista_grupos)
+        self.window_cambiar_nombre_grupo.show()
+
+    def gestionar_script(self):
+        """
+        Gestiona los scripts que dispone el grupo actualmente seleccionado
+
+        """
+        # Obtenemos el elemento actualmente seleccionado
+        id_grupo = self.ventana.cSelecionarGrupo.itemData(self.ventana.cSelecionarGrupo.currentIndex())
+        # nombre_grupo = self.ventana.cSelecionarGrupo.currentText()
+        self.window_gestionar_script = IU_GESTIONAR_SCRIPT.GestionarScript(self.id_usuario,
+                                                                           self.lista_alumnos_grupo, id_grupo)
+        self.window_gestionar_script.show()
+
+    def _generar_tabla(self):
+        """
+        Genera una tabla a partir de una lista de alumnos del grupo actualmente selecccionado
+
         """
         # Bloquemos las señales y vaciamos la tabla
         self.ventana.tListaAlumnos.blockSignals(True)
         self.ventana.tListaAlumnos.clear()
         # Rellenamos la tabla
-        tamano_lista = p_lista_alumnos_grupo.obtener_tamano_lista()
-        # El lengh de los datos que me vienen
+        tamano_lista = self.lista_alumnos_grupo.obtener_tamano_lista()
+        # El tamaño de los datos que me vienen
         self.ventana.tListaAlumnos.setRowCount(tamano_lista)
         for i in range(0, tamano_lista):
             # Rellenamos la tabla
-            alumno = p_lista_alumnos_grupo.obtener_alumno(i)
+            alumno = self.lista_alumnos_grupo.obtener_alumno(i)
             newitem = QTableWidgetItem(alumno.dni_a)
             self.ventana.tListaAlumnos.setItem(i, 0, newitem)
             newitem = QTableWidgetItem(alumno.nombre_a)
@@ -249,23 +319,37 @@ class Main(QtWidgets.QMainWindow):
             self.ventana.tListaAlumnos.setItem(i, 3, newitem)
         # Liberamos las señales
         self.ventana.tListaAlumnos.blockSignals(False)
-        # todo aquí vamos a programar el textoa  mostrar con los alumnos que tiene el grupo
-        # self.ventana.lNumeroAlumnos.setText("Número de alumnos en el grupo: 0")
+        # Actualizo el valor del label con el número de alumnos del grupo actual.
+        self.ventana.lNumeroAlumnos.setText("Número de alumnos en el grupo: %s"
+                                            % tamano_lista)
 
     def generar_combo_box(self):
         """
         Dada una lista de grupos, rellena el combo box con los datos necesarios
 
         """
-        # todo podriamos hacer aquí la llamada a la BD para obtener la lista de grupos
+        # Obtenemos la lista actual de los grupos
+        self.lista_grupos = self.controladora_main.obtener_grupos(self.id_usuario)
         # Bloqueamos la señal del combo box y lo limpiamos
         self.ventana.cSelecionarGrupo.blockSignals(True)
         self.ventana.cSelecionarGrupo.clear()
         tamano_lista = self.lista_grupos.obtener_tamano_lista()
-        # Cargamos los datoss del combobox
-        for i in range(0, tamano_lista):
-            un_grupo = self.lista_grupos.obtener_grupo(i)
-            self.ventana.cSelecionarGrupo.addItem(un_grupo.nombre_grupo, un_grupo.id_grupo)
+        if tamano_lista == 0:
+            # El usuario no tiene grupos creados anteriormente
+            self.ventana.cSelecionarGrupo.addItem("No hay grupos disponibles")
+            # Deshabilitamos los botones de función de los grupos
+            self.ventana.bGestionarScripts.setDisabled(True)
+            self.ventana.bCambiarNombre.setDisabled(True)
+            self.ventana.bEliminarGrupo.setDisabled(True)
+        else:
+            # Cargamos los datoss del combobox
+            for i in range(0, tamano_lista):
+                un_grupo = self.lista_grupos.obtener_grupo(i)
+                self.ventana.cSelecionarGrupo.addItem(un_grupo.nombre_grupo, un_grupo.id_grupo)
+            # Habilitamos los botones de función de grupos
+            self.ventana.bGestionarScripts.setDisabled(False)
+            self.ventana.bCambiarNombre.setDisabled(False)
+            self.ventana.bEliminarGrupo.setDisabled(False)
         # Habilitamos el combobox y seleccionamos el primer grupo de la lista
         self.ventana.cSelecionarGrupo.setCurrentIndex(0)
         self.ventana.cSelecionarGrupo.blockSignals(False)

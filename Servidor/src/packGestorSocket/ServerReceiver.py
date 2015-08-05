@@ -255,32 +255,59 @@ class ServerHandler(StreamRequestHandler):
         sus datos serán eliminados del sistema.
 
         :param p_data: Contiene el identificador del usuario, del grupo y la lista de alumnos
-        :return:
+        :return: True -> Si el grupo se ha borrado correctamente
+                False -> Si algo ha sucedido durante el borrado del grupo
         """
         gestor_alumno = GestorAlumno.GestorAlumno()
         gestor_grupo = GestorGrupo.GestorGrupo()
         gestor_tag_script = GestorTagScript.GestorTagScript()
+        gestor_historial = GestorHistorial.GestorHistorial()
         id_usuario = p_data[1]['id_usuario']
         id_grupo = p_data[1]['id_grupo']
         lista_alumnos = p_data[1]['lista_alumnos']
         # Obtenemos los scripts que tiene el grupo
         lista_scripts = gestor_tag_script.obtener_scripts(id_grupo)
         lista_tags = gestor_tag_script.obtener_tags(id_grupo)
+        resultado = True
         # Por cada alumno, eliminamos el script
         for alumno in lista_alumnos:
             # Eliminamos el script
             for script in lista_scripts:
-                gestor_tag_script.eliminar_script(script['IdScript'], alumno['Dni'], id_usuario, id_grupo)
+                elim_script = gestor_tag_script.eliminar_script(script['IdScript'], alumno['Dni'], id_usuario, id_grupo)
+                if elim_script:
+                    # Se ha eliminado el tag del alumno actual, insertamos la acción en el historial
+                    gestor_historial.anadir_historial_script(script['IdScript'], alumno['Nombre'], alumno['Apellido'],
+                                                             id_usuario, id_grupo, False, 'Borrado de grupo')
+                else:
+                    # Algo ha pasado, paramos
+                    resultado = False
+                    break
             # Eliminamos los TAGS
             for tag in lista_tags:
-                gestor_tag_script.eliminar_tag(tag['IdTag'], alumno['Dni'], id_usuario, id_grupo)
-
-            # Si las cosas han ido bien
-            # Eliminamos al alumno
-            rdo = gestor_alumno.borrar_alumno(alumno['Dni'])
+                elim_tag = gestor_tag_script.eliminar_tag(tag['IdTag'], alumno['Dni'], id_usuario, id_grupo)
+                if elim_tag:
+                    # Se ha eliminado el tag del alumno actual, insertamos la acción en el historial
+                    gestor_historial.anadir_historial_tag(tag['IdTag'], alumno['Nombre'], alumno['Apellido'],
+                                                              id_usuario, id_grupo, False, 'Borrado de grupo')
+                else:
+                    # Algo ha pasado, paramos
+                    resultado = False
+                    break
 
         # Por último eliminamos el grupo del sistema.
-        resultado = gestor_grupo.borrar_grupo(id_grupo)
+        if resultado:
+            resultado_borrar_grupo = gestor_grupo.borrar_grupo(id_grupo)
+            if resultado_borrar_grupo:
+                # Insertamos en el historial lo sucediddo
+                # gestor_historial.anadir_historial_grupo(id_usuario, id_grupo, False, 'Borrado de grupo')
+                # Comprobamos si algún alumno se ha quedado sin grupo y lo eliminamos del sistema
+                for alumno2 in lista_alumnos:
+                    rdo = gestor_alumno.borrar_alumno(alumno2['Dni'])
+            else:
+                # Algo ha pasado a la hora de borrar el grupo.
+                resultado = False
+
+        return resultado
 
     def cambiar_nombre(self, p_data):
         """
@@ -290,7 +317,7 @@ class ServerHandler(StreamRequestHandler):
         """
         gestor_grupo = GestorGrupo.GestorGrupo()
         id_grupo = p_data[1]['id_grupo']
-        nombre_grupo = p_data[1]['nombre_gruo']
+        nombre_grupo = p_data[1]['nombre_grupo']
         resultado = gestor_grupo.cambiar_nombre(id_grupo, nombre_grupo)
         return resultado
 

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'IU_CREAR_GRUPO_NOMBRE.ui'
+# Form implementation generated from reading ui file 'IU_CAMBIAR_NOMBRE_GRUPO.ui'
 #
-# Created by: PyQt5 UI code generator 5.4.2
+# Created by: PyQt5 UI code generator 5.5
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from Cliente.src.packControladoras import CCrearGrupo
+from Cliente.src.packControladoras import CMain
 import re
 
 class Ui_Dialog(object):
@@ -22,6 +22,14 @@ class Ui_Dialog(object):
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
         self.verticalLayout.addWidget(self.label)
+        self.lNuevoNombreGrupo = QtWidgets.QLabel(Dialog)
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        self.lNuevoNombreGrupo.setFont(font)
+        self.lNuevoNombreGrupo.setAlignment(QtCore.Qt.AlignCenter)
+        self.lNuevoNombreGrupo.setObjectName("lNuevoNombreGrupo")
+        self.verticalLayout.addWidget(self.lNuevoNombreGrupo)
         spacerItem1 = QtWidgets.QSpacerItem(20, 25, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.verticalLayout.addItem(spacerItem1)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
@@ -42,12 +50,12 @@ class Ui_Dialog(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem5)
-        self.bCrearGrupo = QtWidgets.QPushButton(Dialog)
+        self.bCambiarNombre = QtWidgets.QPushButton(Dialog)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/dialog-ok.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.bCrearGrupo.setIcon(icon)
-        self.bCrearGrupo.setObjectName("bCrearGrupo")
-        self.horizontalLayout.addWidget(self.bCrearGrupo)
+        icon.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/edit-rename.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.bCambiarNombre.setIcon(icon)
+        self.bCambiarNombre.setObjectName("bCambiarNombre")
+        self.horizontalLayout.addWidget(self.bCambiarNombre)
         spacerItem6 = QtWidgets.QSpacerItem(60, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem6)
         self.bCancelar = QtWidgets.QPushButton(Dialog)
@@ -66,47 +74,47 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Nombre Grupo"))
-        self.label.setText(_translate("Dialog", "Por favor, define un nombre válido para crear el &grupo:"))
-        self.bCrearGrupo.setText(_translate("Dialog", "Crear Grupo"))
+        Dialog.setWindowTitle(_translate("Dialog", "Cambiar Nombre Grupo"))
+        self.label.setText(_translate("Dialog", "Por favor, define &un nombre válido para:"))
+        self.lNuevoNombreGrupo.setText(_translate("Dialog", "...."))
+        self.bCambiarNombre.setText(_translate("Dialog", "Cambiar Nombre"))
         self.bCancelar.setText(_translate("Dialog", "Cancelar"))
 
-class CrearGrupoNombre(QtWidgets.QDialog):
+class CambiarNombreGrupo(QtWidgets.QDialog):
     # Definimos el constructor de la clase principal
-    def __init__(self, p_iu_crear_grupo, p_iu_main, p_id_usuario, p_lista_alumnos, p_lista_grupos, parent=None):
+    def __init__(self, p_iu_main, p_id_grupo, p_nombre_grupo_actual, p_lista_grupos, parent=None):
         # Llamamos al constructor de la clase padre
-        super(CrearGrupoNombre, self).__init__(parent)
+        super(CambiarNombreGrupo, self).__init__(parent)
         self.el_parent = parent
         # Instancio la Interfaz
         self.ventana = Ui_Dialog()
         self.ventana.setupUi(self)
 
-        self.iu_crear_grupo = p_iu_crear_grupo # El objeto de Crear_Grupo para poder cerrar la interfaz anterior.
-        self.iu_main = p_iu_main # El objeto del main para poder recargar el combobox del main
-        self.id_usuario = p_id_usuario
-        self.lista_alumnos = p_lista_alumnos
+        self.iu_main = p_iu_main
+        self.id_grupo = p_id_grupo
         self.lista_grupos = p_lista_grupos
 
-        # Conectamos los botones
-        self.ventana.bCancelar.clicked.connect(self.close)
-        self.ventana.bCrearGrupo.clicked.connect(self.crear_grupo)
+        self.ventana.lNuevoNombreGrupo.setText(p_nombre_grupo_actual)
 
-    def crear_grupo(self):
+        # Configuramos las acciones de los botones
+        self.ventana.bCancelar.clicked.connect(self.close)
+        self.ventana.bCambiarNombre.clicked.connect(self.cambiar_nombre_grupo)
+
+    def cambiar_nombre_grupo(self):
         # Obtenemos le nombre del grupoo y lo validamos
         nombre_grupo = self.ventana.lNombreGrupo.text()
         if self.__mascara_filtrado(nombre_grupo):
             # El nombre del grupo no existe por lo que podemos insertar los datos en la BD
-            controladora_grupo = CCrearGrupo.CCrearGrupo()
-            resultado = controladora_grupo.crear_grupo(self.id_usuario, nombre_grupo,
-                                                       self.lista_alumnos, self.lista_grupos)
+            controladora_main = CMain.CMain()
+            resultado = controladora_main.cambiar_nombre(self.id_grupo, nombre_grupo, self.lista_grupos)
             # Si el resultado es correcto, mostramos una pantalla de confirmación. y cerramoas la interfaz anterior.
             print "Resultado de la operación es %s" % resultado
             if resultado is True:
+                # Las cosas han ido como deberian.
                 self.iu_main.generar_combo_box()
-                self.iu_crear_grupo.close()
                 self.close()
             else:
-                print "El grupo no se ha creado correctamente por alguna razón."
+                print "El nombre del grupo no se ha actualizado"
         else:
             print "Los caracteres del grupo introducidos son inválidos"
 
