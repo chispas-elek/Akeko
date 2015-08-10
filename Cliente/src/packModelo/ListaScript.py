@@ -2,7 +2,7 @@
 __author__ = 'Rubén Mulero'
 
 import Script
-
+from PyQt5 import QtGui, QtWidgets, QtCore
 
 class ListaScript(object):
 
@@ -10,6 +10,18 @@ class ListaScript(object):
         self.lista = []
 
     # Definición de los métodos necesarios
+
+    def anadir(self, p_elemento):
+        self.lista.append(p_elemento)
+
+    def obtener_tamano_lista(self):
+        """
+        Obtiene el tamaño de la lista
+
+        :return: El número de elementos que tiene la lista
+        """
+
+        return len(self.lista)
 
     def cotejar_lista_s(self, p_lista_script):
         """
@@ -36,10 +48,45 @@ class ListaScript(object):
         :param p_elemento: El elementoa  comprobar
         :return: True o False dependiendo si la lista contiene o no el elemento
         """
-        if p_elemento in self.lista:
-            return True
-        else:
-            return False
+        encontrado = False
+        it = self._obtener_iterador()
+        while not encontrado:
+            try:
+                script = it.next()
+                if p_elemento.id_script == script.id_script:
+                    encontrado = True
+            except StopIteration:
+                break
+        return encontrado
+
+    def cargar_lista_script(self, p_iu_list_item):
+        """
+        Se encarga de cargar en un elemento list de QT los nombres del Tag para mostrarlos en la interfaz
+
+        :param p_iu_list_item: El objeto de list_aplicados o list_disponibles a rellenar
+        :return:
+        """
+        for elemento in self.lista:
+            # item_script = QtWidgets.QListWidgetItem()
+            item_script = ListWidgetItem()
+            item_script.setData(QtCore.Qt.UserRole, QtCore.QVariant(("script", elemento)))
+            item_script.setIcon(QtGui.QIcon("plasma-next-icons/Breeze/actions/toolbar/irc-operator.svg"))
+            item_script.setText(elemento.nombre_s)
+            p_iu_list_item.addItem(item_script)
+
+    def imprimir_elementos_iu(self, p_label):
+        """
+        Ésta función sirve para poder cargar los Scritps que pertenecen a un TAG e imprimirlos en la interfaz
+        que sea necesaria
+
+        :param p_label:
+        :return:
+        """
+        imprimir = ""
+        for elemento in self.lista:
+           imprimir = imprimir + elemento.nombre_s + " -- "
+
+        p_label.setText(imprimir)
 
     def deconstruir(self):
         """
@@ -63,7 +110,18 @@ class ListaScript(object):
         :return:
         """
         for diccionario in p_lista_diccionario:
-            un_script = Script.Script(diccionario['IdScript'], diccionario['NombreS'],
-                                            diccionario['Descripcion'], diccionario['Activo'],
-                                            diccionario['Ruta'])
+            un_script = Script.Script(diccionario['IdScript'], diccionario['NombreScript'],
+                                            diccionario['Descripcion'], None, None)
             self.lista.append(un_script)
+
+
+# Reimplemento la clase de WidgetItem para que ponga los Scripts por debajo de los tags
+# y los ordene de forma alfabética.
+
+class ListWidgetItem(QtWidgets.QListWidgetItem):
+    def __lt__(self, other):
+        other_datos = other.data(QtCore.Qt.UserRole)
+        if other_datos[0] == "tag":
+            return False
+        else:
+            return self.text() < other.text()

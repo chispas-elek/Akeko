@@ -59,7 +59,7 @@ class GestorHistorial(object):
         respuesta = False
         bd = MySQLConnector.MySQLConnector()
         # Obtenemos los nombres a partir de los Identificadores que hemnos recibido
-        consulta_1 = "SELECT NombreScript FROM SCRIPT WHERE IdScript=%s", (p_id_script, )
+        consulta_1 = "SELECT NombreScript FROM Script WHERE IdScript=%s", (p_id_script, )
         respuesta_bd_1 = bd.execute(consulta_1)
         consulta_2 = "SELECT NombreGrupo FROM Grupo WHERE IdGrupo=%s", (p_id_grupo, )
         respuesta_bd_2 = bd.execute(consulta_2)

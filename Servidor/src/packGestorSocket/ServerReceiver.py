@@ -237,7 +237,7 @@ class ServerHandler(StreamRequestHandler):
             # Insertamos los nuevos alumnos en el sistema
             for alumno_nuevo in lista_alumnos_nuevos:
                 gestor_alumno.anadir_alumno(alumno_nuevo['Dni'], alumno_nuevo['Nombre'],
-                                              alumno_nuevo['Apellido'], alumno_nuevo['Email'])
+                                            alumno_nuevo['Apellido'], alumno_nuevo['Email'])
             # Agregamos el nuevo grupo, con sus alumnos asociados
             # Si ésta función devuelve True es que las cosas han ido bien
             resultado = gestor_grupo.anadir_grupo(nombre_grupo, id_usuario, lista_alumnos)
@@ -288,7 +288,7 @@ class ServerHandler(StreamRequestHandler):
                 if elim_tag:
                     # Se ha eliminado el tag del alumno actual, insertamos la acción en el historial
                     gestor_historial.anadir_historial_tag(tag['IdTag'], alumno['Nombre'], alumno['Apellido'],
-                                                              id_usuario, id_grupo, False, 'Borrado de grupo')
+                                                          id_usuario, id_grupo, False, 'Borrado de grupo')
                 else:
                     # Algo ha pasado, paramos
                     resultado = False
@@ -349,9 +349,12 @@ class ServerHandler(StreamRequestHandler):
                         -> lista_cambios_s: Una lista que contiene los cambios en los scripts que se realizarán
                         -> lista_cambios_t: Una lista que contiene los cambios en los tags que se realizarán.
                         -> lista_alumnos: La lista de los alumnos afectados
-        :return:
+        :return: True -> Si todo se ha aplicado sin problemas
+                False -> Si algo no ha ido bien
         """
+        resultado = False
         gesto_tag_script = GestorTagScript.GestorTagScript()
+        gestor_historial = GestorHistorial.GestorHistorial()
         id_usuario = p_data[1]['id_usuario']
         id_grupo = p_data[1]['id_grupo']
         lista_cambios_s = p_data[1]['lista_cambios_s']
@@ -361,19 +364,94 @@ class ServerHandler(StreamRequestHandler):
         for alumno in lista_alumnos:
             # Modificamos los scripts
             for cambio_s in lista_cambios_s:
+                aplicado_s_ok = False
+                eliminado_s_ok = False
                 if cambio_s['accion'] == 'anadir_script':
                     # añadimos script al alumno actual
-                    gesto_tag_script.aplicar_script(cambio_s['id_script'], alumno['Dni'], id_usuario, id_grupo)
+                    aplicado_s = gesto_tag_script.aplicar_script(cambio_s['id_script'], alumno['Dni'], id_usuario,
+                                                               id_grupo)
+                    # Actualizamos la BD del historial
+                    if aplicado_s:
+                        exito = gestor_historial.anadir_historial_script(cambio_s['id_script'], alumno['Nombre'],
+                                                                         alumno['Apellido'], id_usuario, id_grupo, True,
+                                                                         'Se ha añadido un Script')
+                        if exito:
+                            aplicado_s_ok = True
+                        else:
+                            # Error serio a la hora de actualizar el historial
+                            break
+                    else:
+                        # Error serio a la hora de aplicar el scrio
+                        break
                 else:
                     # Eliminamos script al alumno actual
-                    gesto_tag_script.eliminar_script(cambio_s['id_script'], alumno['Dni'], id_usuario, id_grupo)
+                    eliminado_s = gesto_tag_script.eliminar_script(cambio_s['id_script'], alumno['Dni'], id_usuario,
+                                                                id_grupo)
+                    # Actualizamos el historial
+                    if eliminado_s:
+                        exito = gestor_historial.anadir_historial_script(cambio_s['id_script'], alumno['Nombre'],
+                                                                         alumno['Apellido'], id_usuario, id_grupo,
+                                                                         False, 'Se ha borrado un Script')
+                        if exito:
+                            eliminado_s_ok = True
+
+                        else:
+                            # No se ha actualizado correctamente la BD
+                            break
+                    else:
+                        # El script no se ha eliminado correctamente de la BD
+                        break
+
+                # Si las cosas van bien damos luz verde
+                if aplicado_s_ok or eliminado_s_ok:
+                    resultado = True
+                else:
+                    resultado = False
             # Modificamos los Tags
             for cambio_t in lista_cambios_t:
+                aplicado_t_ok = False
+                eliminado_t_ok = False
                 if cambio_t['accion'] == 'anadir_tag':
-                    gesto_tag_script.aplicar_tag(cambio_t['id_tag'], alumno['Dni'], id_usuario, id_grupo)
+                    # Añadimos los scripts del Tag
+                    aplicado_t = gesto_tag_script.aplicar_tag(cambio_t['id_tag'], alumno['Dni'], id_usuario, id_grupo)
+                    # Actualizar el historial
+                    if aplicado_t:
+                        # Actualizamos el historial
+                        exito_t = gestor_historial.anadir_historial_tag(cambio_t['id_tag'], alumno['Nombre'],
+                                                                        alumno['Apellido'], id_usuario, id_grupo,
+                                                                        True, 'Se ha añadido un Tag')
+                        if exito_t:
+                            aplicado_t_ok = True
+                        else:
+                            # No se ha actualizado bien la BD
+                            break
+                    else:
+                        # Algo no ha ido bienn
+                        break
                 else:
                     # Eliminamos el tag
-                    gesto_tag_script.eliminar_tag(cambio_t['id_tag'], alumno['Dni'], id_usuario, id_grupo)
+                    eliminado_t = gesto_tag_script.eliminar_tag(cambio_t['id_tag'], alumno['Dni'], id_usuario, id_grupo)
+                    # Actualizamos el historial
+                    if eliminado_t:
+                        exito_t = gestor_historial.anadir_historial_tag(cambio_t['id_tag'], alumno['Nombre'],
+                                                                        alumno['Apellido'], id_usuario, id_grupo,
+                                                                        False, 'Se ha eliminado un Tag')
+
+                        if exito_t:
+                            eliminado_t_ok = True
+                        else:
+                            # No se ha actualizado bien la BD
+                            break
+                    else:
+                        # No se ha eliminado correctamente el TAg
+                        break
+
+                if aplicado_t_ok or eliminado_t_ok:
+                    resultado = True
+                else:
+                    resultado = False
+
+        return resultado
 
     def eliminar_tag_usuario(self, p_data):
         """
@@ -444,7 +522,7 @@ class ServerHandler(StreamRequestHandler):
                 # Se ha cambiado de owner, deshabilitamos el TAg en todos los grupos del user actual
                 lista_grupo = gestor_grupo.obtener_grupos_tag(id_tag)
                 for grupo in lista_grupo:
-                    #Obtenemos la lista de alumnos del grupo actual
+                    # Obtenemos la lista de alumnos del grupo actual
                     lista_alumno = gestor_alumno.obtener_alumnos(grupo['IdGrupo'])
                     for alumno in lista_alumno:
                         # Eliminamos los scripts de este TAG
@@ -455,7 +533,7 @@ class ServerHandler(StreamRequestHandler):
                 # Por cada grupo, debemos hacer los cambios
                 lista_grupo = gestor_grupo.obtener_grupos_tag(id_tag)
                 for grupo in lista_grupo:
-                    #Obtenemos la lista de alumnos del grupo actual
+                    # Obtenemos la lista de alumnos del grupo actual
                     lista_alumno = gestor_alumno.obtener_alumnos(grupo['IdGrupo'])
                     for alumno in lista_alumno:
                         for cambio in lista_cambios:

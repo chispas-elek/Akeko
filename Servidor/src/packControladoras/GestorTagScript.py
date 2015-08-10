@@ -4,6 +4,7 @@ __author__ = 'Rubén Mulero'
 
 import subprocess as sub
 from Servidor.src.packGestorBD import MySQLConnector
+import datetime
 
 
 class Singleton(type):
@@ -70,26 +71,26 @@ class GestorTagScript(object):
         :param p_dni: El Dni del alumno
         :param p_id_usuario: El identificador del usuario
         :param p_id_grupo:  El identificador del grupo
-        :return:
+        :return: True -> Si el script se ha aplicado correctamente al alumno del grupo seleecionado
+                False -> Si algo no ha ido bien
         """
+        exito = False
         # Añadimos la intención en la BD
         actualizar_datos = self._anadir_intencion(p_id_script, p_dni, p_id_usuario, p_id_grupo)
         if actualizar_datos:
             # La intención del script se ha registrado correctamente
             bd = MySQLConnector.MySQLConnector()
-            consulta_1 = "INSERT INTO Script_Grupo(IdGrupo,IdScipt) VALUES (%s,%s);", (p_id_grupo, p_id_script)
+            consulta_1 = "INSERT INTO Script_Grupo(IdGrupo,IdScript) VALUES (%s,%s);", (p_id_grupo, p_id_script)
             respuesta_bd_1 = bd.execute(consulta_1)
-            # Insertamos el Historial de lo sucedido
-            consulta_2 = """INSERT INTO Historial VALUES(IdScript,Dni,IdUsuario,IdGrupo,Accion,Informacion)
-                        VALUES(%s,%s,%s,%s,'anadir','Se ha anadido un script');
-                        """, (p_id_script, p_dni, p_id_usuario, p_id_grupo)
-            respuesta_bd_2 = bd.execute(consulta_2)
-            # Comprobar que las 2 respuesta sean correctas y enviar la operación que se ha realizado.
+            if respuesta_bd_1 == 1:
+                    exito = True
         else:
             # Ha existido algun error serio a la hora de intentar añadir la intención
             # O ejecutar el script. Revisar qué ha sucedido
             # Añadir exception
             pass
+
+        return exito
 
     def eliminar_script(self, p_id_script, p_dni, p_id_usuario, p_id_grupo):
         """
@@ -102,7 +103,7 @@ class GestorTagScript(object):
         :param p_id_grupo:  El identificador del grupo
         :return:
         """
-        # todo cambiar la actualización del historial
+        exito = False
         # Elimino la intención de la BD
         actualizar_datos = self._eliminar_intencion(p_id_script, p_dni, p_id_usuario, p_id_grupo)
         if actualizar_datos:
@@ -110,15 +111,13 @@ class GestorTagScript(object):
             bd = MySQLConnector.MySQLConnector()
             consulta_1 = "DELETE FROM Script_Grupo WHERE IdGrupo=%s, IdScript=%s;", (p_id_grupo, p_id_script)
             respuesta_bd_1 = bd.execute(consulta_1)
-            # Insertamos en el Historial los datos
-            consulta_2 = """INSERT INTO Historial VALUES(IdScript,Dni,IdUsuario,IdGrupo,Accion,Informacion)
-                        VALUES(%s,%s,%s,%s,'borrar','Se ha borrado un script');
-                        """, (p_id_script, p_dni, p_id_usuario, p_id_grupo)
-            respuesta_bd_2 = bd.execute(consulta_2)
-            # Comprobar que las 2 respuestas hayan salido bien
+            if respuesta_bd_1 == 1:
+                exito = True
         else:
             # Error garrafal, añadir alguna excepcion en éste punto
             pass
+
+        return exito
 
     def _anadir_intencion(self, p_id_script, p_dni, p_id_usuario, p_id_grupo):
         """
@@ -139,6 +138,7 @@ class GestorTagScript(object):
         consulta_1 = "SELECT IdScript FROM Aplicacion WHERE IdScript=%s AND Dni=%s;", (p_id_script, p_dni)
         respuesta_bd = bd.execute(consulta_1)
         if len(respuesta_bd) != 0:
+            # todo podriamos intentar verificar que al menos el script exista.
             # El script ya ha sido añadido asi que simplemente añado la intención
             consulta_2 = """INSERT INTO Aplicacion(IdScript,Dni,IdUsuario,IdGrupo) VALUES
                         (%s,%s,%s,%s);
@@ -158,7 +158,7 @@ class GestorTagScript(object):
                 if respuesta_bd_3:
                     actualizar_bd = True
             else:
-                # Error garrafal raiseo excepción
+                # Por alguna razón, el script ya no existe en la BD y no se puede aplicar correctamente
                 pass
 
         return actualizar_bd
@@ -274,11 +274,12 @@ class GestorTagScript(object):
         """
         # todo formatear la fechaCreacion a str
         bd = MySQLConnector.MySQLConnector()
-        consulta = """SELECT IdTag,NombreTag,Descripcion,FechaCreacion FROM Tag
+        consulta = """SELECT IdTag,NombreTag,Descripcion,FechaCreacion,IdUsuario FROM Tag
                     WHERE IdTag IN (SELECT IdTag FROM Tag_Grupo WHERE IdGrupo=%s);
                     """, (p_id_grupo, )
         respuesta_bd = bd.execute(consulta)
-        return respuesta_bd
+        respuesta_bd_f_formateada = self._formatear_hora(respuesta_bd)
+        return respuesta_bd_f_formateada
 
     def obtener_tags_disponibles(self, p_id_grupo):
         """
@@ -288,11 +289,12 @@ class GestorTagScript(object):
         """
         # todo formatear la fechaCreacion a str
         bd = MySQLConnector.MySQLConnector()
-        consulta = """SELECT IdTag,NombreTag,Descripcion,FechaCreacion FROM Tag
+        consulta = """SELECT IdTag,NombreTag,Descripcion,FechaCreacion,IdUsuario FROM Tag
                     WHERE IdTag NOT IN (SELECT IdTag FROM Tag_Grupo WHERE IdGrupo=%s);
                     """, (p_id_grupo, )
         respuesta_bd = bd.execute(consulta)
-        return respuesta_bd
+        respuesta_bd_f_formateada = self._formatear_hora(respuesta_bd)
+        return respuesta_bd_f_formateada
 
     def obtener_tags_usuario(self, p_id_usuario):
         """
@@ -304,7 +306,8 @@ class GestorTagScript(object):
         bd = MySQLConnector.MySQLConnector()
         consulta = "SELECT IdTag,NombreTag,Descripcion,FechaCreacion FROM Tag WHERE IdUsuario=%s;", (p_id_usuario, )
         respuesta_bd = bd.execute(consulta)
-        return respuesta_bd
+        respuesta_bd_f_formateada = self._formatear_hora(respuesta_bd)
+        return respuesta_bd_f_formateada
 
     def anadir_tag(self, p_nombre_tag, p_id_usuario, p_descripcion, p_lista_scrip):
         """
@@ -348,8 +351,10 @@ class GestorTagScript(object):
         :param p_dni: El identificador del alumno
         :param p_id_usuario: El identificador del usuario
         :param p_id_grupo: El identificador del grupo
-        :return:
+        :return: True -> Si todos los scripts se han insertado correctamente
+                False -> Algo no ha ido bien durante la aplicación del Tag
         """
+        exito = False
         # Dado el tag, tenemos que obtener sus scripts asociados
         lista_scripts = self.obtener_scripts_tag(p_id_tag)
         bd = MySQLConnector.MySQLConnector()
@@ -357,18 +362,19 @@ class GestorTagScript(object):
             actualizar_datos = self._anadir_intencion(script['IdScript'], p_dni, p_id_usuario, p_id_grupo)
             if actualizar_datos:
                 # La intención del script se ha registrado correctamente
+                # todo duplicate Entry
                 consulta_1 = "INSERT INTO Tag_Grupo(IdGrupo,IdTag) VALUES (%s,%s);", (p_id_grupo, p_id_tag)
                 respuesta_bd_1 = bd.execute(consulta_1)
+                if respuesta_bd_1 == 1:
+                    # Las inserciones han ido correctamente bien.
+                    exito = True
             else:
                 # Ha existido algun error serio a la hora de intentar añadir la intención
                 # O ejecutar el script. Revisar qué ha sucedido
                 # Añadir exception
+                exito = False
                 break
-        # Insertamos el Historial de lo sucedido
-        consulta_2 = """INSERT INTO Historial VALUES(IdTag,Dni,IdUsuario,IdGrupo,Accion,Informacion)
-                        VALUES(%s,%s,%s,%s,'anadir','Se ha anadido un tag');
-                        """, (p_id_tag, p_dni, p_id_usuario, p_id_grupo)
-        respuesta_bd_2 = bd.execute(consulta_2)
+        return exito
 
     def eliminar_tag(self, p_id_tag, p_dni, p_id_usuario, p_id_grupo):
         """
@@ -381,18 +387,18 @@ class GestorTagScript(object):
         :param p_id_grupo: El identificador del grupo
         :return:
         """
-        actualizar_bd = False
+        exito = False
         # Obtenemos los scripts asociados al tag
         lista_scripts = self.obtener_scripts_tag(p_id_tag)
         for script in lista_scripts:
             actualizar_datos = self._eliminar_intencion(script['IdScript'], p_dni, p_id_usuario, p_id_grupo)
             if actualizar_datos:
-                actualizar_bd = True
+                exito = True
             else:
                 # Algo serio ha pasado, paramos la acción
-                actualizar_bd = False
+                exito = False
                 break
-        return actualizar_bd
+        return exito
 
     def borrar_tag(self, p_id_tag):
         """
@@ -492,6 +498,22 @@ class GestorTagScript(object):
                     # Algo no ha ido bien
                     pass
 
+    def _formatear_hora(self, p_list_dict_valores):
+        """
+        La base de datos devuelve los datos en formato datetime. El cual es incompatible con JSON ya que pide Strings
+        o ints. Para evitar problemas, con ésta función vamos a transformar el valor datetime en un String en un formato
+        europeo
+
+        :param p_dict_valores: La lista que contiene los diciconarios con los valores de la BD
+
+        :return: El dicionario de datos enviados con la fechas formateadas.
+        """
+        for valor in p_list_dict_valores:
+            fecha_de_la_bd = valor['FechaCreacion']
+            fecha_formateada = fecha_de_la_bd.strftime("%H:%M:%S %d-%m-%Y")
+            valor['FechaCreacion'] = fecha_formateada
+
+        return p_list_dict_valores
 
 
 class Solitario(object):

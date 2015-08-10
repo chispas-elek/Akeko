@@ -1,9 +1,10 @@
 # -*- encoding: utf-8 -*-
-from Cliente.src.packModelo import Tag
 
 __author__ = 'Rubén Mulero'
 
-import Cliente.src.packModelo.Tag
+
+from PyQt5 import QtGui, QtWidgets, QtCore
+import Tag
 
 class ListaTag(object):
 
@@ -11,6 +12,9 @@ class ListaTag(object):
         self.lista = []
 
     # Definición de los métodos necesarios
+
+    def anadir(self, p_elemento):
+        self.lista.append(p_elemento)
 
     def cotejar_lista_t(self, p_lista_tag):
         """
@@ -38,12 +42,18 @@ class ListaTag(object):
         :param p_elemento: El elementoa  comprobar
         :return: True o False dependiendo si la lista contiene o no el elemento
         """
-        if p_elemento in self.lista:
-            return True
-        else:
-            return False
+        encontrado = False
+        it = self._obtener_iterador()
+        while not encontrado:
+            try:
+                tag = it.next()
+                if p_elemento.id_tag == tag.id_tag:
+                    encontrado = True
+            except StopIteration:
+                break
+        return encontrado
 
-    def filtrado_script(self, p_lista_s):
+    def filtrado_script(self, p_c_gestionar_script, p_lista_s):
         """
         Elimina los scripts redundantes que ya puedan estar incluidos en los TAGS
 
@@ -51,13 +61,28 @@ class ListaTag(object):
         :return: Una lista de scripts con los scripts redundantes eliminados
         """
         scripts_filtrados = p_lista_s
-
         for elemento in self.lista:
-            sus_scripts_elemento = elemento.lista_s
+            sus_scripts_elemento = p_c_gestionar_script.obtener_scripts_tag(elemento.id_tag)
             # Cotejamos la lista de scripts con la lista de scripts del TAG y filtramos
             scripts_filtrados = scripts_filtrados.cotejar_lista_s(sus_scripts_elemento)
 
         return scripts_filtrados
+
+    def cargar_lista_tag(self, p_iu_list_item):
+        """
+        Se encarga de cargar en un elemento list de QT los nombres del Tag para mostrarlos en la interfaz
+
+        :param p_item_tag El item del tag a introducir
+        :param p_iu_list_item: El objeto de list_aplicados o list_disponibles a rellenar
+        :return:
+        """
+        for elemento in self.lista:
+            # item_tag = QtWidgets.QListWidgetItem()
+            item_tag = ListWidgetItem()
+            item_tag.setData(QtCore.Qt.UserRole, QtCore.QVariant(("tag", elemento)))
+            item_tag.setIcon(QtGui.QIcon("plasma-next-icons/Breeze/actions/toolbar/get-hot-new-stuff.svg"))
+            item_tag.setText(elemento.nombre_tag)
+            p_iu_list_item.addItem(item_tag)
 
     def deconstruir(self):
         """
@@ -86,3 +111,15 @@ class ListaTag(object):
                             diccionario['Descripcion'], diccionario['FechaCreacion'],
                             diccionario['IdUsuario'], None)
             self.lista.append(un_tag)
+
+
+# Reimplemento la clase ListWidgetItem para que ponga los Tags por encima de los Scripts
+# Ordenados de forma alfabética
+
+class ListWidgetItem(QtWidgets.QListWidgetItem):
+    def __lt__(self, other):
+        other_datos = other.data(QtCore.Qt.UserRole)
+        if other_datos[0] == "script":
+            return True
+        else:
+            return self.text() < other.text()

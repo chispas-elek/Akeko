@@ -1,9 +1,10 @@
 # -*- encoding: utf-8 -*-
 __author__ = 'Rubén Mulero'
 
-import collections
+
 from Cliente.src.packGestorSocket import ServerSender
 from Cliente.src.packModelo import ListaScript, ListaTag
+from PyQt5 import QtCore
 
 
 class Singleton(type):
@@ -86,43 +87,42 @@ class CGestionarScript(object):
         lista_tag_dispo.construir(resultado)
         return lista_tag_dispo
 
-    def aplicar_cambios(self, p_id_usuario, p_id_grupo,
-                        p_lista_vieja_s, p_lista_nueva_s,
-                        p_lista_vieja_t, p_lista_nueva_t,
-                        p_lista_alumnos):
+    def obtener_scripts_tag(self, p_id_tag):
         """
-        Aplica los nuevos cambios de scripts y Tags en un grupo seleccionado
+        Dado el identificador de un TAg. Obtiene la lista de Scripts que Posee
 
-        :param p_id_usuario: El identificador del usuario
-        :param p_id_grupo: El identificador del grupo
-        :param p_lista_vieja_s: La lista anterior de scripts
-        :param p_lista_nueva_s: La lista con los nuevos scripts
-        :param p_lista_nueva_t: La nueva lista de Tags
-        :param p_lista_vieja_t: La lista anterior de Tags
-        :param p_lista_alumnos: La lista que contiene los alumnos del grupo
+        :param p_id_tag:
         :return:
         """
-        # Antes de hacer nada hacemos un filtrado de datos para evitar redundancias
-        p_lista_nueva_s_filtrado = p_lista_nueva_t.filtrado_script(p_lista_nueva_s)
+        lista_envio = []
+        lista_envio.append({'metodo': 'obtener_scripts_tag'})
+        lista_envio.append({'id_tag': p_id_tag})
+        socket = ServerSender.ServerSender(lista_envio)
+        resultado = socket.enviar_datos()
+        lista_scripts_tag = ListaScript.ListaScript()
+        lista_scripts_tag.construir(resultado)
+        return lista_scripts_tag
+
+    def aplicar_cambios(self, p_id_usuario, p_id_grupo, p_lista_alumnos,
+                        p_lista_disponibles_previa, p_lista_disponibles_actual,
+                        p_lista_aplicados_previa, p_lista_aplicados_actual):
 
         lista_envio = []
-        # Primero vamos a controlar que no estemos aplicando las mismas listas
-        comparar = lambda x, y: collections.Counter(x) == collections.Counter(y)
-        if comparar(p_lista_vieja_s, p_lista_nueva_s) is not True or comparar(p_lista_vieja_t, p_lista_nueva_t) is not True:
-            # Vamos a crear un diccionario de cambios que va a ser enviada
-            # Primero vamos a crear la lista de cambios de los scripts
-            if comparar(p_lista_vieja_s, p_lista_nueva_s):
-                # La lista de scripts no ha cambiado
-                lista_cambios_s = None
-            else:
-                lista_cambios_s = self._crear_lista_cambios(p_lista_vieja_s, p_lista_nueva_s_filtrado, True)
-            # A continuación repetimos para los TAGS
-            if comparar(p_lista_vieja_t, p_lista_nueva_t):
-                # La lista de TAgs no ha cambiado
-                lista_cambios_t = None
-            else:
-                lista_cambios_t = self._crear_lista_cambios(p_lista_vieja_t, p_lista_nueva_t, False)
-            # Creamos el diccionario y enviamos los datos por socket
+        resultado = None
+        # Lo primero es crear dos listas de elementos que contengan los tags y los scripts
+        lista_cambios_s = []
+        lista_cambios_t = []
+        # Vamos a realizar un filtrado de los scripts aplicados para eliminar redundancias
+        lista_aplicados_filtrada = self._filtrar_scripts(p_lista_aplicados_actual)
+        if lista_aplicados_filtrada is not None:
+            # La lista se ha filtrado correctament
+            # Vamos a comprobar qué script se han agregado
+            self._crear_lista_cambios(lista_cambios_s, lista_cambios_t, p_lista_disponibles_previa,
+                                      lista_aplicados_filtrada, True)
+            self._crear_lista_cambios(lista_cambios_s, lista_cambios_t, p_lista_disponibles_actual,
+                                      p_lista_aplicados_previa, False)
+            # Preparamos el envio de los datos
+
             lista_envio.append({'metodo': 'aplicar_cambios'})
             lista_envio.append({'id_usuario': p_id_usuario,
                                 'id_grupo': p_id_grupo,
@@ -132,61 +132,147 @@ class CGestionarScript(object):
             socket = ServerSender.ServerSender(lista_envio)
             resultado = socket.enviar_datos()
         else:
-            # El usuario no ha hecho ningún cambio Raise exception
+            # Tenemos que devolver a la interfaz un dato para que  muestre un error de que hay 2 o más TAGS que tienen
+            # Los mismos scripts por apicar y que ésto, no es deseable.
+            # todo vamos a devolver un None a la interfaz en caso de error garrafal
             resultado = None
+
         return resultado
 
-    def _crear_lista_cambios(self, p_lista_vieja, p_lista_nueva, p_es_script):
+    def _filtrar_scripts(self, p_lista_aplicados):
         """
-        Genera la lista de cambios para los scripts
+        Ésta función separa los scripts y los tags en dos valores distintos y comprueba que no existan redundancias.
+        Una redundancia es la existencia de un script, que ya está contenido en un TAG.
 
-        :param p_lista_vieja: La lista vieja de Scripts
-        :param p_lista_nueva: La lista nueva de Scripts
-        :param p_es_script: True si es para crear una lista de cambios de scripts
-                            False si es para crear una lista de cambios de TAGS
-        :return: La lista de cambios
+        :param p_lista_aplicados:
+        :return: una lista con los scripts redundantes eliminados
+                en caso de error se devueve None
         """
-        lista_cambios = []
-        if len(p_lista_vieja) != 0:
-            if p_es_script:
-                # Primero cotejamos la lista vieja con la nueva para eliminar scripts
-                lista_borrado = p_lista_vieja.cotejar_lista_s(p_lista_nueva)
-                # Ahora cotejamos la lista nueva con la vieja para saber cuáles son los scripts nuevos
-                lista_anadir = p_lista_nueva.cotejar_lista_s(p_lista_vieja)
+        lista_aplicados = p_lista_aplicados
+        lista_filtrada = []
+        fallo = False
+        i = 0
+        while i < len(lista_aplicados) and fallo is not True:
+            item = lista_aplicados[i]
+            item_data = item.data(QtCore.Qt.UserRole)
+            if item_data[0] == "tag":
+                # Tenemos un TAg, vamos a obtener sus TAGS y comprobar si existen en los demás elementos
+                tag = item_data[1]
+                lista_scripts_del_tag = self.obtener_scripts_tag(tag.id_tag)
+                if len(lista_filtrada) != 0:
+                    for filtrado in lista_filtrada:
+                        filtrado_data = filtrado.data(QtCore.Qt.UserRole)
+                        if filtrado_data[0] == "tag":
+                            # Hay un Tag, Vamos a comprobar si son compatibles
+                            otro_tag = filtrado_data[1]
+                            lista_scripts_del_otro_tag = self.obtener_scripts_tag(otro_tag.id_tag)
+                            resultado = lista_scripts_del_otro_tag.cotejar_lista_s(lista_scripts_del_tag)
+                            if len(resultado) == lista_scripts_del_tag.obtener_tamano_lista():
+                                # No hay problema, no se repiten scripts
+                                lista_filtrada.append(item)
+                            else:
+                                print "El nuevo tag tiene scripts que ya contiene el que está en la lista de filtados"
+                                lista_filtrada = None
+                                fallo = True
+                                break
+                        else:
+                            # Es imposible darse el caso que haya scripts, pero se deja programado por si acaso
+                            otro_script = filtrado_data[1]
+                            resultado = lista_scripts_del_tag.existe(otro_script)
+                            if resultado:
+                                # Elimino el script
+                                lista_filtrada.remove(filtrado)
+                            # El tag siempre va a tener preferencia sobre el Scipt
+                            lista_filtrada.append(item)
+                else:
+                    # La lista de filtrado, está vacía, inserto directamente
+                    lista_filtrada.append(item)
+
             else:
-                # Primero cotejamos la lista vieja con la nueva para eliminar scripts
-                lista_borrado = p_lista_vieja.cotejar_lista_t(p_lista_nueva)
-                # Ahora cotejamos la lista nueva con la vieja para saber cuáles son los scripts nuevos
-                lista_anadir = p_lista_nueva.cotejar_lista_t(p_lista_vieja)
-            # Creamos la lista de cambios
-            for borrado in lista_borrado:
-                if p_es_script:
-                    lista_cambios.append({'accion': 'borrar_script',
-                                          'id_script': borrado.id_script})
+                # El item es un script. Comprobamos si éste es compatible con los TAGS que haya
+                if len(lista_filtrada) != 0:
+                    # Vamos a comprobar si los elementos son TAGS. En caso afirmativo comprobaremos si el script
+                    # Es compatible
+                    script = item_data[1]
+                    resultado = False
+                    j = 0
+                    while j < len(lista_filtrada) and resultado is not True:
+                        filtrado_2 = lista_filtrada[j]
+                        filtrado_2_data = filtrado_2.data(QtCore.Qt.UserRole)
+                        if filtrado_2_data[0] == "tag":
+                            # Hay un tag, comprobamos compatiblidad
+                            otro_tag = filtrado_2_data[1]
+                            lista_scripts_del_otro_tag = self.obtener_scripts_tag(otro_tag.id_tag)
+                            resultado = lista_scripts_del_otro_tag.existe(script)
+                        else:
+                            # Ya no existen más TAGS, no tiene sentido seguir recorriendo la lista
+                            resultado = True
+                        j += 1
+                    if not resultado:
+                        # Si resultado se ha mantenido False, es que el script no se encuentra en ningún TAG
+                        # Podemos insertarlo
+                        lista_filtrada.append(item)
                 else:
-                    lista_cambios.append({'accion': 'borrar_tag',
-                                          'id_tag': borrado.id_Tag,
-                                          # Convertir ésta lista a diccionario
-                                          'lista_s': borrado.lista_s
-                                          })
-            for anadir in lista_anadir:
-                if p_es_script:
-                    lista_cambios.append({'accion': 'anadir_script',
-                                          'id_script': anadir.id_script})
-                else:
-                    lista_cambios.append({'acccion': 'anadir_tag',
-                                          'id_tag': anadir.id_tag,
-                                          # 'lista_s': anadir.lista_s
-                                          })
+                    # La lista de filtrados está vacía, insertamos el scrippt directamente
+                    lista_filtrada.append(item)
+
+            i += 1
+
+        return lista_filtrada
+
+    def _crear_lista_cambios(self, p_lista_cambios_s, p_lista_cambios_t, p_lista_disponible, p_lista_aplicado, p_accion):
+        """
+        Dada la acción emitida. Comprobaremos la lista disponible antigua, con la lista de aplicados nueva en busca
+        de tags/scripts a agregar. O comprobaremos la lista antigua de aplicados con la lista nueva de disponibles
+        en busca de tags/scripts a eliminar
+
+        :param p_lista_cambios_s: La lista de cambios de los scripts
+        :param p_lista_cambios_t: La lista de cambios de los tags
+        :param p_lista_disponible: La lista diponibles, puede ser antigua o nueva
+        :param p_lista_aplicado: La lista de aplicados, puede ser antigua o nueva
+        :param p_accion: True para Mirar que añadir
+                        False para mirar que eliminar.
+        :return:
+        """
+
+        if p_accion:
+            # Vamos a comprobar que tenemos que AÑADIR
+            # Recorremos la lista vieja de disponibles y miramos qué elementos han pasado a la nueva lista de aplicados
+            for item in p_lista_disponible:
+                item_aplicado_encontrado = False
+                i = 0
+                while i < len(p_lista_aplicado) and item_aplicado_encontrado is not True:
+                    elemento = p_lista_aplicado[i]
+                    if elemento is item:
+                        # El elemento se encuentra en la nueva lista
+                        elemento_data = elemento.data(QtCore.Qt.UserRole)
+                        if elemento_data[0] == "tag":
+                            # El elemento es un tag
+                            p_lista_cambios_t.append({'accion': 'anadir_tag',
+                                                      'id_tag': elemento_data[1].id_tag})
+                        else:
+                            # El elemento es un script
+                            p_lista_cambios_s.append({'accion': 'anadir_script',
+                                                     'id_script': elemento_data[1].id_script})
+                        item_aplicado_encontrado = True
+                    i += 1
         else:
-            # Agregamos directamente la nueva lista
-            for nueva in p_lista_nueva:
-                if p_es_script:
-                    lista_cambios.append({'accion': 'anadir_script',
-                                          'id_script': nueva.id_script})
-                else:
-                    lista_cambios.append({'accion': 'anadir_tag',
-                                          'id_tag': nueva.id_tag,
-                                          # 'lista_s': nueva.lista_s
-                                          })
-        return lista_cambios
+            # Vamos a comprobar que tenemos que BORRAR
+            for item_2 in p_lista_aplicado:
+                item_disponible_encontrado = False
+                j = 0
+                while j < len(p_lista_disponible) and item_disponible_encontrado is not True:
+                    elemento_2 = p_lista_disponible[j]
+                    if elemento_2 is item_2:
+                        # El elemento se encuentra en la nueva lista
+                        elemento_2_data = elemento_2.data(QtCore.Qt.UserRole)
+                        if elemento_2_data[0] == "tag":
+                            # El elemento es un tag
+                            p_lista_cambios_t.append({'accion': 'borrar_tag',
+                                                        'id_tag': elemento_2_data[1].id_Tag})
+                        else:
+                            # El elemento es un script
+                            p_lista_cambios_s.append({'accion': 'borrar_script',
+                                                        'id_script': elemento_2_data[0].id_script})
+                        item_disponible_encontrado = True
+                    j += 1

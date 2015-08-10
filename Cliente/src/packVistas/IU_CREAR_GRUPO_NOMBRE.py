@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 from Cliente.src.packControladoras import CCrearGrupo
 import re
 
@@ -103,6 +104,14 @@ class CrearGrupoNombre(QtWidgets.QDialog):
             print "Resultado de la operación es %s" % resultado
             if resultado is True:
                 self.iu_main.generar_combo_box()
+                # Creamos ventana de aviso
+                msg_box = QMessageBox()
+                msg_box.setIcon(1)
+                msg_box.setWindowTitle("Creación de un grupo")
+                msg_box.setText("CORRECTO")
+                msg_box.setInformativeText("El grupo se ha creado corretamente")
+                msg_box.exec_()
+                # Cerramos y volvemos al main
                 self.iu_crear_grupo.close()
                 self.close()
             else:
