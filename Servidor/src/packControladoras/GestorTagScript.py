@@ -64,8 +64,7 @@ class GestorTagScript(object):
 
     def aplicar_script(self, p_id_script, p_dni, p_id_usuario, p_id_grupo):
         """
-        Dado un script, llama a añadir intencion y actualiza la tablas de Script-Grupo e
-        Historial para dejar patente que a un alumno se le ha agregado unn nuevo scrit.
+        Dado un script, llama a añadir intencion
 
         :param p_id_script: El identificador del scriot
         :param p_dni: El Dni del alumno
@@ -79,11 +78,7 @@ class GestorTagScript(object):
         actualizar_datos = self._anadir_intencion(p_id_script, p_dni, p_id_usuario, p_id_grupo)
         if actualizar_datos:
             # La intención del script se ha registrado correctamente
-            bd = MySQLConnector.MySQLConnector()
-            consulta_1 = "INSERT INTO Script_Grupo(IdGrupo,IdScript) VALUES (%s,%s);", (p_id_grupo, p_id_script)
-            respuesta_bd_1 = bd.execute(consulta_1)
-            if respuesta_bd_1 == 1:
-                    exito = True
+            exito = True
         else:
             # Ha existido algun error serio a la hora de intentar añadir la intención
             # O ejecutar el script. Revisar qué ha sucedido
@@ -94,8 +89,7 @@ class GestorTagScript(object):
 
     def eliminar_script(self, p_id_script, p_dni, p_id_usuario, p_id_grupo):
         """
-        Dado un script, llama a eliminar intencion y actualizar las tablas de Script-Grupo e
-        Historial para dejar patente que un alumno se le ha quitado un script.
+        Dado un script, llama a eliminar intencion.
 
         :param p_id_script: El identificador del scriot
         :param p_dni: El Dni del alumno
@@ -107,15 +101,44 @@ class GestorTagScript(object):
         # Elimino la intención de la BD
         actualizar_datos = self._eliminar_intencion(p_id_script, p_dni, p_id_usuario, p_id_grupo)
         if actualizar_datos:
-            # Se ha eliminado correctamente la intención
-            bd = MySQLConnector.MySQLConnector()
-            consulta_1 = "DELETE FROM Script_Grupo WHERE IdGrupo=%s, IdScript=%s;", (p_id_grupo, p_id_script)
-            respuesta_bd_1 = bd.execute(consulta_1)
-            if respuesta_bd_1 == 1:
-                exito = True
+            exito = True
         else:
             # Error garrafal, añadir alguna excepcion en éste punto
             pass
+
+        return exito
+
+    def anadir_script_al_grupo(self, p_id_grupo, p_id_script):
+        """
+        Añade la relación entre Grupo y Script. Cuando un script se ha aplicado a todos los alumnos de un grupo
+
+        :param p_id_gruo:
+        :param p_id_script:
+        :return:
+        """
+        exito = False
+        bd = MySQLConnector.MySQLConnector()
+        consulta = "INSERT INTO Script_Grupo(IdGrupo,IdScript) VALUES (%s,%s);", (p_id_grupo, p_id_script)
+        respuesta_bd = bd.execute(consulta)
+        if respuesta_bd == 1:
+            exito = True
+
+        return exito
+
+    def eliminar_script_al_grupo(self, p_id_grupo, p_id_script):
+        """
+        Elimina la relación entre Grupo y Script. Cuando un script se ha eliminado a todos los alumnos de un Grupo
+
+        :param p_id_grupo:
+        :param p_id_script:
+        :return:
+        """
+        exito = False
+        bd = MySQLConnector.MySQLConnector()
+        consulta = "DELETE FROM Script_Grupo WHERE IdGrupo=%s AND IdScript=%s;", (p_id_grupo, p_id_script)
+        respuesta_bd = bd.execute(consulta)
+        if respuesta_bd == 1:
+            exito = True
 
         return exito
 
@@ -200,7 +223,7 @@ class GestorTagScript(object):
                 pass
         return actualizar_bd
 
-    def exite_intencion(self,p_id_script, p_dni, p_id_usuario, p_id_grupo):
+    def exite_intencion(self, p_id_script, p_dni, p_id_usuario, p_id_grupo):
         """
         Comprobamos si existe o no una intención en la BD dado varios datos
 
@@ -361,13 +384,7 @@ class GestorTagScript(object):
         for script in lista_scripts:
             actualizar_datos = self._anadir_intencion(script['IdScript'], p_dni, p_id_usuario, p_id_grupo)
             if actualizar_datos:
-                # La intención del script se ha registrado correctamente
-                # todo duplicate Entry
-                consulta_1 = "INSERT INTO Tag_Grupo(IdGrupo,IdTag) VALUES (%s,%s);", (p_id_grupo, p_id_tag)
-                respuesta_bd_1 = bd.execute(consulta_1)
-                if respuesta_bd_1 == 1:
-                    # Las inserciones han ido correctamente bien.
-                    exito = True
+                exito = True
             else:
                 # Ha existido algun error serio a la hora de intentar añadir la intención
                 # O ejecutar el script. Revisar qué ha sucedido
@@ -398,6 +415,43 @@ class GestorTagScript(object):
                 # Algo serio ha pasado, paramos la acción
                 exito = False
                 break
+        return exito
+
+    def anadir_tag_al_grupo(self, p_id_grupo, p_id_tag):
+        """
+        Añade la relación entre Tag_Grupo para dejar patente que a todos los alumnos se le han agregado el TAG
+
+        :param p_id_grupo:
+        :param p_id_tag:
+        :return:
+        """
+        exito = False
+        bd = MySQLConnector.MySQLConnector()
+        consulta = "INSERT INTO Tag_Grupo(IdGrupo,IdTag) VALUES (%s,%s);", (p_id_grupo, p_id_tag)
+        respuesta_bd = bd.execute(consulta)
+        if respuesta_bd == 1:
+            # Las inserciones han ido correctamente bien.
+            exito = True
+
+        return exito
+
+    def eliminar_tag_al_grupo(self, p_id_grupo, p_id_tag):
+        """
+        Elimina la relación entre Tag_Grupo para dejar patente que a todos los alumnos se le han eliminado el TAG
+
+        :param p_id_grupo:
+        :param p_id_tag:
+
+        :return:
+        """
+        exito = False
+        bd = MySQLConnector.MySQLConnector()
+        consulta = "DELETE FROM Tag_Grupo WHERE IdGrupo=%s AND IdTag=%s;", (p_id_grupo, p_id_tag)
+        respuesta_bd = bd.execute(consulta)
+        if respuesta_bd == 1:
+            # Las inserciones han ido correctamente bien.
+            exito = True
+
         return exito
 
     def borrar_tag(self, p_id_tag):

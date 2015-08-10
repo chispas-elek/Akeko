@@ -269,6 +269,7 @@ class ServerHandler(StreamRequestHandler):
         lista_scripts = gestor_tag_script.obtener_scripts(id_grupo)
         lista_tags = gestor_tag_script.obtener_tags(id_grupo)
         resultado = True
+
         # Por cada alumno, eliminamos el script
         for alumno in lista_alumnos:
             # Eliminamos el script
@@ -360,96 +361,137 @@ class ServerHandler(StreamRequestHandler):
         lista_cambios_s = p_data[1]['lista_cambios_s']
         lista_cambios_t = p_data[1]['lista_cambios_t']
         lista_alumnos = p_data[1]['lista_alumnos']
-        # Por cada alumno realizamos la lista de cambios necesaria
-        for alumno in lista_alumnos:
-            # Modificamos los scripts
-            for cambio_s in lista_cambios_s:
-                aplicado_s_ok = False
-                eliminado_s_ok = False
-                if cambio_s['accion'] == 'anadir_script':
-                    # añadimos script al alumno actual
+
+
+        # Lo primero que vamos a hacer, es recorrer la lista de cambios de los Scripts.
+        # Aplicando cada script 1 a 1 a cada alumno.
+        for cambio_s in lista_cambios_s:
+            # Vamos a recorrer cada alumno, aplicando o eliminando el script actual
+            if cambio_s['accion'] == 'anadir_script':
+                # Se le añade el script actual a los alumnos
+                aplicado_s = False
+                for alumno in lista_alumnos:
                     aplicado_s = gesto_tag_script.aplicar_script(cambio_s['id_script'], alumno['Dni'], id_usuario,
-                                                               id_grupo)
-                    # Actualizamos la BD del historial
-                    if aplicado_s:
-                        exito = gestor_historial.anadir_historial_script(cambio_s['id_script'], alumno['Nombre'],
-                                                                         alumno['Apellido'], id_usuario, id_grupo, True,
-                                                                         'Se ha añadido un Script')
-                        if exito:
-                            aplicado_s_ok = True
-                        else:
-                            # Error serio a la hora de actualizar el historial
-                            break
+                                                                 id_grupo)
+                    if aplicado_s is not True:
+                        # Error durante la aplicación del script al alumno. Paramos la ejecución.
+                        break
+                if aplicado_s:
+                    # El script se ha aplicado a todos los alumnos añado la relación entre grupo y scriot
+                    grupo_aplicado_s = gesto_tag_script.anadir_script_al_grupo(id_grupo, cambio_s['id_script'])
+                    if grupo_aplicado_s:
+                        # Se ha resgistrado correctamente. Añadimos el historial
+                        historial_registrado_s = gestor_historial.anadir_historial_script(cambio_s['id_script'],
+                                                                                          alumno['Nombre'],
+                                                                                          alumno['Apellido'],
+                                                                                          id_usuario, id_grupo, True,
+                                                                                          'Se ha añadido un Script')
+                        if historial_registrado_s:
+                            # las cosas han ido correctas
+                            resultado = True
                     else:
-                        # Error serio a la hora de aplicar el scrio
+                        # Ha ocurrido un error serio. Paramos la ejecución.
+                        resultado = False
                         break
                 else:
-                    # Eliminamos script al alumno actual
+                    # Algo serio ha ocurrido a la hora de aplicar los scrips.
+                    resultado = False
+                    break
+            else:
+                # Se elimina el script actual a los alumnos
+                eliminado_s = False
+                for alumno in lista_alumnos:
                     eliminado_s = gesto_tag_script.eliminar_script(cambio_s['id_script'], alumno['Dni'], id_usuario,
-                                                                id_grupo)
-                    # Actualizamos el historial
-                    if eliminado_s:
-                        exito = gestor_historial.anadir_historial_script(cambio_s['id_script'], alumno['Nombre'],
-                                                                         alumno['Apellido'], id_usuario, id_grupo,
-                                                                         False, 'Se ha borrado un Script')
-                        if exito:
-                            eliminado_s_ok = True
-
-                        else:
-                            # No se ha actualizado correctamente la BD
-                            break
-                    else:
-                        # El script no se ha eliminado correctamente de la BD
+                                                                   id_grupo)
+                    if eliminado_s is not True:
+                        # Error durante la aplicación del script al alumno. Paramos la ejecución.
                         break
-
-                # Si las cosas van bien damos luz verde
-                if aplicado_s_ok or eliminado_s_ok:
-                    resultado = True
+                if eliminado_s:
+                    # El script se ha aplicado a todos los alumnos añado la relación entre grupo y scriot
+                    grupo_eliminado_s = gesto_tag_script.eliminar_script_al_grupo(id_grupo, cambio_s['id_script'])
+                    if grupo_eliminado_s:
+                        # Se ha resgistrado correctamente. Añadimos el historial
+                        historial_registrado_s = gestor_historial.anadir_historial_script(cambio_s['id_script'],
+                                                                                          alumno['Nombre'],
+                                                                                          alumno['Apellido'],
+                                                                                          id_usuario, id_grupo,
+                                                                                          False,
+                                                                                          'Se ha borrado un Script')
+                        if historial_registrado_s:
+                            # las cosas han ido correctas
+                            resultado = True
+                    else:
+                        # Ha ocurrido un error serio. Paramos la ejecución.
+                        resultado = False
+                        break
                 else:
+                    # Algo serio ha ocurrido a la hora de aplicar los scrips.
                     resultado = False
-            # Modificamos los Tags
-            for cambio_t in lista_cambios_t:
-                aplicado_t_ok = False
-                eliminado_t_ok = False
-                if cambio_t['accion'] == 'anadir_tag':
-                    # Añadimos los scripts del Tag
-                    aplicado_t = gesto_tag_script.aplicar_tag(cambio_t['id_tag'], alumno['Dni'], id_usuario, id_grupo)
-                    # Actualizar el historial
-                    if aplicado_t:
-                        # Actualizamos el historial
-                        exito_t = gestor_historial.anadir_historial_tag(cambio_t['id_tag'], alumno['Nombre'],
-                                                                        alumno['Apellido'], id_usuario, id_grupo,
-                                                                        True, 'Se ha añadido un Tag')
-                        if exito_t:
-                            aplicado_t_ok = True
-                        else:
-                            # No se ha actualizado bien la BD
-                            break
+                    break
+
+        # Ahora vamos a proccesar la lista de Tags con todos los alumnos
+
+        for cambio_t in lista_cambios_t:
+            if cambio_t['accion'] == 'anadir_tag':
+                # Se le añade el tag actual a los alumnos
+                aplicado_t = False
+                for alumno in lista_alumnos:
+                    aplicado_t = gesto_tag_script.aplicar_tag(cambio_t['id_tag'], alumno['Dni'], id_usuario,
+                                                              id_grupo)
+                    if aplicado_t is not True:
+                        # Error durante la aplicación del tag al alumno. Paramos la ejecución.
+                        break
+                if aplicado_t:
+                    # El tag se ha aplicado a todos los alumnos añado la relación entre grupo y tag
+                    grupo_aplicado_t = gesto_tag_script.anadir_tag_al_grupo(id_grupo, cambio_t['id_tag'])
+                    if grupo_aplicado_t:
+                        # Se ha resgistrado correctamente. Añadimos el historial
+                        historial_registrado_t = gestor_historial.anadir_historial_tag(cambio_t['id_tag'],
+                                                                                       alumno['Nombre'],
+                                                                                       alumno['Apellido'], id_usuario,
+                                                                                       id_grupo,
+                                                                                       True, 'Se ha añadido un Tag')
+                        if historial_registrado_t:
+                            # las cosas han ido correctas
+                            resultado = True
                     else:
-                        # Algo no ha ido bienn
+                        # Ha ocurrido un error serio. Paramos la ejecución.
+                        resultado = False
                         break
                 else:
-                    # Eliminamos el tag
-                    eliminado_t = gesto_tag_script.eliminar_tag(cambio_t['id_tag'], alumno['Dni'], id_usuario, id_grupo)
-                    # Actualizamos el historial
-                    if eliminado_t:
-                        exito_t = gestor_historial.anadir_historial_tag(cambio_t['id_tag'], alumno['Nombre'],
-                                                                        alumno['Apellido'], id_usuario, id_grupo,
-                                                                        False, 'Se ha eliminado un Tag')
-
-                        if exito_t:
-                            eliminado_t_ok = True
-                        else:
-                            # No se ha actualizado bien la BD
-                            break
-                    else:
-                        # No se ha eliminado correctamente el TAg
-                        break
-
-                if aplicado_t_ok or eliminado_t_ok:
-                    resultado = True
-                else:
+                    # Algo serio ha ocurrido a la hora de aplicar los tags.
                     resultado = False
+                    break
+            else:
+                # Se elimina el tag actual a los alumnos
+                eliminado_t = False
+                for alumno in lista_alumnos:
+                    eliminado_t = gesto_tag_script.aplicar_tag(cambio_t['id_tag'], alumno['Dni'], id_usuario,
+                                                               id_grupo)
+                    if eliminado_t is not True:
+                        # Error durante la aplicación del tag al alumno. Paramos la ejecución.
+                        break
+                if eliminado_t:
+                    # El tag se ha aplicado a todos los alumnos añado la relación entre grupo y tag
+                    grupo_eliminado_t = gesto_tag_script.eliminar_tag_al_grupo(id_grupo, cambio_t['id_tag'])
+                    if grupo_eliminado_t:
+                        # Se ha resgistrado correctamente. Añadimos el historial
+                        historial_registrado_t = gestor_historial.anadir_historial_tag(cambio_t['id_tag'],
+                                                                                       alumno['Nombre'],
+                                                                                       alumno['Apellido'], id_usuario,
+                                                                                       id_grupo,
+                                                                                       False, 'Se ha eliminado un Tag')
+                        if historial_registrado_t:
+                            # las cosas han ido correctas
+                            resultado = True
+                    else:
+                        # Ha ocurrido un error serio. Paramos la ejecución.
+                        resultado = False
+                        break
+                else:
+                    # Algo serio ha ocurrido a la hora de aplicar los tags.
+                    resultado = False
+                    break
 
         return resultado
 
