@@ -116,6 +116,7 @@ class CrearGrupoAnadirAlumno(QtWidgets.QWidget):
         # Instancio la Interfaz
         self.ventana = Ui_Form()
         self.ventana.setupUi(self)
+        self.move(QtWidgets.QDesktopWidget().availableGeometry().center() - self.frameGeometry().center())
 
         self.iu_crear_grupo = p_iu_crear_grupo
         self.lista_alumnos = p_lista_alumnos

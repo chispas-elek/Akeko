@@ -81,6 +81,7 @@ class CrearGrupoNombre(QtWidgets.QDialog):
         # Instancio la Interfaz
         self.ventana = Ui_Dialog()
         self.ventana.setupUi(self)
+        self.move(QtWidgets.QDesktopWidget().availableGeometry().center() - self.frameGeometry().center())
 
         self.iu_crear_grupo = p_iu_crear_grupo # El objeto de Crear_Grupo para poder cerrar la interfaz anterior.
         self.iu_main = p_iu_main # El objeto del main para poder recargar el combobox del main

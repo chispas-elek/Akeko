@@ -127,6 +127,7 @@ class CrearGrupo(QtWidgets.QWidget):
         # Instancio la Interfaz
         self.ventana = Ui_Form()
         self.ventana.setupUi(self)
+        self.move(QtWidgets.QDesktopWidget().availableGeometry().center() - self.frameGeometry().center())
 
         self.iu_main = p_iu_main
 

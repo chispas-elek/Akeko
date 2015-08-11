@@ -62,6 +62,20 @@ class GestorTagScript(object):
         respuesta_bd = bd.execute(consulta)
         return respuesta_bd
 
+    def obtener_scripts_no_en_tag(self, p_id_tag):
+        """
+        Obtiene los scritps que NO estan incluidos en un TAG
+
+        :param p_id_tag: El identificador de un tag
+        :return: La lista de los scripts que no están incluidos en un TAG
+        """
+        bd = MySQLConnector.MySQLConnector()
+        consulta = """SELECT IdScript,NombreScript,Descripcion FROM Script
+                    WHERE IdScript NOT IN (SELECT IdScript FROM Tag_Script WHERE IdTag=%s)
+                    AND Activo=%s;""", (p_id_tag, True)
+        respuesta_bd = bd.execute(consulta)
+        return respuesta_bd
+
     def aplicar_script(self, p_id_script, p_dni, p_id_usuario, p_id_grupo):
         """
         Dado un script, llama a añadir intencion
@@ -327,7 +341,8 @@ class GestorTagScript(object):
         """
         # todo formatear la fechaCreacion a str
         bd = MySQLConnector.MySQLConnector()
-        consulta = "SELECT IdTag,NombreTag,Descripcion,FechaCreacion FROM Tag WHERE IdUsuario=%s;", (p_id_usuario, )
+        consulta = "SELECT IdTag,NombreTag,Descripcion,FechaCreacion,IdUsuario FROM Tag WHERE IdUsuario=%s;", \
+                   (p_id_usuario, )
         respuesta_bd = bd.execute(consulta)
         respuesta_bd_f_formateada = self._formatear_hora(respuesta_bd)
         return respuesta_bd_f_formateada

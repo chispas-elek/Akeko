@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'IU_LOGIN.ui'
-#
-# Created by: PyQt5 UI code generator 5.4.2
-#
-# WARNING! All changes made in this file will be lost!
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from sys import argv
@@ -97,6 +91,7 @@ class Principal(QtWidgets.QMainWindow):
         # Instancio la Interfaz
         self.ventana = Ui_MainWindow()
         self.ventana.setupUi(self)
+        self.move(QtWidgets.QDesktopWidget().availableGeometry().center() - self.frameGeometry().center())
 
         # Programamos los conectores de cada botón, lista, etc....
         self.ventana.bLogin.clicked.connect(self.login)

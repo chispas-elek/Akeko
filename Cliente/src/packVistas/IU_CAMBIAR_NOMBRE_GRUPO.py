@@ -89,6 +89,7 @@ class CambiarNombreGrupo(QtWidgets.QDialog):
         # Instancio la Interfaz
         self.ventana = Ui_Dialog()
         self.ventana.setupUi(self)
+        self.move(QtWidgets.QDesktopWidget().availableGeometry().center() - self.frameGeometry().center())
 
         self.iu_main = p_iu_main
         self.id_grupo = p_id_grupo

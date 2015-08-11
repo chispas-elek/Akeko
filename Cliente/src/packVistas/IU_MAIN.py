@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'IU_MAIN.ui'
-#
-# Created by: PyQt5 UI code generator 5.4.2
-#
-# WARNING! All changes made in this file will be lost!
-
-from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QHeaderView, QMessageBox
 from Cliente.src.packControladoras import CMain
-import IU_CREAR_GRUPO, IU_CAMBIAR_NOMBRE_GRUPO, IU_GESTIONAR_SCRIPT
+import IU_CREAR_GRUPO, IU_CAMBIAR_NOMBRE_GRUPO, IU_GESTIONAR_SCRIPT, IU_MIS_TAGS
 
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -108,7 +102,13 @@ class Ui_MainWindow(object):
         icon5.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/application-exit.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionCerrarSesion.setIcon(icon5)
         self.actionCerrarSesion.setObjectName("actionCerrarSesion")
+        self.actionGestionar_Mis_Tags = QtWidgets.QAction(MainWindow)
+        icon6 = QtGui.QIcon()
+        icon6.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/milestone.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionGestionar_Mis_Tags.setIcon(icon6)
+        self.actionGestionar_Mis_Tags.setObjectName("actionGestionar_Mis_Tags")
         self.menuArchivo.addAction(self.actionAnadirGrupo)
+        self.menuHistorial.addAction(self.actionGestionar_Mis_Tags)
         self.menuHistorial.addAction(self.actionVerHistorial)
         self.menuCerrar_sesi_n.addAction(self.actionCerrarSesion)
         self.menubar.addAction(self.menuArchivo.menuAction())
@@ -142,6 +142,7 @@ class Ui_MainWindow(object):
         self.actionAnadirGrupo.setText(_translate("MainWindow", "&Añadir nuevo grupo"))
         self.actionVerHistorial.setText(_translate("MainWindow", "Ver historial de &cambios"))
         self.actionCerrarSesion.setText(_translate("MainWindow", "&Cerrar la sesión actual"))
+        self.actionGestionar_Mis_Tags.setText(_translate("MainWindow", "Gestionar Mis &Tags"))
 
 class Main(QtWidgets.QMainWindow):
     # Definimos el constructor de la clase principal
@@ -152,6 +153,7 @@ class Main(QtWidgets.QMainWindow):
         # Instancio la Interfaz
         self.ventana = Ui_MainWindow()
         self.ventana.setupUi(self)
+        self.move(QtWidgets.QDesktopWidget().availableGeometry().center() - self.frameGeometry().center())
 
         # Modificamos las propiedades de la tabla para que no pueda ser editable y solo se pueda seleccionar 1 fila
         self.ventana.tListaAlumnos.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -184,6 +186,7 @@ class Main(QtWidgets.QMainWindow):
         # self.ventana.bLogin.clicked.connect(self.login)
         self.ventana.cSelecionarGrupo.currentIndexChanged.connect(self.seleccionar_item)
         self.ventana.actionAnadirGrupo.triggered.connect(self.crear_grupo)
+        self.ventana.actionGestionar_Mis_Tags.triggered.connect(self.mis_tags)
         self.ventana.bCambiarNombre.clicked.connect(self.cambiar_nombre_grupo)
         self.ventana.bEliminarGrupo.clicked.connect(self.eliminar_grupo)
         self.ventana.bGestionarScripts.clicked.connect(self.gestionar_script)
@@ -193,6 +196,7 @@ class Main(QtWidgets.QMainWindow):
         self.window_cambiar_nombre_grupo = None
         self.window_eliminar_grupo = None
         self.window_crear_grupo = None
+        self.window_mis_tags = None
 
     def crear_grupo(self):
         """
@@ -203,6 +207,16 @@ class Main(QtWidgets.QMainWindow):
         if self.window_crear_grupo is None:
             self.window_crear_grupo = IU_CREAR_GRUPO.CrearGrupo(self, self.id_usuario, self.lista_grupos)
         self.window_crear_grupo.show()
+
+    def mis_tags(self):
+        """
+        Inicializa la interfaz de mis tags, para que el usuario pueda crear sus tags personalizados.
+
+        :return:
+        """
+        if self.window_mis_tags is None:
+            self.window_mis_tags = IU_MIS_TAGS.MisTags(self.id_usuario)
+        self.window_mis_tags.show()
 
     def eliminar_grupo(self):
         """
