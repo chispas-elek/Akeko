@@ -35,3 +35,16 @@ class GestorUsuario(object):
             # El usuario y contraseña son correctos
             id_usuario = int(respuesta_bd[0]['IdUsuario'])
         return id_usuario
+
+    def obtener_todos_los_propietarios(self, p_id_usuario):
+        """
+        Obtiene todos los propietarios disponibles para que puedan recibir un posible Tag por parte del usuario actual
+        del sistema
+
+        :param p_id_usuario: El identificador del usuario actual
+        :return: La lista de los usuarios que no poseen el Tag a heredar.
+        """
+        bd = MySQLConnector.MySQLConnector()
+        consulta = "SELECT IdUsuario,Nombre,Apellido FROM Usuario WHERE NOT IdUsuario=%s", (p_id_usuario, )
+        respuesta_bd = bd.execute(consulta)
+        return respuesta_bd

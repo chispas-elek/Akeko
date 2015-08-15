@@ -177,7 +177,7 @@ class MisTags(QtWidgets.QMainWindow):
         self.controlador_mis_tags = CMisTags.CMisTags()
 
         # Cargamos la lista de datos
-        self._cargar_datos()
+        self.cargar_datos()
 
         # Deshabilitar algunos botones inicialmente
         self.ventana.bModificar_tag.setDisabled(True)
@@ -195,7 +195,7 @@ class MisTags(QtWidgets.QMainWindow):
         self.ventana.bModificar_tag.clicked.connect(self.modificar_tag)
         self.ventana.bEliminar_tag.clicked.connect(self.borrar_tag)
 
-    def _cargar_datos(self):
+    def cargar_datos(self):
         # Bloqueamos señales y limpiamos
         self.ventana.listTagsUsuario.blockSignals(True)
         self.ventana.listTagsUsuario.clear()
@@ -206,6 +206,12 @@ class MisTags(QtWidgets.QMainWindow):
 
         # Libreamos las señales
         self.ventana.listTagsUsuario.blockSignals(False)
+
+        # Limpiamos la ventana de información
+        self.ventana.lNombreTag.setText("")
+        self.ventana.lFecha.setText("")
+        self.ventana.lDescripcion.setText("")
+        self.ventana.lScripts.setText("")
 
     def imprimir_informacion(self):
         """
@@ -237,7 +243,7 @@ class MisTags(QtWidgets.QMainWindow):
         :return:
         """
         if self.window_crear_tag is None:
-            self.window_crear_tag = IU_GESTIONAR_TAG.GestionarTag(self.id_usuario, -1)
+            self.window_crear_tag = IU_GESTIONAR_TAG.GestionarTag(self.id_usuario, None, self)
         self.window_crear_tag.show()
 
     def modificar_tag(self):
@@ -250,7 +256,7 @@ class MisTags(QtWidgets.QMainWindow):
         item_seleccionado = self.ventana.listTagsUsuario.currentItem()
         item_seleccionado_datos = item_seleccionado.data(QtCore.Qt.UserRole)
         tag = item_seleccionado_datos[1]
-        self.window_modificar_tag = IU_GESTIONAR_TAG.GestionarTag(self.id_usuario, tag.id_tag)
+        self.window_modificar_tag = IU_GESTIONAR_TAG.GestionarTag(self.id_usuario, tag, self)
         self.window_modificar_tag.show()
 
     def borrar_tag(self):
@@ -288,10 +294,13 @@ class MisTags(QtWidgets.QMainWindow):
                 info_box.setWindowTitle("Borrado de un tag")
                 info_box.setText("CORRECTO")
                 info_box.setInformativeText("El Tag se ha borrado satisfactoriamente")
+                info_box.exec_()
+                self.cargar_datos()
             else:
                 # Ha ocurrido algún error
                 error_box = QMessageBox()
                 error_box.setIcon(3)
                 error_box.setWindowTitle("Borrado de un tag")
-                error_box.setText("CORRECTO")
-                error_box.setInformativeText("El Tag se ha borrado satisfactoriamente")
+                error_box.setText("Error")
+                error_box.setInformativeText("Algo ha pasado al eliminar el Tag")
+                error_box.exec_()

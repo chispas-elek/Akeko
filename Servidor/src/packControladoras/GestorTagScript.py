@@ -250,7 +250,7 @@ class GestorTagScript(object):
         existe = False
         bd = MySQLConnector.MySQLConnector()
         consulta = "SELECT IdScript FROM Aplicacion WHERE IdScript=%s AND Dni=%s AND IdUsuario=%s AND IdGrupo=%s", (
-                    p_id_script, p_dni, p_id_usuario, p_id_grupo)
+            p_id_script, p_dni, p_id_usuario, p_id_grupo)
         respuesta_bd = bd.execute(consulta)
         if len(respuesta_bd) != 0:
             existe = True
@@ -268,7 +268,7 @@ class GestorTagScript(object):
         correcto = False
         # Comprobar si la suma de verificación SHA-1 es correcta y en caso positivo continuar
         bd = MySQLConnector.MySQLConnector()
-        consulta_1 = "SELECT Ruta,SHA FROM Script WHERE IdScript=%s;", (p_id_script, )
+        consulta_1 = "SELECT Ruta,SHA FROM Script WHERE IdScript=%s;", (p_id_script,)
         respuesta_bd = bd.execute(consulta_1)
         if len(respuesta_bd) != 0:
             # Obtenemos la Ruta del script
@@ -313,22 +313,21 @@ class GestorTagScript(object):
         bd = MySQLConnector.MySQLConnector()
         consulta = """SELECT IdTag,NombreTag,Descripcion,FechaCreacion,IdUsuario FROM Tag
                     WHERE IdTag IN (SELECT IdTag FROM Tag_Grupo WHERE IdGrupo=%s);
-                    """, (p_id_grupo, )
+                    """, (p_id_grupo,)
         respuesta_bd = bd.execute(consulta)
         respuesta_bd_f_formateada = self._formatear_hora(respuesta_bd)
         return respuesta_bd_f_formateada
 
-    def obtener_tags_disponibles(self, p_id_grupo):
+    def obtener_tags_disponibles(self, p_id_grupo, p_id_usuario):
         """
         Obtenemos los tags que aún no han sido aplicados en un grupo
         :param p_id_grupo: El identificador de un grupo
         :return: Los tags que aún no han sido aplicados en un grupo
         """
-        # todo formatear la fechaCreacion a str
         bd = MySQLConnector.MySQLConnector()
         consulta = """SELECT IdTag,NombreTag,Descripcion,FechaCreacion,IdUsuario FROM Tag
-                    WHERE IdTag NOT IN (SELECT IdTag FROM Tag_Grupo WHERE IdGrupo=%s);
-                    """, (p_id_grupo, )
+                    WHERE IdTag NOT IN (SELECT IdTag FROM Tag_Grupo WHERE IdGrupo=%s) AND IdUsuario=%s;
+                    """, (p_id_grupo, p_id_usuario)
         respuesta_bd = bd.execute(consulta)
         respuesta_bd_f_formateada = self._formatear_hora(respuesta_bd)
         return respuesta_bd_f_formateada
@@ -342,12 +341,12 @@ class GestorTagScript(object):
         # todo formatear la fechaCreacion a str
         bd = MySQLConnector.MySQLConnector()
         consulta = "SELECT IdTag,NombreTag,Descripcion,FechaCreacion,IdUsuario FROM Tag WHERE IdUsuario=%s;", \
-                   (p_id_usuario, )
+                   (p_id_usuario,)
         respuesta_bd = bd.execute(consulta)
         respuesta_bd_f_formateada = self._formatear_hora(respuesta_bd)
         return respuesta_bd_f_formateada
 
-    def anadir_tag(self, p_nombre_tag, p_id_usuario, p_descripcion, p_lista_scrip):
+    def crear_tag_usuario(self, p_nombre_tag, p_id_usuario, p_descripcion, p_lista_scrip):
         """
         Añadimos un nuevo tag en el sistema
 
@@ -360,7 +359,7 @@ class GestorTagScript(object):
         # Primero se comprueba si el nombre del tag ya existe en el sistema.
         bd = MySQLConnector.MySQLConnector()
         exito = False
-        consulta1 = "SELECT IdTag FROM Tag WHERE NombreTag=%s", (p_nombre_tag, )
+        consulta1 = "SELECT IdTag FROM Tag WHERE NombreTag=%s", (p_nombre_tag,)
         respuesta_bd_1 = bd.execute(consulta1)
         if len(respuesta_bd_1) == 0:
             # No existe el nombre en la BD, procedeemos a insertar el TAG
@@ -370,12 +369,12 @@ class GestorTagScript(object):
             if respuesta_bd_2 == 1:
                 # Se ha insertado el tag correctamente, añadimos los Scripts
                 # Obtenemos le identificador que se le ha asociado a nuestro nuevo TAG
-                consulta3 = "SELECT IdTag FROM Tag WHERE NombreTag=%s", (p_nombre_tag, )
+                consulta3 = "SELECT IdTag FROM Tag WHERE NombreTag=%s", (p_nombre_tag,)
                 respuesta_bd_3 = bd.execute(consulta3)
                 # Recorremos la lista de script y vamos insertado uno a uno en la BD
                 for script in p_lista_scrip:
                     consulta4 = "INSERT INTO Tag_Script(IdTag,IdScript) VALUES(%s,%s);", \
-                                (respuesta_bd_3['IdTag'], script)
+                                (int(respuesta_bd_3[0]['IdTag']), int(script['IdScript']))
                     bd.execute(consulta4)
                 exito = True
         return exito
@@ -476,13 +475,83 @@ class GestorTagScript(object):
         :param p_id_tag: El identificador del TAG
         :return: True o False dependiendo del éxito de la operación
         """
+        resultado = False
         bd = MySQLConnector.MySQLConnector()
-        consulta = "DELETE FROM Tag WHERE IdTag=%s;", (p_id_tag, )
+        consulta = "DELETE FROM Tag WHERE IdTag=%s;", (p_id_tag,)
         respuesta_bd = bd.execute(consulta)
         if len(respuesta_bd) != 0:
-            return True
-        else:
-            return False
+            resultado = True
+
+        return resultado
+
+
+    def modificar_scripts_del_tag(self, p_id_tag, p_lista_cambios):
+        """
+        Dada una lista de cambios. Se modifican los scripts que tenga un Tag.
+
+        :param p_id_tag:
+        :param p_lista_cambios:
+
+        :return: True -> Todos los cambios han sido correctos
+                False -> Algo no ha ido como deberia.
+        """
+        exito = False
+        bd = MySQLConnector.MySQLConnector()
+        # Recorremos la lista
+        for cambio in p_lista_cambios:
+            if cambio['accion'] == 'borrar_script':
+                # Eliminamos la relación
+                consulta_1 = "DELETE FROM Tag_Script WHERE IdTag=%s AND IdScript=%s;", (p_id_tag, cambio['id_script'])
+                resultado_bd_1 = bd.execute(consulta_1)
+                if resultado_bd_1 == 1:
+                    exito = True
+                else:
+                    # Algo no ha ido bien
+                    exito = False
+                    break
+            else:
+                # Vamos a añadir un Script al TAg
+                consulta_2 = "INSERT INTO Tag_Script(IdTag,IdScript) VALUES (%s,%s);", (p_id_tag, cambio['id_script'])
+                resultado_bd_2 = bd.execute(consulta_2)
+                if resultado_bd_2 == 1:
+                    exito = True
+                else:
+                    exito = False
+                    break
+
+        return exito
+
+    def anadir_script_al_tag(self, p_id_tag, p_id_script):
+        """
+        Añade la relación entre un Tag y un Script
+
+        :param p_id_tag:
+        :param p_id_script:
+        :return:
+        """
+        exito = False
+        bd = MySQLConnector.MySQLConnector()
+        consulta = "INSERT INTO Tag_Script(IdTag,IdScript) VALUES (%s,%s);", (p_id_tag, p_id_script)
+        resultado_bd = bd.execute(consulta)
+        if resultado_bd == 1:
+            exito = True
+
+        return exito
+
+    def eliminar_scrit_al_tag(self, p_id_tag, p_id_script):
+        """
+        Elimina la relación entre un Tag y un Script
+
+        :return:
+        """
+        exito = False
+        bd = MySQLConnector.MySQLConnector()
+        consulta = "DELETE FROM Tag_Script WHERE IdTag=%s AND IdScript=%s;", (p_id_tag, p_id_script)
+        resultado_bd = bd.execute(consulta)
+        if resultado_bd == 1:
+            exito = True
+
+        return exito
 
     def modificar_tag(self, p_id_tag, p_nombre_tag, p_descripcion, p_owner):
         """
@@ -497,14 +566,15 @@ class GestorTagScript(object):
         exito = False
         # Comprobamos que le nombre del tag no exista en la BD
         bd = MySQLConnector.MySQLConnector()
-        consulta_1 = "SELECT IdTag FROM TAG WHERE NombreTag=%s AND IdUsuario=%s", (p_nombre_tag, p_owner)
+        consulta_1 = "SELECT IdTag FROM Tag WHERE NombreTag=%s AND IdUsuario=%s", (p_nombre_tag, p_owner)
         respuesta_bd_1 = bd.execute(consulta_1)
         if len(respuesta_bd_1) != 0:
-            if respuesta_bd_1['IddTag'] is p_id_tag:
+            if int(respuesta_bd_1[0]['IdTag']) == p_id_tag:
                 # El nombre del tag no se ha querido actualziar
-                consulta_2 = "UPDATE Tag SET " \
-                             "NombreTag=%s,Descripcion=%s,IdUsuario=%;", (p_nombre_tag, p_descripcion, p_owner)
+                consulta_2 = "UPDATE Tag SET NombreTag=%s,Descripcion=%s,IdUsuario=%s WHERE IdTag=%s;", \
+                             (p_nombre_tag, p_descripcion, p_owner, p_id_tag)
                 respuesta_bd_2 = bd.execute(consulta_2)
+                print respuesta_bd_2
                 exito = True
             else:
                 # YA existe el nombre del TAG
@@ -512,31 +582,33 @@ class GestorTagScript(object):
                 pass
         else:
             # No existe el Tag asi que podemos actualizar sin miedo
-            consulta_3 = "UPDATE Tag SET " \
-                             "NombreTag=%s,Descripcion=%s,IdUsuario=%;", (p_nombre_tag, p_descripcion, p_owner)
+            consulta_3 = "UPDATE Tag SET NombreTag=%s,Descripcion=%s,IdUsuario=%s WHERE IdTag=%s;", \
+                         (p_nombre_tag, p_descripcion, p_owner, p_id_tag)
             respuesta_bd_3 = bd.execute(consulta_3)
-            exito = True
+            if respuesta_bd_3 == 1:
+                # todo ejecutar Script de envío de correo electronico con mensaje al nuevo usuario
+                # Debemos obtener el mail del nuevo usuario y enviarle la informacion
+                exito = True
 
         return exito
 
-    def modificar_scripts_del_tag(self, p_id_tag, p_id_script, p_dni, p_id_usuario, p_id_grupo, p_accion):
+    def modificar_scripts_alumnos_de_un_grupo(self, p_id_script, p_dni, p_id_usuario, p_id_grupo, p_accion):
         """
-        Añade o elimina un script de un Tag y actualiza las tablas necesarias
+        Dada una accicón determinada, la función comprueba si se quiere añadir o eliminar un script en el TAg y realiza
+        los cambios pertinentes.
 
-        :param p_id_tag: El identificador del TAg
-        :param p_id_script: El identificador del script
-        :param p_dni: El Dni del alumno que afecta
-        :param p_accion: La acción a tomar, siendo borrar o agregar.
+        :param p_id_script:
+        :param p_dni:
+        :param p_id_usuario:
+        :param p_id_grupo:
+        :param p_accion:
         :return:
         """
-        if p_accion is 'borrar_script':
+        resultado = False
+        if p_accion == 'borrar_script':
             actualizar_datos = self._eliminar_intencion(p_id_script, p_dni, p_id_usuario, p_id_grupo)
             if actualizar_datos:
-                # Cambiamos los scripts del TAg
-                bd = MySQLConnector.MySQLConnector()
-                consulta_1 = "DELETE FROM Tag_Script WHERE IdTag=%s AND IdScript=%s;", (p_id_tag, p_id_script)
-                resultado_bd_1 = bd.execute(consulta_1)
-                # Podria ser interesante actualizar el historia. Ya se pensará
+                resultado = True
             else:
                 # Error garrafal, añadir alguna excepcion en éste punto
                 pass
@@ -547,25 +619,16 @@ class GestorTagScript(object):
                 # Si el script no existe, simplemente añadimos intención y lo agregamos a la tabla de Script_tag
                 actualizar_datos = self._anadir_intencion(p_id_script, p_dni, p_id_usuario, p_id_grupo)
                 if actualizar_datos:
-                    # Modificamos la tabla de script-tag
-                    bd = MySQLConnector.MySQLConnector()
-                    consulta_2 = "INSERT INTO Tag_Script(IdTag,IdScript) VALUES (%s,%s);", (p_id_tag, p_id_script)
-                    resultado_bd_2 = bd.execute(consulta_2)
+                    resultado = True
                 else:
                     # Error garrafal
                     pass
             else:
-                # Si el script Si existe, debemos eliminar el script de script_grupo y meterlo en Script_tag
-                bd = MySQLConnector.MySQLConnector()
-                consulta_3 = "DELETE FROM Script_Grupo WHERE IdGrupo=%s AND IdScript=%s;", (p_id_grupo, p_id_script)
-                resultado_bd_3 = bd.execute(consulta_3)
-                if resultado_bd_3:
-                    consulta_4 = "INSERT INTO Tag_Script(IdTag,IdScript) VALUES (%s,%s);", (p_id_tag, p_id_script)
-                    resultado_bd_4 = bd.execute(consulta_4)
-                    # Comprobar éste resultado
-                else:
-                    # Algo no ha ido bien
-                    pass
+                # Ha ocurrido algún error extraño porque la intención no deberia de existir al ser llamado éste método.
+                pass
+        return resultado
+
+
 
     def _formatear_hora(self, p_list_dict_valores):
         """
@@ -586,14 +649,13 @@ class GestorTagScript(object):
 
 
 class Solitario(object):
-
     # For other purposes. Code reserved
 
     def testing(self):
         correcto = False
         # p = sub.Popen(shlex.split('sh /home/administrador/ex11-7.generarlist.sh'),  stdout=sub.PIPE, stderr=sub.PIPE)
         ruta = '/home/administrador/ex11-7.generarlist.sh'
-        p = sub.Popen(('sh', ruta),  stdout=sub.PIPE, stderr=sub.PIPE)
+        p = sub.Popen(('sh', ruta), stdout=sub.PIPE, stderr=sub.PIPE)
         salidas, errores = p.communicate()
         if len(salidas) != 0:
             print salidas
@@ -601,4 +663,3 @@ class Solitario(object):
             # Ha habido errores lanzamos una excepción
             print errores
         return correcto
-

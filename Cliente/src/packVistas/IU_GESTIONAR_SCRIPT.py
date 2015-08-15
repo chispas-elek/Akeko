@@ -181,6 +181,7 @@ class GestionarScript(QtWidgets.QWidget):
         # Instancio la Interfaz
         self.ventana = Ui_Form()
         self.ventana.setupUi(self)
+        self.move(QtWidgets.QDesktopWidget().availableGeometry().center() - self.frameGeometry().center())
 
         # Parámetros adicionales para los listWidget
         self.ventana.listDisponibles.setSortingEnabled(True)
@@ -228,14 +229,14 @@ class GestionarScript(QtWidgets.QWidget):
         self.scripts_aplicados = self.controlador_gestionar_script.obtener_scripts(self.id_grupo)
         self.tags_aplicados = self.controlador_gestionar_script.obtener_tags(self.id_grupo)
         self.scripts_disponibles = self.controlador_gestionar_script.obtener_scripts_disponibles(self.id_grupo)
-        self.tags_disponibles = self.controlador_gestionar_script.obtener_tags_disponibles(self.id_grupo)
+        self.tags_disponibles = self.controlador_gestionar_script.obtener_tags_disponibles(self.id_grupo, self.id_usuario)
         # Una ve obtenidos todos los datos, rellenamos las tablas
         # Primero vamos a rellenear los tags
         self.tags_disponibles.cargar_lista_tag(self.ventana.listDisponibles)
         self.tags_aplicados.cargar_lista_tag(self.ventana.listAplicados)
         # Ahora rellenamos los scripts disponibles
         self.scripts_disponibles.cargar_lista_script(self.ventana.listDisponibles)
-        self.scripts_aplicados.cargar_lista_script(self.ventana.listDisponibles)
+        self.scripts_aplicados.cargar_lista_script(self.ventana.listAplicados)
         # Libreamos las señales
         self.ventana.listAplicados.blockSignals(False)
         self.ventana.listDisponibles.blockSignals(False)
@@ -370,6 +371,7 @@ class GestionarScript(QtWidgets.QWidget):
                     msg_box.setText("CORRECTO")
                     msg_box.setInformativeText("Los cambios se han aplicado correctamente en el sistema")
                     msg_box.exec_()
+                    self.close()
                 else:
                     # Algo ha pasado, reproducimos el error
                     error_box = QMessageBox()

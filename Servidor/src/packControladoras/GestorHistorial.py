@@ -7,7 +7,6 @@ produzcan, debido a las acciones de un usuario.
 
 """
 
-
 from Servidor.src.packGestorBD import MySQLConnector
 
 
@@ -35,10 +34,10 @@ class GestorHistorial(object):
         :return: El historial completo de dicho usuario
         """
         bd = MySQLConnector.MySQLConnector()
-        consulta = "SELECT * FROM Historial WHERE IdUsuario=%s", p_id_usuario
+        consulta = "SELECT * FROM Historial WHERE IdUsuario=%s ORDER BY Fecha;", (p_id_usuario, )
         respuesta_bd = bd.execute(consulta)
 
-        return respuesta_bd
+        return self._formatear_hora(respuesta_bd)
 
     def anadir_historial_script(self, p_id_script, p_nombre_alumno, p_apellido,
                                 p_id_usuario, p_id_grupo, p_accion, p_info):
@@ -59,9 +58,9 @@ class GestorHistorial(object):
         respuesta = False
         bd = MySQLConnector.MySQLConnector()
         # Obtenemos los nombres a partir de los Identificadores que hemnos recibido
-        consulta_1 = "SELECT NombreScript FROM Script WHERE IdScript=%s", (p_id_script, )
+        consulta_1 = "SELECT NombreScript FROM Script WHERE IdScript=%s", (p_id_script,)
         respuesta_bd_1 = bd.execute(consulta_1)
-        consulta_2 = "SELECT NombreGrupo FROM Grupo WHERE IdGrupo=%s", (p_id_grupo, )
+        consulta_2 = "SELECT NombreGrupo FROM Grupo WHERE IdGrupo=%s", (p_id_grupo,)
         respuesta_bd_2 = bd.execute(consulta_2)
         if len(respuesta_bd_1) != 0 and len(respuesta_bd_2) != 0:
             # Tenemos datos, vamos a obtenerlos y a insertar en el historial lo sucedido
@@ -97,9 +96,9 @@ class GestorHistorial(object):
         respuesta = False
         bd = MySQLConnector.MySQLConnector()
         # Obtenemos los nombres a partir de los Identificadores que hemnos recibido
-        consulta_1 = "SELECT NombreTag FROM Tag WHERE IdTag=%s", (p_id_tag, )
+        consulta_1 = "SELECT NombreTag FROM Tag WHERE IdTag=%s", (p_id_tag,)
         respuesta_bd_1 = bd.execute(consulta_1)
-        consulta_2 = "SELECT NombreGrupo FROM Grupo WHERE IdGrupo=%s", (p_id_grupo, )
+        consulta_2 = "SELECT NombreGrupo FROM Grupo WHERE IdGrupo=%s", (p_id_grupo,)
         respuesta_bd_2 = bd.execute(consulta_2)
         if len(respuesta_bd_1) != 0 and len(respuesta_bd_2) != 0:
             # Tenemos datos, vamos a obtenerlos y a insertar en el historial lo sucedido
@@ -117,7 +116,7 @@ class GestorHistorial(object):
 
         return respuesta
 
-    def anadir_historial_grupo (self, p_id_usuario, p_id_grupo, p_accion, p_info):
+    def anadir_historial_grupo(self, p_id_usuario, p_id_grupo, p_accion, p_info):
         """
         Añade a la base de datos una entrada referente a la adición o no de un grupo en el sistema
 
@@ -131,7 +130,7 @@ class GestorHistorial(object):
         respuesta = False
         bd = MySQLConnector.MySQLConnector()
         # Obtemer el nombre del grupo
-        consulta_1 = "SELECT NombreGrupo from Grupo WHERE IdGrupo=%s", (p_id_grupo, )
+        consulta_1 = "SELECT NombreGrupo from Grupo WHERE IdGrupo=%s", (p_id_grupo,)
         respuesta_bd_1 = bd.execute(consulta_1)
         if len(respuesta_bd_1) != 0:
             # Tenemos datos, vamos a insertar en el historial
@@ -145,3 +144,40 @@ class GestorHistorial(object):
                 respuesta = True
 
         return respuesta
+
+    def anadir_historia_gestion_tag(self, p_id_usuario, p_accion, p_info):
+        """
+        Ésta función registra todos los datos relacionados con agregar, modificar o eliminar un targ en el sistema
+
+        :param p_id_usuario: El identificador de un usuario
+        :param p_accion: La acción a realizar
+        :param p_info: La información asociada
+        :return: True -> Si se ha introducido bien todos los datos
+                False -> Si algo ha ocurrido.
+        """
+        exito = False
+        bd = MySQLConnector.MySQLConnector()
+        consulta = "INSERT INTO Historial(IdUsuario,Accion,Informacion) VALUES(%s,%s,%s);", \
+                     (p_id_usuario, p_accion, p_info)
+        respuesta_bd = bd.execute(consulta)
+        if respuesta_bd == 1:
+            exito = True
+        return exito
+
+
+    def _formatear_hora(self, p_list_dict_valores):
+        """
+        La base de datos devuelve los datos en formato datetime. El cual es incompatible con JSON ya que pide Strings
+        o ints. Para evitar problemas, con ésta función vamos a transformar el valor datetime en un String en un formato
+        europeo
+
+        :param p_dict_valores: La lista que contiene los diciconarios con los valores de la BD
+
+        :return: El dicionario de datos enviados con la fechas formateadas.
+        """
+        for valor in p_list_dict_valores:
+            fecha_de_la_bd = valor['Fecha']
+            fecha_formateada = fecha_de_la_bd.strftime("%d/%m/%Y")
+            valor['Fecha'] = fecha_formateada
+
+        return p_list_dict_valores

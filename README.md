@@ -18,6 +18,11 @@ Breeze Icons are licensed under the [LGPLv3](http://opensource.org/licenses/lgpl
 
 Original author is [Nitux S.A.](http://nitrux.in/)
 
-You can download it from this [link.](https://github.com/NitruxSA/plasma-next-icons.git)
+You can download it from this [link.](https://github.com/NitruxSA/plasma-next-icons.git).
 
-Thanks for the authors for this awesome icons.
+
+PyQt5 are licensed under the [LGPLv3](http://opensource.org/licenses/lgpl-3.0.html).
+
+Original author is [Riverbank Computing Limited](https://www.riverbankcomputing.com/news).
+
+Thanks to all of then for this awesome desings and software.

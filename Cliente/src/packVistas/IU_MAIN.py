@@ -2,7 +2,7 @@
 
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QHeaderView, QMessageBox
 from Cliente.src.packControladoras import CMain
-import IU_CREAR_GRUPO, IU_CAMBIAR_NOMBRE_GRUPO, IU_GESTIONAR_SCRIPT, IU_MIS_TAGS
+import IU_CREAR_GRUPO, IU_CAMBIAR_NOMBRE_GRUPO, IU_GESTIONAR_SCRIPT, IU_MIS_TAGS, IU_HISTORIAL
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -190,6 +190,7 @@ class Main(QtWidgets.QMainWindow):
         self.ventana.bCambiarNombre.clicked.connect(self.cambiar_nombre_grupo)
         self.ventana.bEliminarGrupo.clicked.connect(self.eliminar_grupo)
         self.ventana.bGestionarScripts.clicked.connect(self.gestionar_script)
+        self.ventana.actionVerHistorial.triggered.connect(self.historial)
 
         # Iniciamos las variables de las nuevas ventanas
         self.window_gestionar_script = None
@@ -197,6 +198,7 @@ class Main(QtWidgets.QMainWindow):
         self.window_eliminar_grupo = None
         self.window_crear_grupo = None
         self.window_mis_tags = None
+        self.window_historial = None
 
     def crear_grupo(self):
         """
@@ -296,6 +298,16 @@ class Main(QtWidgets.QMainWindow):
                     (self, id_grupo, nombre_grupo, self.lista_grupos)
         self.window_cambiar_nombre_grupo.show()
 
+
+    def historial(self):
+        """
+        Muesta el historial del usuario actual para ver los cambios realizados
+
+        """
+        if self.window_historial is None:
+            self.window_historial = IU_HISTORIAL.Historial(self.id_usuario)
+        self.window_historial.show()
+
     def gestionar_script(self):
         """
         Gestiona los scripts que dispone el grupo actualmente seleccionado
@@ -315,7 +327,7 @@ class Main(QtWidgets.QMainWindow):
         """
         # Bloquemos las señales y vaciamos la tabla
         self.ventana.tListaAlumnos.blockSignals(True)
-        self.ventana.tListaAlumnos.clear()
+        # self.ventana.tListaAlumnos.clear()
         # Rellenamos la tabla
         tamano_lista = self.lista_alumnos_grupo.obtener_tamano_lista()
         # El tamaño de los datos que me vienen

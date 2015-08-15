@@ -3,7 +3,7 @@ __author__ = 'Rubén Mulero'
 
 from Cliente.src.packGestorSocket import ServerSender
 
-from Cliente.src.packModelo import ListaHistorial, Historial
+from Cliente.src.packModelo import ListaHistorial
 
 class Singleton(type):
 
@@ -33,9 +33,10 @@ class CHistorial(object):
         lista_envio.append({'id_usuario': p_id_usuario})
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
-        # todo recuerda que con ésto solo obtienes las entradas con los identificadores, si quieres los datos tienes que realizar más llamadas
-        # Por ejemplo, el nombre del TAG, el nombre del script, etc etc....
-        return resultado
+        lista_historial = ListaHistorial.ListaHistorial()
+        lista_historial.construir(resultado)
+
+        return lista_historial
 
     def filtrar_historial(self, p_nombre_alumno, p_id_script,
                           p_fecha_ini, p_fecha_fin, p_lista_historial):

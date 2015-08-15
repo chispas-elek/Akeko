@@ -3,6 +3,9 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from Cliente.src.packControladoras import CMisTags
+from Cliente.src.packModelo import ListaScript
+import re
+
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -46,13 +49,15 @@ class Ui_Form(object):
         self.gridLayout.addWidget(self.label_3, 0, 0, 1, 1)
         self.bEliminar = QtWidgets.QPushButton(Form)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/arrow-right.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/arrow-right.svg"), QtGui.QIcon.Normal,
+                       QtGui.QIcon.Off)
         self.bEliminar.setIcon(icon)
         self.bEliminar.setObjectName("bEliminar")
         self.gridLayout.addWidget(self.bEliminar, 4, 2, 1, 1)
         self.bAnadir = QtWidgets.QPushButton(Form)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/arrow-left.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/arrow-left.svg"), QtGui.QIcon.Normal,
+                        QtGui.QIcon.Off)
         self.bAnadir.setIcon(icon1)
         self.bAnadir.setObjectName("bAnadir")
         self.gridLayout.addWidget(self.bAnadir, 2, 2, 1, 1)
@@ -135,7 +140,8 @@ class Ui_Form(object):
         self.horizontalLayout.addItem(spacerItem2)
         self.bAplicar = QtWidgets.QPushButton(Form)
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/dialog-ok-apply.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/dialog-ok-apply.svg"),
+                        QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.bAplicar.setIcon(icon2)
         self.bAplicar.setObjectName("bAplicar")
         self.horizontalLayout.addWidget(self.bAplicar)
@@ -143,7 +149,8 @@ class Ui_Form(object):
         self.horizontalLayout.addItem(spacerItem3)
         self.bCerrar = QtWidgets.QPushButton(Form)
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/window-close.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/window-close.svg"), QtGui.QIcon.Normal,
+                        QtGui.QIcon.Off)
         self.bCerrar.setIcon(icon3)
         self.bCerrar.setObjectName("bCerrar")
         self.horizontalLayout.addWidget(self.bCerrar)
@@ -170,9 +177,11 @@ class Ui_Form(object):
         Form.setWindowTitle(_translate("Form", "Gestionar Tag"))
         self.label_4.setText(_translate("Form", "Disponibles"))
         self.listEnElTag.setToolTip(_translate("Form", "Scripts dentro del Tag"))
-        self.listEnElTag.setWhatsThis(_translate("Form", "Contiene los Scripts que están o estarán contenidos en le Tag. Si el Tag es nuevo, ésta lista vendrá por defecto vacía."))
+        self.listEnElTag.setWhatsThis(_translate("Form",
+                                                 "Contiene los Scripts que están o estarán contenidos en le Tag. Si el Tag es nuevo, ésta lista vendrá por defecto vacía."))
         self.listDisponibles.setToolTip(_translate("Form", "Scripts disponibles para el Tag"))
-        self.listDisponibles.setWhatsThis(_translate("Form", "Contiene los scripts disponibles para el Tag actual. Tanto si es para modificar uno como para crearlo. Desplazar éstos scripts al lado izquierdo para incluirlos en el Tag."))
+        self.listDisponibles.setWhatsThis(_translate("Form",
+                                                     "Contiene los scripts disponibles para el Tag actual. Tanto si es para modificar uno como para crearlo. Desplazar éstos scripts al lado izquierdo para incluirlos en el Tag."))
         self.label_3.setText(_translate("Form", "En el tag"))
         self.bEliminar.setToolTip(_translate("Form", "Eliminar un Script del Tag."))
         self.bEliminar.setText(_translate("Form", "Eliminar"))
@@ -191,10 +200,10 @@ class Ui_Form(object):
         self.bAplicar.setText(_translate("Form", "Aplicar"))
         self.bCerrar.setText(_translate("Form", "Cerrar"))
 
+
 class GestionarTag(QtWidgets.QWidget):
     # Definimos el constructor de la clase principal
-    def __init__(self, p_id_usuario, p_id_tag, parent=None):
-        # todo, pensar en enviar el TAG completo, con toda la información.
+    def __init__(self, p_id_usuario, p_tag, p_iu_mis_tags, parent=None):
         # Llamamos al constructor de la clase padre
         super(GestionarTag, self).__init__(parent)
 
@@ -208,8 +217,9 @@ class GestionarTag(QtWidgets.QWidget):
         self.ventana.listEnElTag.setSortingEnabled(True)
 
         self.id_usuario = p_id_usuario
-        self.id_tag = p_id_tag
+        self.tag = p_tag
         self.controlador_mis_tags = CMisTags.CMisTags()
+        self.iu_mis_tags = p_iu_mis_tags
 
         # cagamos los datos de las listas
         self._cargar_datos()
@@ -241,22 +251,42 @@ class GestionarTag(QtWidgets.QWidget):
         self.ventana.listDisponibles.blockSignals(True)
         self.ventana.listDisponibles.clear()
         # Obtenemos los Scripts que hay en el TAG
-        if self.id_tag != -1:
-            scripts_en_el_tag = self.controlador_mis_tags.obtener_scripts_tag(self.id_tag)
+        if self.tag is not None:
+            # Estamos modificando un TAg
+            scripts_en_el_tag = self.controlador_mis_tags.obtener_scripts_tag(self.tag.id_tag)
             scripts_en_el_tag.cargar_lista_script(self.ventana.listEnElTag)
-        scripts_disponibles = self.controlador_mis_tags.obtener_scripts_no_en_tag(self.id_tag)
-        scripts_disponibles.cargar_lista_script(self.ventana.listDisponibles)
+            scripts_disponibles = self.controlador_mis_tags.obtener_scripts_no_en_tag(self.tag.id_tag)
+            scripts_disponibles.cargar_lista_script(self.ventana.listDisponibles)
+            self.ventana.lNombreTag.setText(self.tag.nombre_tag)
+            self.ventana.lDescripcion.setText(self.tag.descripcion)
+
+        else:
+            scripts_disponibles = self.controlador_mis_tags.obtener_scripts_no_en_tag(-1)
+            scripts_disponibles.cargar_lista_script(self.ventana.listDisponibles)
         # Libreamos las señales
         self.ventana.listEnElTag.blockSignals(False)
         self.ventana.listDisponibles.blockSignals(False)
 
-        if self.id_tag != -1:
-            # Cargar el combobox
-            # todo cargar el combobox con los usuarios
+        # Cargamos el comboBox dependiendo de la situación.
+        # Bloque de señales
+        self.ventana.cOwner.blockSignals(True)
+        self.ventana.cOwner.clear()
 
-            # Obtener los datos relativos al TAG
+        if self.tag is not None:
+            # Estamos modificando un tag Existente por lo que vamos a cargar a todos los profesores
+            # Primero añadimos al usuario acutal
+            self.ventana.cOwner.addItem("Yo. Usuario actual", self.id_usuario)
+            lista_usuarios = self.controlador_mis_tags.obtener_todos_los_propietarios(self.id_usuario)
+            if len(lista_usuarios) != 0:
+                for usuario in lista_usuarios:
+                    self.ventana.cOwner.addItem(usuario['Nombre'] + " " + usuario['Apellido'], usuario['IdUsuario'])
+        else:
+            # Esttamos creando un nuevo TAg, el único owner será el propio profesor.
+            # Pasamos
             pass
 
+        # Por último libero el Cbombox
+        self.ventana.cOwner.blockSignals(False)
 
     def anadir_un_elemento(self):
         """
@@ -328,4 +358,165 @@ class GestionarTag(QtWidgets.QWidget):
 
         :return:
         """
-        pass
+        question_box = QMessageBox()
+        question_box.setIcon(2)
+        question_box.setWindowTitle("Aplicar cambios")
+        question_box.setText("¡¡Atención!!")
+        question_box.setInformativeText("¿Estás seguro que deseas aplicar los siguientes cambios?")
+        question_box.setDetailedText("Recuerda revisar correctamente todos los datos. Si estás modificando un script "
+                                     "ten en cuenta si lo estás o no donando. Una vez realizada la donación no podrás "
+                                     "volver a usar más éste script. Revisa de forma cautelosa todos los datos antes "
+                                     "de proceder.")
+        # Creamos los botones de aceptar y cancelar.
+        question_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        question_box.setDefaultButton(QMessageBox.Cancel)
+        # Ejectuamos la interfaz y recogemos el resultado de la decisión
+        seleccion = question_box.exec_()
+        if seleccion == QMessageBox.Ok:
+            if self.tag is None:
+                # Si el TAG es NONE es que queremos crear un nuevo TAG
+                # Obtenemeos las listas actuales
+                lista_en_el_tag_actual = self.ventana.listEnElTag.findItems \
+                    ("*", QtCore.Qt.MatchWrap | QtCore.Qt.MatchWildcard)
+                if len(lista_en_el_tag_actual) != 0:
+                    lista_scripts_nuevo_tag = ListaScript.ListaScript()
+                    # Por cada elemento, extraemos el Script y lo incluimos en la lista
+
+                    for item in lista_en_el_tag_actual:
+                        item_data = item.data(QtCore.Qt.UserRole)
+                        script = item_data[1]
+                        lista_scripts_nuevo_tag.anadir(script)
+                    # Tenemeos que aplicar las máscaras de filtrado para saber si los datos están bien introducidos
+                    if self._mascara_filtrado(self.ventana.lNombreTag.text()):
+                        # El Nombre del tag es correcto
+                        if len(self.ventana.lDescripcion.text()) != 0:
+                            # Contiene al menos alguna descripcción
+                            # LLamamos a la función
+                            exito = self.controlador_mis_tags.crear_tag_usuario(self.ventana.lNombreTag.text(),
+                                                                                self.id_usuario,
+                                                                                self.ventana.lDescripcion.text(),
+                                                                                lista_scripts_nuevo_tag)
+                            if exito:
+                                # Se ha creado el Tag correctamente.
+                                info_box = QMessageBox()
+                                info_box.setIcon(1)
+                                info_box.setWindowTitle("Crear Nuevo Tag")
+                                info_box.setText("CORRECTO")
+                                info_box.setInformativeText("Se ha creado el Tag correctamente en el sistema")
+                                info_box.exec_()
+                                self.iu_mis_tags.cargar_datos()
+                                self.close()
+                            else:
+                                # Ha ocurido un error
+                                error_box = QMessageBox()
+                                error_box.setIcon(3)
+                                error_box.setWindowTitle("Crear Nuevo Tag")
+                                error_box.setText("ERROR")
+                                error_box.setInformativeText("Ha ocurrido algún error a la hora de crear un Tag. "
+                                                             "Revisa que no hayas intentado crear un Tag con el mismo "
+                                                             "nombre de alguno creado con anterioridad")
+                                error_box.exec_()
+                        else:
+                            print "No ha introducido nada en la descripción"
+                            warm_box_2 = QMessageBox()
+                            warm_box_2.setIcon(2)
+                            warm_box_2.setWindowTitle("Crear Nuevo Tag")
+                            warm_box_2.setText("¡Atención!")
+                            warm_box_2.setInformativeText("Introduce al menos una descripción.")
+                            warm_box_2.exec_()
+                    else:
+                        print "Nome del Tag incorrecto"
+                        warm_box = QMessageBox()
+                        warm_box.setIcon(2)
+                        warm_box.setWindowTitle("Crear Nuevo Tag")
+                        warm_box.setText("¡Atención!")
+                        warm_box.setInformativeText("Los datos introducidos para el nombre del Tag no son válidos")
+                        warm_box.exec_()
+                else:
+                    # El usuaio no ha introducido ningún Script
+                    info_box_2 = QMessageBox()
+                    info_box_2.setIcon(1)
+                    info_box_2.setWindowTitle("Crear Nuevo Tag")
+                    info_box_2.setText("INFORMACIÓN")
+                    info_box_2.setInformativeText("Antes de crear un Tag, al menos introduce un Script en él.")
+                    info_box_2.exec_()
+
+            else:
+                # Queremos modificar uno existente
+                # Obtenemos la lsita de scripts actuales
+                lista_en_el_tag_actual = self.ventana.listEnElTag.findItems \
+                    ("*", QtCore.Qt.MatchWrap | QtCore.Qt.MatchWildcard)
+                lista_disponible_actual = self.ventana.listDisponibles.findItems \
+                    ("*", QtCore.Qt.MatchWrap | QtCore.Qt.MatchWildcard)
+                if len(lista_en_el_tag_actual) != 0:
+                    # El nuevo Tag contiene elementos nuevos
+                    if self._mascara_filtrado(self.ventana.lNombreTag.text()):
+                        # El Nombre del tag es correcto
+                        if len(self.ventana.lDescripcion.text()) != 0:
+                            # Contiene al menos alguna descripcción
+                            # LLamamos a la función
+                            owner = self.ventana.cOwner.itemData(self.ventana.cOwner.currentIndex())
+
+                            exito = self.controlador_mis_tags.modificar_tag(self.id_usuario, self.tag.id_tag,
+                                                                            self.ventana.lNombreTag.text(), owner,
+                                                                            self.ventana.lDescripcion.text(),
+                                                                            self.lista_disponble_previa,
+                                                                            lista_disponible_actual,
+                                                                            self.lista_en_el_tag_previa,
+                                                                            lista_en_el_tag_actual)
+
+                            if exito:
+                                # Se ha Modificado correctamente
+                                info_box = QMessageBox()
+                                info_box.setIcon(1)
+                                info_box.setWindowTitle("Modificar Tag actual")
+                                info_box.setText("CORRECTO")
+                                info_box.setInformativeText("Se ha modificado el Tag correctamente en el sistema")
+                                info_box.exec_()
+                                self.iu_mis_tags.cargar_datos()
+                                self.close()
+                            else:
+                                # Ha ocurido un error
+                                error_box = QMessageBox()
+                                error_box.setIcon(3)
+                                error_box.setWindowTitle("Modificar Tag actual")
+                                error_box.setText("ERROR")
+                                error_box.setInformativeText("Ha ocurrido algún error a la hora de modificar un Tag. "
+                                                             "Revisa que no hayas intentado crear un Tag con el mismo "
+                                                             "nombre de alguno creado con anterioridad")
+                                error_box.exec_()
+                        else:
+                            print "No ha introducido nada en la descripción"
+                            warm_box_2 = QMessageBox()
+                            warm_box_2.setIcon(2)
+                            warm_box_2.setWindowTitle("Modificar Tag actual")
+                            warm_box_2.setText("¡Atención!")
+                            warm_box_2.setInformativeText("Introduce al menos una descripción.")
+                            warm_box_2.exec_()
+                    else:
+                        print "Nome del Tag incorrecto"
+                        warm_box = QMessageBox()
+                        warm_box.setIcon(2)
+                        warm_box.setWindowTitle("Modificar Tag actual")
+                        warm_box.setText("¡Atención!")
+                        warm_box.setInformativeText("Los datos introducidos para el nombre del Tag no son válidos")
+                        warm_box.exec_()
+                else:
+                    error_box_2 = QMessageBox()
+                    error_box_2.setIcon(3)
+                    error_box_2.setWindowTitle("Modificar Tag actual")
+                    error_box_2.setText("ERROR")
+                    error_box_2.setInformativeText("No dejar el Tag sin scripts. "
+                                                   "Debes dejar al Tag con al menos un script.")
+                    error_box_2.exec_()
+
+    def _mascara_filtrado(self, p_texto):
+        """
+        Filtra los valores de entrada para permitir sólo letras y números
+
+        :param p_texto: El texto a comprobar
+        :return: True si la cadeno de texto contiene a-z, A-Z, 0-9
+                False si la cadena de texto contiene espacios o caracteres extraños
+        """
+        patron = re.compile("[a-zA-Z\d]*$")
+        return patron.match(p_texto)

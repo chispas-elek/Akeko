@@ -106,3 +106,20 @@ class GestorGrupo(object):
                     SELECT IdGrupo FROM Tag_Grupo WHERE IdTag=%s);""""", (p_id_tag, )
         respuesta_bd = bd.execute(consulta)
         return respuesta_bd
+
+    def existe_script(self, p_id_grupo, p_id_script):
+        """
+        Vericia si un script determinado está o no aplicado en un Grupo
+
+        :param p_id_script: El identificador del script
+        :param p_id_grupo: El identificador del grupo
+        :return: True -> El Script solicitado existe en el grupo
+                False -> El Script solicitado no existe en el grupo
+        """
+        existe = False
+        bd = MySQLConnector.MySQLConnector()
+        consulta = "SELECT * FROM Script_Grupo WHERE IdScript=%s and IdGrupo=%s", (p_id_script, p_id_grupo)
+        respuesta_bd = bd.execute(consulta)
+        if len(consulta) != 0:
+            existe = True
+        return respuesta_bd

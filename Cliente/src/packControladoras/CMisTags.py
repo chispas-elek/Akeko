@@ -4,6 +4,7 @@ __author__ = 'Rubén Mulero'
 import collections
 from Cliente.src.packGestorSocket import ServerSender
 from Cliente.src.packModelo import ListaScript, ListaTag
+from PyQt5 import QtCore
 
 
 class Singleton(type):
@@ -22,12 +23,19 @@ class CMisTags(object):
     # Hemos creado el patrón de la MAE
     # Definimos el código que deseamos en la clase.
 
-    def obtener_todos_los_usuarios(self):
+    def obtener_todos_los_propietarios(self, p_id_usuario):
         """
         Obtiene todos los usuarios del sistema para mostrarlos en el Propietario
+
+        :param p_id_usuario: El identificador del usuario actual
         :return:
         """
-        pass
+        lista_envio = []
+        lista_envio.append({'metodo': 'obtener_todos_los_propietarios'})
+        lista_envio.append({'id_usuario': p_id_usuario})
+        socket = ServerSender.ServerSender(lista_envio)
+        resultado = socket.enviar_datos()
+        return resultado
 
     def obtener_tags_usuario(self, p_id_usuario):
         """
@@ -77,7 +85,7 @@ class CMisTags(object):
         lista_scripts.construir(resultado)
         return lista_scripts
 
-    def anadir_tag(self, p_nombre_tag, p_id_usuario, p_descripcion, p_lista_scrip):
+    def crear_tag_usuario(self, p_nombre_tag, p_id_usuario, p_descripcion, p_lista_scrip):
         """
         Añadimos un nuevo Tag en el sistema
 
@@ -87,49 +95,54 @@ class CMisTags(object):
         :param p_lista_scrip: La lista que contiene los scripts
         :return:
         """
-        # todo habrá que modificar el nombre del método a crear_tag_usuario
         lista_envio = []
-        lista_envio.append({'metodo': 'anadir_tag'})
+        lista_envio.append({'metodo': 'crear_tag_usuario'})
         lista_envio.append({'nombre_tag': p_nombre_tag,
                             'id_usuario': p_id_usuario,
                             'descripcion': p_descripcion,
-                            'lista_script': p_lista_scrip
+                            'lista_script': p_lista_scrip.deconstruir()
                             })
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
         return resultado
 
-    def modificar_tag(self, p_id_usuario, p_id_tag, p_nombre_tag, p_lista_vieja_s,
-                      p_lista_nueva_s, p_owner, p_descripcion):
+    def modificar_tag(self, p_id_usuario, p_id_tag, p_nombre_tag, p_owner, p_descripcion, p_lista_disponible_previa,
+                        p_lista_disponible_actual, p_lista_en_el_tag_previa, p_lista_en_el_tag_actual):
         """
-        Modifica los scripts de un Tag.
+        Modifica los scripts que tiene actualmente el TAG y los aplica/elimina en los grupos afectados por el mismo.
 
-        :param p_id_usuario: El identificador de un usuario
-        :param p_id_tag: El identificador del tag a modificar
-        :param p_nombre_tag: El nuevo nombre del Tag
-        :param p_lista_vieja_s: La lista antigua de scripts
-        :param p_lista_nueva_s: La lista nueva de scripts
-        :param p_owner: El nuevo owner del grupo (El identificador del nuevo propietario
-        :param p_descripcion: La nueva descripción del tag
+
+        :param p_id_usuario: El identidicador del usuario
+        :param p_id_tag: El identificador del TAg
+        :param p_nombre_tag: El nombre del Tag
+        :param p_owner: El propietario del Tag
+        :param p_descripcion: La descripcción del Tag
+        :param p_lista_disponible_previa: La lista de scripts disponibles previa
+        :param p_lista_disponible_actual: La lista de scripts disponibles actual
+        :param p_lista_en_el_tag_previa: La lista de scripts en el tag previa
+        :param p_lista_en_el_tag_actual: La lista de scripts en el tag actual
         :return:
         """
-        # Lo primero es crear una lista de cambios con los scripts
+        # inicializamos la lista de envío y de cambios
         lista_envio = []
-        # Primero comaramos si los scripts son iguales
-        comparar = lambda x, y: collections.Counter(x) == collections.Counter(y)
-        if comparar(p_lista_vieja_s, p_lista_nueva_s):
-            # Las listas son iguales
-            lista_cambios = None
-        else:
-            # La lista de scritps es distinta
-            lista_cambios = self._crear_lista_cambios(p_lista_vieja_s, p_lista_nueva_s)
+        lista_cambios = []
+
+        # Los tags deben contener a la fuerzaz minimo un script, por ello debemos recorrerlos SIEMPRE.
+        # Se puede dar el caso que un usuario sólo busque moddificar los datos del TAG, en vez de otra cosa
+
+        # Verificamos si debemos AÑADIR algun Script
+        self._crear_lista_cambios(lista_cambios, p_lista_disponible_previa, p_lista_en_el_tag_actual, True)
+        # Verificamos si debeoms ELIMINAR algún Script
+        self._crear_lista_cambios(lista_cambios, p_lista_disponible_actual, p_lista_en_el_tag_previa, False)
+
+        # todo merece la pena ponerse a comprobar datos para verificar si hace falta enviar al server?
 
         lista_envio.append({'metodo': 'modificar_tag'})
         lista_envio.append({'id_usuario': p_id_usuario,
                             'id_tag': p_id_tag,
                             'nombre_tag': p_nombre_tag,
                             'owner': p_owner,
-                            'descripcionn': p_descripcion,
+                            'descripcion': p_descripcion,
                             'lista_cambios': lista_cambios
                             })
 
@@ -154,33 +167,45 @@ class CMisTags(object):
         resultado = socket.enviar_datos()
         return resultado
 
-    def _crear_lista_cambios(self, p_lista_vieja, p_lista_nueva):
+    def _crear_lista_cambios(self, p_lista_cambios, p_lista_disponible, p_lista_en_el_tag, p_accion):
         """
-        Genera la lista de cambios para los scripts
+        Crea la lista de cambios para el TAg actual.
 
-        :param p_lista_vieja: La lista vieja de Scripts
-        :param p_lista_nueva: La lista nueva de Scripts
+        :param p_lista_cambios: La lista que contendrá los cambios
+        :param p_lista_disponible: La lista de scripts disponibles. Puede ser la vieja o la nueva
+        :param p_lista_en_el_tag:  La lista de scripts aplicados en el tag
+        :param p_accion: True --> Vamos a mirar que scripts se añaden
+                        False --> Vamos a mirar que scripts de borran
 
-        :return: La lista de cambios
+        :return: La lista de cambios deseada.
         """
-        lista_cambios = []
-        if len(p_lista_vieja) != 0:
-            # Primero cotejamos la lista vieja con la nueva para eliminar scripts
-            lista_borrado = p_lista_vieja.cotejar_lista_s(p_lista_nueva)
-            # Ahora cotejamos la lista nueva con la vieja para saber cuáles son los scripts nuevos
-            lista_anadir = p_lista_nueva.cotejar_lista_s(p_lista_vieja)
 
-            # Creamos la lista de cambios
-            for borrado in lista_borrado:
-                lista_cambios.append({'accion': 'borrar_script',
-                                      'id_script': borrado.id_script})
-            for anadir in lista_anadir:
-                lista_cambios.append({'accion': 'anadir_script',
-                                      'id_script': anadir.id_script})
+        if p_accion:
+            # Vamos a comprobar que tenemos que AÑADIR
+            # Recorremos la lista vieja de disponibles y miramos qué elementos han pasado a la nueva lista de aplicados
+            for item in p_lista_disponible:
+                item_aplicado_encontrado = False
+                i = 0
+                while i < len(p_lista_en_el_tag) and item_aplicado_encontrado is not True:
+                    elemento = p_lista_en_el_tag[i]
+                    if elemento is item:
+                        # El elemento se encuentra en la nueva lista
+                        elemento_data = elemento.data(QtCore.Qt.UserRole)
+                        p_lista_cambios.append({'accion': 'anadir_script',
+                                                     'id_script': elemento_data[1].id_script})
+                        item_aplicado_encontrado = True
+                    i += 1
         else:
-            # Esto podria no producirse nunca.
-            # Agregamos directamente la nueva lista
-            for nueva in p_lista_nueva:
-                lista_cambios.append({'accion': 'anadir_script',
-                                      'id_script': nueva.id_script})
-        return lista_cambios
+            # Vamos a comprobar que tenemos que BORRAR
+            for item_2 in p_lista_en_el_tag:
+                item_disponible_encontrado = False
+                j = 0
+                while j < len(p_lista_disponible) and item_disponible_encontrado is not True:
+                    elemento_2 = p_lista_disponible[j]
+                    if elemento_2 is item_2:
+                        # El elemento se encuentra en la nueva lista
+                        elemento_2_data = elemento_2.data(QtCore.Qt.UserRole)
+                        p_lista_cambios.append({'accion': 'borrar_script',
+                                                        'id_script': elemento_2_data[1].id_script})
+                        item_disponible_encontrado = True
+                    j += 1

@@ -71,16 +71,19 @@ class CGestionarScript(object):
         lista_script_dispo.construir(resultado)
         return lista_script_dispo
 
-    def obtener_tags_disponibles(self, p_id_grupo):
+    def obtener_tags_disponibles(self, p_id_grupo, p_id_usuario):
         """
         Obtenemos la lista de Tags disponibles para el grupo
 
         :param p_id_grupo: El identificador del grupo
+        :param p_id_usuario: El identificador del usuario
         :return: La lista con los tags disponibles
         """
         lista_envio = []
         lista_envio.append({'metodo': 'obtener_tags_disponibles'})
-        lista_envio.append({'id_grupo': p_id_grupo})
+        lista_envio.append({'id_grupo': p_id_grupo,
+                            'id_usuario': p_id_usuario
+                            })
         socket = ServerSender.ServerSender(lista_envio)
         resultado = socket.enviar_datos()
         lista_tag_dispo = ListaTag.ListaTag()
@@ -273,6 +276,6 @@ class CGestionarScript(object):
                         else:
                             # El elemento es un script
                             p_lista_cambios_s.append({'accion': 'borrar_script',
-                                                        'id_script': elemento_2_data[0].id_script})
+                                                        'id_script': elemento_2_data[1].id_script})
                         item_disponible_encontrado = True
                     j += 1

@@ -4,52 +4,84 @@ __author__ = 'Rubén Mulero'
 
 class Historial(object):
 
-    def __init__(self, p_id_historial, p_id_script, p_id_tag, p_dni,
-                 p_id_usuario, p_id_grupo, p_fecha_crea, p_accion, p_informacion):
+    def __init__(self, p_id_historial, p_nombre_script, p_nombre_tag, p_nombre_alumno,
+                 p_apellido, p_nombre_grupo, p_fecha_creacion_h, p_id_usuario, p_accion, p_informacion):
+
 
         self.id_historial = p_id_historial
-        self.id_script = p_id_script
-        self.id_tag = p_id_tag
-        self.dni = p_dni
+        if p_nombre_script is None:
+            self.nombre_script = "--"
+        else:
+            self.nombre_script = p_nombre_script
+        if p_nombre_tag is None:
+            self.nombre_tag = "--"
+        else:
+            self.nombre_tag = p_nombre_tag
+        self.nombre_alumno = p_nombre_alumno
+        self.apellido = p_apellido
+        self.nombre_grupo = p_nombre_grupo
+        self.fecha_creacion_h = p_fecha_creacion_h
         self.id_usuario = p_id_usuario
-        self.id_grupo = p_id_grupo
-        self.fecha_crea = p_fecha_crea
         self.accion = p_accion
         self.informacion = p_informacion
 
-    # getters y setters
+    # Seteamos los Getters y los Setters
 
     @property
     def id_historial(self):
-         return self.__id_historial
+        return self.__id_historial
 
     @id_historial.setter
     def id_historial(self, un_id_historial):
-         self.__id_historial = un_id_historial
+        self.__id_historial = un_id_historial
 
     @property
-    def id_script(self):
-        return self.__id_script
+    def nombre_script(self):
+        return self.__nombre_script
 
-    @id_script.setter
-    def id_script(self, un_id_scrit):
-        self.__id_script = un_id_scrit
-
-    @property
-    def id_tag(self):
-        return self.__id_tag
-
-    @id_tag.setter
-    def id_tag(self, un_id_tag):
-        self.__id_tag = un_id_tag
+    @nombre_script.setter
+    def nombre_script(self, un_nombre_script):
+        self.__nombre_script = un_nombre_script
 
     @property
-    def dni(self):
-        return self.__dni
+    def nombre_tag(self):
+        return self.__nombre_tag
 
-    @dni.setter
-    def dni(self, un_dni):
-        self.__dni = un_dni
+    @nombre_tag.setter
+    def nombre_tag(self, un_nombre_tag):
+        self.__nombre_tag = un_nombre_tag
+
+    @property
+    def nombre_alumno(self):
+        return self.__nombre_alumno
+
+    @nombre_alumno.setter
+    def nombre_alumno(self, un_nombre_alumno):
+        self.__nombre_alumno = un_nombre_alumno
+
+    @property
+    def apellido(self):
+        return self.__apellido
+
+    @apellido.setter
+    def apellido(self, un_apellido):
+        self.__apellido = un_apellido
+
+    @property
+    def nombre_grupo(self):
+        return self.__nombre_grupo
+
+    @nombre_grupo.setter
+    def nombre_grupo(self, un_nombre_grupo):
+        self.__nombre_grupo = un_nombre_grupo
+
+    @property
+    def fecha_creacion_h(self):
+        return self.__fecha_creacion_h
+
+    @fecha_creacion_h.setter
+    def fecha_creacion_h(self, una_fecha_creacion_h):
+        self.__fecha_creacion_h = una_fecha_creacion_h
 
     @property
     def id_usuario(self):
@@ -58,22 +90,6 @@ class Historial(object):
     @id_usuario.setter
     def id_usuario(self, un_id_usuario):
         self.__id_usuario = un_id_usuario
-
-    @property
-    def id_grupo(self):
-        return self.__id_grupo
-
-    @id_grupo.setter
-    def id_grupo(self, un_id_grupo):
-        self.__id_grupo = un_id_grupo
-
-    @property
-    def fecha_crea(self):
-        return self.__fecha_crea
-
-    @fecha_crea.setter
-    def fecha_crea(self, una_fecha_crea):
-        self.__fecha_crea = una_fecha_crea
 
     @property
     def accion(self):
@@ -90,4 +106,3 @@ class Historial(object):
     @informacion.setter
     def informacion(self, una_informacion):
         self.__informacion = una_informacion
-
