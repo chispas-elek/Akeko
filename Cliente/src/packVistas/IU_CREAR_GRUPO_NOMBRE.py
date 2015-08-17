@@ -105,6 +105,7 @@ class CrearGrupoNombre(QtWidgets.QDialog):
             print "Resultado de la operación es %s" % resultado
             if resultado is True:
                 self.iu_main.generar_combo_box()
+                self.iu_main.seleccionar_item()
                 # Creamos ventana de aviso
                 msg_box = QMessageBox()
                 msg_box.setIcon(1)

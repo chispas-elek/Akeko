@@ -256,6 +256,7 @@ class Main(QtWidgets.QMainWindow):
                 msg_box.exec_()
                 # Regeneramos el combo box.
                 self.generar_combo_box()
+                self.seleccionar_item()
             else:
                 print "Existe algún error a la hora de borrar el alumno"
                 msg_box_e = QMessageBox()
@@ -282,6 +283,7 @@ class Main(QtWidgets.QMainWindow):
         else:
             # Ha pasado algo a la hora de obtener los alumnos. Damos un error
             print "Error serio a la hora de obtener los alumnos de un Grupo"
+            # todo limpiar la tabla de elementos
 
     def cambiar_nombre_grupo(self):
         """

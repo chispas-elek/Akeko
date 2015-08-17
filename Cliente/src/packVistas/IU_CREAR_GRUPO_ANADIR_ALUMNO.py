@@ -165,7 +165,7 @@ class CrearGrupoAnadirAlumno(QtWidgets.QWidget):
                 if patron_apellido.match(self.ventana.lApellidos.text()) and self.ventana.lApellidos.text() != "":
                     print "apellido ok"
                     patron = re.compile(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$")
-                    if patron.match(self.ventana.lEmail.text()) and self.ventana.lDni.text() != "":
+                    if patron.match(self.ventana.lEmail.text()) and self.ventana.lEmail.text() != "":
                         print "ALL OK"
                         resultado = True
                     else:

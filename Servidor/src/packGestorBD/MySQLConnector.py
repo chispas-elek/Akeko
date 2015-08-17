@@ -27,13 +27,22 @@ class MySQLConnector(object):
             cur = database.cursor(MySQLdb.cursors.DictCursor)
             # Si nos conectamos correctamente, ejecutamos Consulta
             try:
-                devolver = cur.execute(*p_consulta)
-                # Si la consulta es un SELECT obtenemos todos los datos
-                # Si es UPDATE o DELETE hacemos un commit.
-                if p_consulta[0].upper().startswith('SELECT'):
-                    devolver = cur.fetchall()
+                if type(p_consulta) == tuple:
+                    # Es una tupla con datos, llamada combinada
+                    devolver = cur.execute(*p_consulta)
+                    # Si la consulta es un SELECT obtenemos todos los datos
+                    # Si es UPDATE o DELETE hacemos un commit.
+                    if p_consulta[0].upper().startswith('SELECT'):
+                        devolver = cur.fetchall()
+                    else:
+                        database.commit()
                 else:
-                    database.commit()
+                    # Es un simple String de datos. LLamada sencilla
+                    devolver = cur.execute(p_consulta)
+                    if p_consulta.upper().startswith('SELECT'):
+                        devolver = cur.fetchall()
+                    else:
+                        database.commit()
             except MySQLdb.Error, e:
                 try:
                     print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
