@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QLineEdit
 from sys import argv
 from Cliente.src.packControladoras import CLogin
 import re
@@ -97,8 +97,8 @@ class Principal(QtWidgets.QMainWindow):
         self.ventana.bLogin.clicked.connect(self.login)
         # Configuramos las máscaras de entrada
 
-        # todo descomentar ésto para que la contraseña no sea visible
-        # self.ventana.lEditContrasena.setEchoMode(QLineEdit.Password)
+        # descomentar ésto para que la contraseña no sea visible
+        self.ventana.lEditContrasena.setEchoMode(QLineEdit.Password)
 
         # Iniciamos las variables de las nuevas ventanas
         self.window_main = None

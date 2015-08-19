@@ -43,11 +43,7 @@ class Script(object):
 
     @activo.setter
     def activo(self, un_activo):
-        if un_activo is not True or un_activo is not False:
-            # El atributo ha sido mal seteado. Lo ponemos en false por defecto
-            self.__activo = False
-        else:
-            self.__activo = un_activo
+        self.__activo = un_activo
 
     @property
     def ruta(self):

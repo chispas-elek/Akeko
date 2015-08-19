@@ -306,8 +306,7 @@ class Main(QtWidgets.QMainWindow):
         Muesta el historial del usuario actual para ver los cambios realizados
 
         """
-        if self.window_historial is None:
-            self.window_historial = IU_HISTORIAL.Historial(self.id_usuario)
+        self.window_historial = IU_HISTORIAL.Historial(self.id_usuario)
         self.window_historial.show()
 
     def gestionar_script(self):

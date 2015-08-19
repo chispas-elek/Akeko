@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 from Cliente.src.packModelo import Alumno
 import re
 
@@ -135,6 +136,12 @@ class CrearGrupoAnadirAlumno(QtWidgets.QWidget):
             # Aqui ejectuamos el existe alumno y añadimos o no
             if self.lista_alumnos.exite_alumno(nuevo_alumno.dni_a) is None:
                 print "Se añade al alumno %s" % nuevo_alumno.nombre_a
+                info_box = QMessageBox()
+                info_box.setIcon(1)
+                info_box.setWindowTitle("Añadir un alumno")
+                info_box.setText("Información")
+                info_box.setInformativeText("El alumno ha sido añadido de manera satisfactoria.")
+                info_box.exec_()
                 self.lista_alumnos.anadir(nuevo_alumno)
                 self.iu_crear_grupo.generar_tabla()
                 self.close()
@@ -143,7 +150,12 @@ class CrearGrupoAnadirAlumno(QtWidgets.QWidget):
                 # Mostrar una pantalla del error.
         else:
             # Alguno de los datos no ha sido correctamente introducidos.
-            print resultado
+            warm_box = QMessageBox()
+            warm_box.setIcon(2)
+            warm_box.setWindowTitle("Añadir un alumno")
+            warm_box.setText("¡Atención!")
+            warm_box.setInformativeText(resultado)
+            warm_box.exec_()
 
     def _mascara_filtrado_datos(self):
         """

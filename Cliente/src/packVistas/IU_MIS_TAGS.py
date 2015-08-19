@@ -242,8 +242,7 @@ class MisTags(QtWidgets.QMainWindow):
 
         :return:
         """
-        if self.window_crear_tag is None:
-            self.window_crear_tag = IU_GESTIONAR_TAG.GestionarTag(self.id_usuario, None, self)
+        self.window_crear_tag = IU_GESTIONAR_TAG.GestionarTag(self.id_usuario, None, self)
         self.window_crear_tag.show()
 
     def modificar_tag(self):
@@ -283,6 +282,7 @@ class MisTags(QtWidgets.QMainWindow):
         seleccion = warm_box.exec_()
         if seleccion == QMessageBox.Ok:
             # Obtener los datos del item
+            # todo solvertar pequeño error al eliminar un tag
             item_seleccionado = self.ventana.listTagsUsuario.currentItem()
             item_seleccionado_datos = item_seleccionado.data(QtCore.Qt.UserRole)
             tag = item_seleccionado_datos[1]

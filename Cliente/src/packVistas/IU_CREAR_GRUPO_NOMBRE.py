@@ -116,6 +116,14 @@ class CrearGrupoNombre(QtWidgets.QDialog):
                 # Cerramos y volvemos al main
                 self.iu_crear_grupo.close()
                 self.close()
+            elif resultado is None:
+                print "El grupo ya existe en el sistema"
+                msg_box = QMessageBox()
+                msg_box.setIcon(2)
+                msg_box.setWindowTitle("Creación de un grupo")
+                msg_box.setText("ADVERTENCIA")
+                msg_box.setInformativeText("El nombre del grupo ya existe en el sistema. Por favor elige otro.")
+                msg_box.exec_()
             else:
                 print "El grupo no se ha creado correctamente por alguna razón."
         else:

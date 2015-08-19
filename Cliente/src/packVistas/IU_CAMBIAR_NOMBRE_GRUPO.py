@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 from Cliente.src.packControladoras import CMain
 import re
 
@@ -112,6 +113,12 @@ class CambiarNombreGrupo(QtWidgets.QDialog):
             print "Resultado de la operación es %s" % resultado
             if resultado is True:
                 # Las cosas han ido como deberian.
+                info_box = QMessageBox()
+                info_box.setIcon(1)
+                info_box.setWindowTitle("Cambiar Nombre Grupo")
+                info_box.setText("CORRECTO")
+                info_box.setInformativeText("Nombre del grupo cambiado correctamente.")
+                info_box.exec_()
                 self.iu_main.generar_combo_box()
                 self.close()
             else:

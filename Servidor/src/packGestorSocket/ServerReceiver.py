@@ -56,7 +56,7 @@ class ServerHandler(StreamRequestHandler):
     # Gestiona las conexiones que recibe de cada cliente y elige lo que debe hacer.
     def handle(self):
         try:
-            reciv = Decoder.Decoder(self.request.recv(1024).strip())
+            reciv = Decoder.Decoder(self.request.recv(4096).strip())
             data = reciv.decode_json()
             # Programamos el diccionario para elegir las acciones a realizar.
             operaciones = {'iniciar_sesion': self.iniciar_sesion,
@@ -364,9 +364,10 @@ class ServerHandler(StreamRequestHandler):
         descripcion = p_data[1]['descripcion']
         lista_script = p_data[1]['lista_script']
         resultado_creacion = gestor_tag_script.crear_tag_usuario(nombre_tag, id_usuario, descripcion, lista_script)
-        if resultado_creacion:
+        if resultado_creacion is True:
             # Insertamos en el historial la creación del TAG
-            resultado = gestor_historial.anadir_historia_gestion_tag(id_usuario, True, 'Se ha creado un nuevo Tag')
+            resultado = gestor_historial.anadir_historia_gestion_tag(nombre_tag, id_usuario, True,
+                                                                     'Se ha creado un nuevo Tag')
         return resultado
 
     def aplicar_cambios(self, p_data):

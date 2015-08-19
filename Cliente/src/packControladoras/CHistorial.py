@@ -52,3 +52,4 @@ class CHistorial(object):
         """
         historial_filtrado = []
         # todo hacer el filtrado del historial Revisar pagima 86 del manual para usar MATCH
+        pass

@@ -145,7 +145,7 @@ class GestorHistorial(object):
 
         return respuesta
 
-    def anadir_historia_gestion_tag(self, p_id_usuario, p_accion, p_info):
+    def anadir_historia_gestion_tag(self, p_nombre_tag, p_id_usuario, p_accion, p_info):
         """
         Ésta función registra todos los datos relacionados con agregar, modificar o eliminar un targ en el sistema
 
@@ -157,8 +157,9 @@ class GestorHistorial(object):
         """
         exito = False
         bd = MySQLConnector.MySQLConnector()
-        consulta = "INSERT INTO Historial(IdUsuario,Accion,Informacion) VALUES(%s,%s,%s);", \
-                     (p_id_usuario, p_accion, p_info)
+        consulta = "INSERT INTO Historial(NombreScript,NombreTag,NombreAlumno,Apellido,NombreGrupo,IdUsuario,Accion," \
+                   "Informacion) VALUES(%s,%s,%s,%s,%s,%s,%s,%s);", \
+                   ("", p_nombre_tag, "", "", "", p_id_usuario, p_accion, p_info)
         respuesta_bd = bd.execute(consulta)
         if respuesta_bd == 1:
             exito = True
