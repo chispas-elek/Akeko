@@ -750,17 +750,27 @@ class ErrorAlumno(Exception):
 
 
 # Configuracion de los datos de escucha y ejecucion infinita del servidor.
-if __name__ == "__main__":
-    PORT = 13373
-    try:
-        # obtenemos la ip local de la máquina y ejecutamos el servidor en escucha.
-        HOST = socket.gethostbyname(socket.gethostname())
-        server = MySSLThreadingTCPServer((HOST, PORT), ServerHandler,
-                                         "../../../ssl/cacert.pem",
-                                         "../../../ssl/private/key.pem")
-        # Se queda en ejecución infinita
-        server.serve_forever()
-    except socket.error:
-        print "Ha ocurrido un error a la hora de obtener" \
-              "la ip local del servidor"
-        exit()
+#if __name__ == "__main__":
+class ConfigServer(object):
+
+    def __init__(self, p_PORT, p_cert, p_key):
+        self._PORT = p_PORT
+        self._cert = p_cert
+        self._key = p_key
+
+    def iniciar_servidor(self):
+        try:
+            # obtenemos la ip local de la máquina y ejecutamos el servidor en escucha.
+            HOST = socket.gethostbyname(socket.gethostname())
+            # server = MySSLThreadingTCPServer((HOST, self._PORT), ServerHandler,
+            #                                 "../../../ssl/cacert.pem",
+            #                                "../../../ssl/private/key.pem")
+            server = MySSLThreadingTCPServer((HOST, self._PORT), ServerHandler,
+                                             self._cert,
+                                             self._key)
+            # Se queda en ejecución infinita
+            server.serve_forever()
+        except socket.error:
+            print "Ha ocurrido un error a la hora de obtener" \
+                  "la ip local del servidor"
+            exit()
