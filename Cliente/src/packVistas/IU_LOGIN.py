@@ -2,7 +2,6 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QLineEdit
-from sys import argv
 from Cliente.src.packControladoras import CLogin
 import re
 import IU_MAIN
@@ -166,10 +165,3 @@ class Principal(QtWidgets.QMainWindow):
         """
         patron = re.compile("[a-zA-Z\d]*$")
         return patron.match(p_texto)
-
- # Se lanza la interface principal
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(argv)
-    myapp = Principal()
-    myapp.show()
-    exit(app.exec_())

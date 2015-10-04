@@ -28,7 +28,7 @@ class ServerSender(object):
         #s.settimeout(10)
         # Creamos el socket SSL y le indicamos el certificado
         self.ssl_sock = ssl.wrap_socket(s,
-                                        ca_certs="../../../ssl/cacert.pem",
+                                        ca_certs="ssl/cacert.pem",
                                         cert_reqs=ssl.CERT_REQUIRED,
                                         ssl_version=ssl.PROTOCOL_TLSv1)
         self.datos_enviar = p_datos_enviar

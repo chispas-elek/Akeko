@@ -750,7 +750,6 @@ class ErrorAlumno(Exception):
 
 
 # Configuracion de los datos de escucha y ejecucion infinita del servidor.
-#if __name__ == "__main__":
 class ConfigServer(object):
 
     def __init__(self, p_PORT, p_cert, p_key):
@@ -768,6 +767,15 @@ class ConfigServer(object):
             server = MySSLThreadingTCPServer((HOST, self._PORT), ServerHandler,
                                              self._cert,
                                              self._key)
+
+            # Si no ha saltado excepción es que el servidor se ha configurado
+            # de manera correcta por lo que damos un feedback
+            print ""
+            print "El servidor esta en ejecución los datos de conexión son los siguientes:"
+            print "======================================================================="
+            print ""
+            print "El HOST local del servidor es: %s" % HOST
+            print "El PUERTO del servidor es: %s" % self._PORT
             # Se queda en ejecución infinita
             server.serve_forever()
         except socket.error:
