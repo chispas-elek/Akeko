@@ -282,8 +282,9 @@ class Main(QtWidgets.QMainWindow):
             self._generar_tabla()
         else:
             # Ha pasado algo a la hora de obtener los alumnos. Damos un error
-            print "Error serio a la hora de obtener los alumnos de un Grupo"
-            # todo limpiar la tabla de elementos
+            print "Error serio a la hora de obtener los alumnos de un Grupo o la tabla no contiene elementos"
+            # Regeneramos la tabla sin valores
+            self._generar_tabla()
 
     def cambiar_nombre_grupo(self):
         """

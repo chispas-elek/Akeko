@@ -18,7 +18,7 @@ import ssl
 class ServerSender(object):
     # Definimos dos constantes y marcamos como internas
     # todo Definir un archivo para cambiar el valor del server name
-    __SERVER_NAME = '192.168.0.10'
+    __SERVER_NAME = 'chispas-rpi.no-ip.biz'
     __PORT = 13373
 
     def __init__(self, p_datos_enviar):

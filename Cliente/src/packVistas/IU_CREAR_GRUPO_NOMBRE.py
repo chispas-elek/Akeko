@@ -126,8 +126,21 @@ class CrearGrupoNombre(QtWidgets.QDialog):
                 msg_box.exec_()
             else:
                 print "El grupo no se ha creado correctamente por alguna razón."
+                error_box_2 = QMessageBox()
+                error_box_2.setIcon(3)
+                error_box_2.setWindowTitle("Creación de un grupo")
+                error_box_2.setText("Error")
+                error_box_2.setInformativeText("El grupo no se ha podido crear debido a un error interno.")
+                error_box_2.exec_()
         else:
             print "Los caracteres del grupo introducidos son inválidos"
+            error_box = QMessageBox()
+            error_box.setIcon(3)
+            error_box.setWindowTitle("Creación de un grupo")
+            error_box.setText("Error")
+            error_box.setInformativeText("El nombre del grupo introducido contiene caracteres extraños. Introduce"
+                                         "un nombre de grupo correcto.")
+            error_box.exec_()
 
     def __mascara_filtrado(self, p_texto):
         """
