@@ -298,7 +298,7 @@ class GestorTagScript(object):
                             print errores
                     else:
                         # Error, los SHA NO son iguales. Raise exception
-                        print "Hola"
+                        print "El SHA no coincide con el de la BD"
                 else:
                     # Error garrafal, raiseamos exception
                     print errores_sha
