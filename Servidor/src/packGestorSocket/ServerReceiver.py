@@ -776,6 +776,9 @@ class ConfigServer(object):
             print ""
             print "El HOST local del servidor es: %s" % HOST
             print "El PUERTO del servidor es: %s" % self._PORT
+            print ""
+            print "======================================================================="
+            print ""
             # Se queda en ejecución infinita
             server.serve_forever()
         except socket.error:

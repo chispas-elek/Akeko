@@ -185,7 +185,7 @@ class GestorTagScript(object):
                 actualizar_bd = True
         else:
             # Es la primera vez que se añade éste script a éste alumno, lo aplicamos
-            resultado = self._execute_script(p_id_script, p_dni)
+            resultado = self._execute_script(p_id_script, p_dni, True)
             if resultado:
                 # El script se ha aplicado bien inserto la intención
                 consulta_3 = """INSERT INTO Aplicacion(IdScript,Dni,IdUsuario,IdGrupo) VALUES
@@ -228,7 +228,7 @@ class GestorTagScript(object):
                 actualizar_bd = True
         else:
             # Ya no queda más intenciones por lo que debemos eliminar el script
-            resultado = self._execute_script(p_id_script, p_dni)
+            resultado = self._execute_script(p_id_script, p_dni, False)
             if resultado:
                 # Al alumno se le ha revocado el script que tenia aplicado
                 actualizar_bd = True
@@ -258,11 +258,13 @@ class GestorTagScript(object):
         return existe
 
     # el parámetro de entrada de los argumentos decidirá la acción.
-    def _execute_script(self, p_id_script, p_dni, *args):
+    def _execute_script(self, p_id_script, p_dni, p_accion):
         """
         Aplicamos un script
         :param p_id_script: El identificador del Script
         :param p_dni: El Dni del alumno
+        :param p_accion: True -> Ejecuta el Script añadiendo datos
+                        False -> Ejecuta el Script eliminando datos
         :return: True o False dependiendo del éxito de la aplicación del script
         """
         correcto = False
@@ -271,29 +273,35 @@ class GestorTagScript(object):
         consulta_1 = "SELECT Ruta,SHA FROM Script WHERE IdScript=%s;", (p_id_script,)
         respuesta_bd = bd.execute(consulta_1)
         if len(respuesta_bd) != 0:
-            # Obtenemos la Ruta del script
-            p = sub.Popen(("shasum", respuesta_bd[0]['Ruta']), stdout=sub.PIPE, stderr=sub.PIPE)
-            salidas_sha, errores_sha = p.communicate()
-            if len(salidas_sha) != 0:
-                # Comprobamos los SHA de la BD con el del archivo
-                salidas = salidas_sha.split()
-                if respuesta_bd[0]['SHA'] == salidas[0]:
-                    # Los SHA coinciden, podemos ejecutar el script
-                    p = sub.Popen(('sh', respuesta_bd[0]['Ruta'], p_dni),
-                                  stdout=sub.PIPE, stderr=sub.PIPE)
-                    salidas, errores = p.communicate()
-                    if len(salidas) != 0:
-                        print salidas
-                        correcto = True
+            consulta_2 = "SELECT Email FROM Alumno WHERE Dni=%s;", (p_dni,)
+            respuesta_bd_2 = bd.execute(consulta_2)
+            if len(respuesta_bd_2) != 0:
+                # Obtenemos el nombre de usuario del mail para usarlo como identificador en los servicios
+                ident_alumno = respuesta_bd_2[0]['Email'].split("@")[0]
+                # Obtenemos la Ruta del script
+                p = sub.Popen(("shasum", respuesta_bd[0]['Ruta']), stdout=sub.PIPE, stderr=sub.PIPE)
+                salidas_sha, errores_sha = p.communicate()
+                if len(salidas_sha) != 0:
+                    # Comprobamos los SHA de la BD con el del archivo
+                    salidas = salidas_sha.split()
+                    if respuesta_bd[0]['SHA'] == salidas[0]:
+                        # Los SHA coinciden, podemos ejecutar el script
+                        p = sub.Popen(('sh', respuesta_bd[0]['Ruta'], ident_alumno, p_accion),
+                                      stdout=sub.PIPE, stderr=sub.PIPE)
+                        salidas, errores = p.communicate()
+                        # todo realizar la acción avanzada del script
+                        if len(salidas) != 0:
+                            print salidas
+                            correcto = True
+                        else:
+                            # El script no se ha podido aplicar bien, raise exception
+                            print errores
                     else:
-                        # El script no se ha podido aplicar bien, raise exception
-                        print errores
+                        # Error, los SHA NO son iguales. Raise exception
+                        print "Hola"
                 else:
-                    # Error, los SHA NO son iguales. Raise exception
-                    print "Hola"
-            else:
-                # Error garrafal, raiseamos exception
-                print errores_sha
+                    # Error garrafal, raiseamos exception
+                    print errores_sha
 
         return correcto
 
