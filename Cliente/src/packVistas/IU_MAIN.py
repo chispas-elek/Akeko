@@ -200,6 +200,9 @@ class Main(QtWidgets.QMainWindow):
         self.window_mis_tags = None
         self.window_historial = None
 
+        # Evito cerrar la ventana
+        self.quiero_cerrar = False
+
     def crear_grupo(self):
         """
         Lanza la interfaz de creación de nuevo grupo, pasándole la lista actual de grupos y el identificador de usuario.
@@ -381,3 +384,10 @@ class Main(QtWidgets.QMainWindow):
         # Habilitamos el combobox y seleccionamos el primer grupo de la lista
         self.ventana.cSelecionarGrupo.setCurrentIndex(0)
         self.ventana.cSelecionarGrupo.blockSignals(False)
+
+    def closeEvent(self, evnt):
+        if self.quiero_cerrar:
+            super(Main, self).closeEvent(evnt)
+        else:
+            evnt.ignore()
+            self.setWindowState(QtCore.Qt.WindowMinimized)

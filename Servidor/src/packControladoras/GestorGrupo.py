@@ -37,7 +37,8 @@ class GestorGrupo(object):
         :param p_nombre_grupo: El nombre del grupo
         :param p_id_usuario: El identificador del usuario
         :param p_lista_alumnos: La lista de alumnos que va a contener el nuevo grupo
-        :return: True o False dependiendo si la operación ha sido un éxito
+        :return: True --> Si todo ha ido como debería
+                False --> Si algo ha fallado
         """
         devolver = False
         bd = MySQLConnector.MySQLConnector()
@@ -122,4 +123,16 @@ class GestorGrupo(object):
         respuesta_bd = bd.execute(consulta)
         if len(consulta) != 0:
             existe = True
+        return respuesta_bd
+
+    def obtener_un_grupo(self, p_id_grupo):
+        """
+        Dado el identificador de un grupo, obtenemos todos los datos relativos al mismo
+
+        :param p_id_grupo:
+        :return: Los datos relativos al grupo
+        """
+        bd = MySQLConnector.MySQLConnector()
+        consulta = "SELECT IdGrupo,NombreGrupo,FechaCreacion,IdUsuario FROM Grupo WHERE IdGrupo=%s", (p_id_grupo, )
+        respuesta_bd = bd.execute(consulta)
         return respuesta_bd

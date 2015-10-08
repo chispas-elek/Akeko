@@ -236,11 +236,13 @@ class ServerHandler(StreamRequestHandler):
         """
         gestor_alumno = GestorAlumno.GestorAlumno()
         gestor_grupo = GestorGrupo.GestorGrupo()
+        gestor_historial = GestorHistorial.GestorHistorial()
         id_usuario = p_data[1]['id_usuario']
         nombre_grupo = p_data[1]['nombre_grupo']
         lista_alumnos = p_data[1]['lista_alumnos']
         lista_alumnos_nuevos = []
         puedo_insertar = True
+        resultado = False
         # Vamos a comprobar que los alumnos estén correctos
         for alumno in lista_alumnos:
             existe = gestor_alumno.buscar_alumno(alumno['Dni'])
@@ -267,7 +269,12 @@ class ServerHandler(StreamRequestHandler):
                                             alumno_nuevo['Apellido'], alumno_nuevo['Email'])
             # Agregamos el nuevo grupo, con sus alumnos asociados
             # Si ésta función devuelve True es que las cosas han ido bien
-            resultado = gestor_grupo.anadir_grupo(nombre_grupo, id_usuario, lista_alumnos)
+            grupo_nuevo = gestor_grupo.anadir_grupo(nombre_grupo, id_usuario, lista_alumnos)
+            if grupo_nuevo:
+                # El grupo se ha creado correctamente. Añadimos el registro en el historial
+                resultado = gestor_historial.anadir_historial_grupo(id_usuario, nombre_grupo,
+                                                                    True, "Se ha añadido un nuevo grupo.")
+
         else:
             # Algo ha fallado y debemos retornar un error
             resultado = {'return': 'Los datos de un alumno no son corretos'}  # Especificar qué alumno por sus Dni
@@ -324,13 +331,17 @@ class ServerHandler(StreamRequestHandler):
 
         # Por último eliminamos el grupo del sistema.
         if resultado:
+            datos_grupo = gestor_grupo.obtener_un_grupo(id_grupo)
             resultado_borrar_grupo = gestor_grupo.borrar_grupo(id_grupo)
             if resultado_borrar_grupo:
                 # Insertamos en el historial lo sucediddo
-                # gestor_historial.anadir_historial_grupo(id_usuario, id_grupo, False, 'Borrado de grupo')
+
+                resultado = gestor_historial.anadir_historial_grupo(id_usuario, datos_grupo[0]['NombreGrupo'], False,
+                                                                    "Se ha eliminado un grupo.")
                 # Comprobamos si algún alumno se ha quedado sin grupo y lo eliminamos del sistema
                 for alumno2 in lista_alumnos:
                     rdo = gestor_alumno.borrar_alumno(alumno2['Dni'])
+                    # todo sería conveniente hacer algo en caso de que ésto falle.
             else:
                 # Algo ha pasado a la hora de borrar el grupo.
                 resultado = False

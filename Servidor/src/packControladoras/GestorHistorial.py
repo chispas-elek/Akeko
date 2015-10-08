@@ -116,7 +116,7 @@ class GestorHistorial(object):
 
         return respuesta
 
-    def anadir_historial_grupo(self, p_id_usuario, p_id_grupo, p_accion, p_info):
+    def anadir_historial_grupo(self, p_id_usuario, p_nombre_grupo, p_accion, p_info):
         """
         Añade a la base de datos una entrada referente a la adición o no de un grupo en el sistema
 
@@ -129,19 +129,14 @@ class GestorHistorial(object):
         """
         respuesta = False
         bd = MySQLConnector.MySQLConnector()
-        # Obtemer el nombre del grupo
-        consulta_1 = "SELECT NombreGrupo from Grupo WHERE IdGrupo=%s", (p_id_grupo,)
-        respuesta_bd_1 = bd.execute(consulta_1)
-        if len(respuesta_bd_1) != 0:
-            # Tenemos datos, vamos a insertar en el historial
-            nombre_grupo = respuesta_bd_1[0]['NombreGrupo']
-            consulta_2 = """INSERT INTO Historial(NombreGrupo,IdUsuario,Accion,Informacion)
-                                VALUES(%s,%s,%s,%s);
-                                """, (nombre_grupo, p_id_usuario, p_accion, p_info)
-            respuesta_bd_2 = bd.execute(consulta_2)
-            if respuesta_bd_2 == 1:
-                # ok
-                respuesta = True
+        # Tenemos datos, vamos a insertar en el historial
+        consulta_2 = "INSERT INTO Historial(NombreScript,NombreTag,NombreAlumno,Apellido,NombreGrupo,IdUsuario,Accion," \
+                   "Informacion) VALUES(%s,%s,%s,%s,%s,%s,%s,%s);", \
+                   ("", "", "", "", p_nombre_grupo, p_id_usuario, p_accion, p_info)
+        respuesta_bd_2 = bd.execute(consulta_2)
+        if respuesta_bd_2 == 1:
+            # ok
+            respuesta = True
 
         return respuesta
 
