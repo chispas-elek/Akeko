@@ -191,6 +191,7 @@ class Main(QtWidgets.QMainWindow):
         self.ventana.bEliminarGrupo.clicked.connect(self.eliminar_grupo)
         self.ventana.bGestionarScripts.clicked.connect(self.gestionar_script)
         self.ventana.actionVerHistorial.triggered.connect(self.historial)
+        self.ventana.actionCerrarSesion.triggered.connect(self.cerrar_sesion)
 
         # Iniciamos las variables de las nuevas ventanas
         self.window_gestionar_script = None
@@ -384,6 +385,14 @@ class Main(QtWidgets.QMainWindow):
         # Habilitamos el combobox y seleccionamos el primer grupo de la lista
         self.ventana.cSelecionarGrupo.setCurrentIndex(0)
         self.ventana.cSelecionarGrupo.blockSignals(False)
+
+    def cerrar_sesion(self):
+        """
+        Fuerza el cerrado de la sesión
+
+        :return:
+        """
+        self.quiero_cerrar = True
 
     def closeEvent(self, evnt):
         if self.quiero_cerrar:

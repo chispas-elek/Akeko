@@ -34,7 +34,7 @@ class GestorHistorial(object):
         :return: El historial completo de dicho usuario
         """
         bd = MySQLConnector.MySQLConnector()
-        consulta = "SELECT * FROM Historial WHERE IdUsuario=%s ORDER BY Fecha;", (p_id_usuario, )
+        consulta = "SELECT * FROM Historial WHERE IdUsuario=%s ORDER BY Fecha desc;", (p_id_usuario, )
         respuesta_bd = bd.execute(consulta)
 
         return self._formatear_hora(respuesta_bd)
@@ -144,6 +144,7 @@ class GestorHistorial(object):
         """
         Ésta función registra todos los datos relacionados con agregar, modificar o eliminar un targ en el sistema
 
+        :param p_nombre_tag: El nombre del Tag
         :param p_id_usuario: El identificador de un usuario
         :param p_accion: La acción a realizar
         :param p_info: La información asociada
@@ -154,7 +155,7 @@ class GestorHistorial(object):
         bd = MySQLConnector.MySQLConnector()
         consulta = "INSERT INTO Historial(NombreScript,NombreTag,NombreAlumno,Apellido,NombreGrupo,IdUsuario,Accion," \
                    "Informacion) VALUES(%s,%s,%s,%s,%s,%s,%s,%s);", \
-                   ("", p_nombre_tag, "", "", "", p_id_usuario, p_accion, p_info)
+                   (None, p_nombre_tag, None, None, None, p_id_usuario, p_accion, p_info)
         respuesta_bd = bd.execute(consulta)
         if respuesta_bd == 1:
             exito = True

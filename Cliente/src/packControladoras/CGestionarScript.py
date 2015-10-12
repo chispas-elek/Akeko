@@ -209,7 +209,7 @@ class CGestionarScript(object):
                             resultado = lista_scripts_del_otro_tag.existe(script)
                         else:
                             # Ya no existen más TAGS, no tiene sentido seguir recorriendo la lista
-                            resultado = True
+                            break
                         j += 1
                     if not resultado:
                         # Si resultado se ha mantenido False, es que el script no se encuentra en ningún TAG

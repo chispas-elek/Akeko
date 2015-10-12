@@ -569,7 +569,8 @@ class ServerHandler(StreamRequestHandler):
                     exito = gesto_tag_script.eliminar_tag(id_tag, alumno['Dni'], id_usuario, grupo['IdGrupo'])
                     if exito:
                         # Actualizamos el Historial con el borrado
-                        actualizado = gestor_historial.anadir_historial_tag(id_tag, alumno['Nombre'], alumno['Apellido'],
+                        actualizado = gestor_historial.anadir_historial_tag(id_tag, alumno['Nombre'],
+                                                                            alumno['Apellido'],
                                                                             id_usuario, grupo['IdGrupo'], False,
                                                                             'Tag eliminado por el usuario')
                         if actualizado:
@@ -585,12 +586,22 @@ class ServerHandler(StreamRequestHandler):
 
             if actualibar_bd:
                 # ha ido bien, vamos a elininar el TAG
-                resultado = gesto_tag_script.borrar_tag(id_tag)
-
+                datos_tag = gesto_tag_script.obtener_info_tag(id_tag)
+                borrar_tag = gesto_tag_script.borrar_tag(id_tag)
+                if borrar_tag:
+                    # Tag borrado OK. Insertamos en el historial
+                    resultado = gestor_historial.anadir_historia_gestion_tag(datos_tag[0]['NombreTag'], id_usuario,
+                                                                             False, 'Se ha eliminado un Tag')
         else:
             # No afecta a ningún Grupo. Eliminamos directamente
-            resultado = gesto_tag_script.borrar_tag(id_tag)
-
+            # Obtenemos primero los datos del Tag antes de borrarlo para el historial
+            datos_tag = gesto_tag_script.obtener_info_tag(id_tag)
+            # todo algo pasa al borrar el tag, reviasar
+            borrar_tag = gesto_tag_script.borrar_tag(id_tag)
+            if borrar_tag:
+                # Tag borrado OK. Insertamos en el historial
+                resultado = gestor_historial.anadir_historia_gestion_tag(datos_tag[0]['NombreTag'], id_usuario,
+                                                                         False, 'Se ha eliminado un Tag')
         return resultado
 
     def modificar_tag(self, p_data):
@@ -691,11 +702,12 @@ class ServerHandler(StreamRequestHandler):
                                 for grupo in lista_grupo:
                                     # Primero comprobamos si el script ya estaba aplicado en el TAg
                                     existe_en_el_grupo = gestor_grupo.existe_script(grupo['IdGrupo'],
-                                                                                cambio['id_script'])
+                                                                                    cambio['id_script'])
 
                                     if existe_en_el_grupo:
                                         # El Script actual ya existe en el TAg. Eliminaamos la relación entre grupo y Script
-                                        gestor_tag_script.eliminar_script_al_grupo(grupo['IdGrupo'], cambio['id_script'])
+                                        gestor_tag_script.eliminar_script_al_grupo(grupo['IdGrupo'],
+                                                                                   cambio['id_script'])
                                         # Se podría registrar la acción en el historial. Sólo opcional
                                     else:
                                         # El script actual no existe en el grupo. Lo aplicamos
@@ -762,7 +774,6 @@ class ErrorAlumno(Exception):
 
 # Configuracion de los datos de escucha y ejecucion infinita del servidor.
 class ConfigServer(object):
-
     def __init__(self, p_PORT, p_cert, p_key):
         self._PORT = p_PORT
         self._cert = p_cert

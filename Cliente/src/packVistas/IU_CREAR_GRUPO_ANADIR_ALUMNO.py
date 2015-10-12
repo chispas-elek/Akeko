@@ -126,6 +126,10 @@ class CrearGrupoAnadirAlumno(QtWidgets.QWidget):
         self.ventana.bCancelar.clicked.connect(self.close)
         self.ventana.bAnadirAlumno.clicked.connect(self.anadir_nuevo_alumno)
 
+        # Configuramos el bloqueo de ventanas
+        self.quiero_cerrar = True
+        self.iu_crear_grupo.quiero_cerrar = False
+
     def anadir_nuevo_alumno(self):
         # primero comprobamos que los datos estén correctos
         resultado = self._mascara_filtrado_datos()
@@ -190,3 +194,11 @@ class CrearGrupoAnadirAlumno(QtWidgets.QWidget):
             resultado = "Dni incorrecto"
 
         return resultado
+
+    def closeEvent(self, evnt):
+        if self.quiero_cerrar:
+            # Quitamos el bloqueo de cerrado de la anterior interfaz y cerramos
+            self.iu_crear_grupo.quiero_cerrar = True
+            super(CrearGrupoAnadirAlumno, self).closeEvent(evnt)
+        else:
+            evnt.ignore()

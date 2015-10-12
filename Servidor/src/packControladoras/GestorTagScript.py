@@ -485,9 +485,9 @@ class GestorTagScript(object):
         """
         resultado = False
         bd = MySQLConnector.MySQLConnector()
-        consulta = "DELETE FROM Tag WHERE IdTag=%s;", (p_id_tag,)
+        consulta = "DELETE FROM Tag WHERE IdTag=%s;", (p_id_tag, )
         respuesta_bd = bd.execute(consulta)
-        if len(respuesta_bd) != 0:
+        if respuesta_bd != 0:
             resultado = True
 
         return resultado
@@ -636,6 +636,18 @@ class GestorTagScript(object):
                 pass
         return resultado
 
+
+    def obtener_info_tag(self, p_id_tag):
+        """
+        Obtiene los datos relativos a un tag dado su identificador
+
+        :param p_id_tag: El identificador del Tag
+        :return: Los datos relativos al tag
+        """
+        bd = MySQLConnector.MySQLConnector()
+        consulta = "SELECT NombreTag,Descripcion,FechaCreacion From Tag where IdTag=%s;", (p_id_tag, )
+        respuesta_bd_1 = bd.execute(consulta)
+        return respuesta_bd_1
 
 
     def _formatear_hora(self, p_list_dict_valores):

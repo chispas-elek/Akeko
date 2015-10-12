@@ -17,9 +17,16 @@ class Historial(object):
             self.nombre_tag = "--"
         else:
             self.nombre_tag = p_nombre_tag
-        self.nombre_alumno = p_nombre_alumno
-        self.apellido = p_apellido
-        self.nombre_grupo = p_nombre_grupo
+        if p_nombre_alumno is None and p_apellido is None:
+            self.nombre_alumno = "--"
+            self.apellido = ""
+        else:
+            self.nombre_alumno = p_nombre_alumno
+            self.apellido = p_apellido
+        if p_nombre_grupo is None:
+            self.nombre_grupo = "--"
+        else:
+            self.nombre_grupo = p_nombre_grupo
         self.fecha_creacion_h = p_fecha_creacion_h
         self.id_usuario = p_id_usuario
         self.accion = p_accion

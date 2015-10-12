@@ -27,7 +27,8 @@ class GestorGrupo(object):
         :return: La lista de los grupos que contiene el usuario
         """
         bd = MySQLConnector.MySQLConnector()
-        consulta = "SELECT IdGrupo,NombreGrupo,IdUsuario FROM Grupo WHERE IdUsuario=%s;", (p_id_usuario, )
+        consulta = "SELECT IdGrupo,NombreGrupo,IdUsuario FROM Grupo WHERE IdUsuario=%s order by FechaCreacion desc;", \
+                   (p_id_usuario, )
         respuesta_bd = bd.execute(consulta)
         return respuesta_bd
 

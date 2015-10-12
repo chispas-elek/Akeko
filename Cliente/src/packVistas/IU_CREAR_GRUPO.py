@@ -158,6 +158,9 @@ class CrearGrupo(QtWidgets.QWidget):
         self.window_crear_grupo_nombre = None
         self.window_anadir_nuevo_alumno = None
 
+        # Configuramos el bloque de ventanas
+        self.quiero_cerrar = True
+
     def anadir_alumno(self):
         """
         Ésta función llama a la ventana que nos permite introducir los datos de un nuevo alumno.
@@ -284,6 +287,11 @@ class CrearGrupo(QtWidgets.QWidget):
             self.ventana.bCrear.setDisabled(False)
             self.ventana.bEliminar.setDisabled(False)
 
+    def closeEvent(self, evnt):
+        if self.quiero_cerrar:
+            super(CrearGrupo, self).closeEvent(evnt)
+        else:
+            evnt.ignore()
 
 # Excepciones de control personalizadas
 class ErrorMalformedSource(Exception):
@@ -293,11 +301,3 @@ class ErrorMalformedSource(Exception):
     def __str__(self):
         return "El fichero contiene una entrada inválida en la línea: " + str(self.valor)
 
-# todo eliminarla una vez testeada la interfaz
-# Se lanza la interface principal
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(argv)
-    lista_grupos = ListaGrupo.ListaGrupo()
-    myapp = CrearGrupo(1, lista_grupos)
-    myapp.show()
-    exit(app.exec_())
