@@ -124,20 +124,23 @@ class CGestionarScript(object):
                                       lista_aplicados_filtrada, True)
             self._crear_lista_cambios(lista_cambios_s, lista_cambios_t, p_lista_disponibles_actual,
                                       p_lista_aplicados_previa, False)
-            # Preparamos el envio de los datos
-
-            lista_envio.append({'metodo': 'aplicar_cambios'})
-            lista_envio.append({'id_usuario': p_id_usuario,
-                                'id_grupo': p_id_grupo,
-                                'lista_cambios_s': lista_cambios_s,
-                                'lista_cambios_t': lista_cambios_t,
-                                'lista_alumnos': p_lista_alumnos.deconstruir()})
-            socket = ServerSender.ServerSender(lista_envio)
-            resultado = socket.enviar_datos()
+            # Si alguna de las listas tiene cambios, enviamos al servidor.
+            if lista_cambios_s or lista_cambios_t:
+                # Preparamos el envio de los datos
+                lista_envio.append({'metodo': 'aplicar_cambios'})
+                lista_envio.append({'id_usuario': p_id_usuario,
+                                    'id_grupo': p_id_grupo,
+                                    'lista_cambios_s': lista_cambios_s,
+                                    'lista_cambios_t': lista_cambios_t,
+                                    'lista_alumnos': p_lista_alumnos.deconstruir()})
+                socket = ServerSender.ServerSender(lista_envio)
+                resultado = socket.enviar_datos()
+            else:
+                print "Las listas no contienen cambios. Se habrán filtrado Scripts en algún Tag."
+                resultado = True
         else:
             # Tenemos que devolver a la interfaz un dato para que  muestre un error de que hay 2 o más TAGS que tienen
             # Los mismos scripts por apicar y que ésto, no es deseable.
-            # todo vamos a devolver un None a la interfaz en caso de error garrafal
             resultado = None
 
         return resultado

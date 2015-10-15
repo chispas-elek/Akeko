@@ -4,7 +4,6 @@ __author__ = 'Rubén Mulero'
 
 import subprocess as sub
 from Servidor.src.packGestorBD import MySQLConnector
-import datetime
 
 
 class Singleton(type):
@@ -145,7 +144,7 @@ class GestorTagScript(object):
 
         :param p_id_grupo:
         :param p_id_script:
-        :return:
+        :return: True o False dependiendo del éxito de la operación
         """
         exito = False
         bd = MySQLConnector.MySQLConnector()
@@ -286,11 +285,13 @@ class GestorTagScript(object):
                     salidas = salidas_sha.split()
                     if respuesta_bd[0]['SHA'] == salidas[0]:
                         # Los SHA coinciden, podemos ejecutar el script
-                        p = sub.Popen(('sh', respuesta_bd[0]['Ruta'], ident_alumno, p_accion),
+                        p = sub.Popen(("/bin/bash", respuesta_bd[0]['Ruta'], ident_alumno, str(p_accion)),
                                       stdout=sub.PIPE, stderr=sub.PIPE)
                         salidas, errores = p.communicate()
-                        # todo realizar la acción avanzada del script
-                        if len(salidas) != 0:
+                        if len(salidas) != 0 and len(errores) == 0:
+                            # El script se ha ejecutado correctamente y no se han producido errores aparentes
+                            # Vamos a obtener los datos necesarios
+                            # todo realizar la acción avanzada del script
                             print salidas
                             correcto = True
                         else:
@@ -401,18 +402,31 @@ class GestorTagScript(object):
         """
         exito = False
         # Dado el tag, tenemos que obtener sus scripts asociados
+        lista_scripts_ya_aplicados = []
         lista_scripts = self.obtener_scripts_tag(p_id_tag)
         bd = MySQLConnector.MySQLConnector()
         for script in lista_scripts:
-            actualizar_datos = self._anadir_intencion(script['IdScript'], p_dni, p_id_usuario, p_id_grupo)
-            if actualizar_datos:
+            # todo por alguna razón eso funciona pero borra parte de las aplicaciones anteriores.
+            # todo no le aplica a todos los alumnos. Algo no va bien.
+            # Antes de añadir el Tag, vamos a ver si el grupo tenía ya un Script previamente aplicado que
+            # pertenezca al grupo.
+            consulta = "SELECT IdScript from Script_Grupo Where IdScript=%s AND IdGrupo=%s", (script['IdScript'],
+                                                                                              p_id_grupo)
+            resultado_bd = bd.execute(consulta)
+            if len(resultado_bd) != 0:
+                # El script que pertenece a ésta lista ya había sido añadido con anterioridad
                 exito = True
+                pass
             else:
-                # Ha existido algun error serio a la hora de intentar añadir la intención
-                # O ejecutar el script. Revisar qué ha sucedido
-                # Añadir exception
-                exito = False
-                break
+                actualizar_datos = self._anadir_intencion(script['IdScript'], p_dni, p_id_usuario, p_id_grupo)
+                if actualizar_datos:
+                    exito = True
+                else:
+                    # Ha existido algun error serio a la hora de intentar añadir la intención
+                    # O ejecutar el script. Revisar qué ha sucedido
+                    # Añadir exception
+                    exito = False
+                    break
         return exito
 
     def eliminar_tag(self, p_id_tag, p_dni, p_id_usuario, p_id_grupo):
@@ -448,12 +462,26 @@ class GestorTagScript(object):
         :return:
         """
         exito = False
+        exito_s = False
         bd = MySQLConnector.MySQLConnector()
-        consulta = "INSERT INTO Tag_Grupo(IdGrupo,IdTag) VALUES (%s,%s);", (p_id_grupo, p_id_tag)
-        respuesta_bd = bd.execute(consulta)
-        if respuesta_bd == 1:
-            # Las inserciones han ido correctamente bien.
-            exito = True
+        ## Antes de añadir la intención, vamos a eliminar los posibles Script residuales.
+        # Obtenemos los tags del grupo actual
+        lista_script = self.obtener_scripts_tag(p_id_tag)
+        for script in lista_script:
+            consulta_s = "SELECT IdScript from Script_Grupo Where IdScript=%s AND IdGrupo=%s", (script['IdScript'],
+                                                                                                p_id_grupo)
+            repuesta_s = bd.execute(consulta_s)
+            if len(repuesta_s):
+                # Este Script ya había sido aplicado. Vamos a eliminar la relación con el grupo
+                exito_s = self.eliminar_script_al_grupo(p_id_grupo, script['IdScript'])
+                if not exito_s:
+                    break
+        if exito_s:
+            consulta = "INSERT INTO Tag_Grupo(IdGrupo,IdTag) VALUES (%s,%s);", (p_id_grupo, p_id_tag)
+            respuesta_bd = bd.execute(consulta)
+            if respuesta_bd == 1:
+                # Las inserciones han ido correctamente bien.
+                exito = True
 
         return exito
 

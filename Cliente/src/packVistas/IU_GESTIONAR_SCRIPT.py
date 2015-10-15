@@ -372,14 +372,30 @@ class GestionarScript(QtWidgets.QWidget):
                     msg_box.setInformativeText("Los cambios se han aplicado correctamente en el sistema")
                     msg_box.exec_()
                     self.close()
+                elif resultado is None:
+                    # El usuario ha introducido dos Tags que contienen scripts que colisionan.
+                    error_box_tag = QMessageBox()
+                    error_box_tag.setIcon(3)
+                    error_box_tag.setWindowTitle("Aplicar cambios")
+                    error_box_tag.setText("ERROR")
+                    error_box_tag.setInformativeText("Has introducido un Tag que contiene Scripts que ya tiene otro "
+                                                     "Tag.")
+                    error_box_tag.setDetailedText("No puedes aplicar un Tag que contenga Scripts que ya están"
+                                                  "aplicados al grupo o que simplemente estén contenidos en "
+                                                  "otro Tag.")
+                    error_box_tag.exec_()
+
                 else:
                     # Algo ha pasado, reproducimos el error
                     error_box = QMessageBox()
                     error_box.setIcon(3)
                     error_box.setWindowTitle("Aplicar cambios")
                     error_box.setText("ERROR")
-                    error_box.setInformativeText("Ha ocurrido algún problema a la hora de aplicar los cambios. "
-                                                 "Por favor, reinténtalo de nuevo.")
+                    error_box.setInformativeText("Ha ocurrido algún problema a la hora de aplicar los cambios.")
+                    error_box.setDetailedText("Se ha producido un error a la hora de aplicar los cambios. Dicho error "
+                                              "es posible que haya sucedido debido a un problema de conexión con el "
+                                              "servidor o que no se haya aplicado de forma correcta algunos de los "
+                                              "cambios que se han solicitado.")
                     error_box.exec_()
             else:
                 # Las listas son iguales y el usuario no ha movido ningún elemento

@@ -15,7 +15,7 @@ else
     
     if [ $2 = True ] ; then
         
-        PASSWORD="$(sh ./_random_password_gen.sh)"
+        PASSWORD=`source ./scripts/_random_password_gen.sh`
         Q1="CREATE DATABASE IF NOT EXISTS db_$1;"
         Q2="GRANT USAGE ON *.* TO $1@localhost IDENTIFIED BY '$PASSWORD';"
         Q3="GRANT ALL PRIVILEGES ON db_$1.* TO $1@localhost;"
@@ -28,10 +28,10 @@ else
         echo "password:$PASSWORD"
 
     else
-
         # Acción de borrado
         SQL="DROP USER '$1'@'localhost';"
         $MYSQL -uroot -pgoldensun108 -e "$SQL" 
+        echo "borrado"
     fi
     
 fi
