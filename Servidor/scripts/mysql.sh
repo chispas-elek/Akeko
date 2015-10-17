@@ -1,5 +1,6 @@
 #!/bin/bash
 
+DESC="Mysql en el servidor www.akeko.com/mysql/bd/alumnos/ehu/"
 EXPECTED_ARGS=2
 E_BADARGS=65
 MYSQL=`which mysql`
@@ -24,14 +25,15 @@ else
     
 
         $MYSQL -uroot -pgoldensun108 -e "$SQL" 
-        echo "username:$1"
-        echo "password:$PASSWORD"
-
+        echo "$1"
+        echo "$PASSWORD"
+	echo "$DESC"
     else
         # Acción de borrado
         SQL="DROP USER '$1'@'localhost';"
         $MYSQL -uroot -pgoldensun108 -e "$SQL" 
         echo "borrado"
+	echo "$DESC"
     fi
     
 fi

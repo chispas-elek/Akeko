@@ -289,11 +289,16 @@ class GestorTagScript(object):
                                       stdout=sub.PIPE, stderr=sub.PIPE)
                         salidas, errores = p.communicate()
                         if len(salidas) != 0 and len(errores) == 0:
-                            # El script se ha ejecutado correctamente y no se han producido errores aparentes
-                            # Vamos a obtener los datos necesarios
-                            # todo realizar la acción avanzada del script
                             print salidas
-                            correcto = True
+                            salidas = salidas.split('\n', 2)
+                            if salidas[0] == "borrado":
+                                # Se ha hecho una eliminación
+                                correcto = self._enviar_mail(respuesta_bd_2[0]['Email'], p_descripcion=salidas[1])
+                            else:
+                                # El script se ha aplicado correctamente. Por lo tanto, enviaremos un mail con los cambios
+                                # hacemos un slipt del usuario y contraseña que nos deevuelve el script
+                                correcto = self._enviar_mail(respuesta_bd_2[0]['Email'], salidas[0], salidas[1],
+                                                             salidas[2])
                         else:
                             # El script no se ha podido aplicar bien, raise exception
                             print errores
@@ -305,6 +310,62 @@ class GestorTagScript(object):
                     print errores_sha
 
         return correcto
+
+    def _enviar_mail(self, p_email_alumno, p_ident_alumno=None, p_contrasena=None, p_descripcion=None):
+        """
+        Contienen el texto que va a representar el cuerpo del Mail a enviar.
+
+        :param p_ident_alumno: Identificador del alumno (Login)
+        :param p_contrasena: Contraseña del alumno
+        :param p_email_alumno: El mail del alumno a enviar
+        :param p_descripcion: Descripción del script.
+        :return: True o False dependiendo de si se ha enviado correctamente el mail
+        """
+        enviado = False
+        if p_ident_alumno is None:
+            # Se ha eliminado un alumno
+            el_texto = """
+                        Hola.
+
+                        El acceso a tu usuario en: %s ha sido eliminado.
+
+                        Ya no podrás loguearte más haciendo uso de tu usuario y contraseña.
+
+                        Un saludo.
+
+
+                        PD: Éste mail ha sido enviado de manera automática, por favor, no responda a ésta dirección.
+
+                        """ % p_descripcion
+        else:
+            # Se ha añadido un alumno
+            el_texto = """
+                        Hola.
+
+                        Se ha generado un acceso en: %s
+
+                        Tus datos para poder acceder a éste servicio, son los siguientes:
+
+                        --> Usuario: %s
+                        --> Contraseña: %s
+
+                        Un saludo.
+
+
+                        PD: Éste mail ha sido enviado de manera automática, por favor, no responda a ésta dirección.
+
+                        """ % (p_descripcion, p_ident_alumno, p_contrasena)
+
+        # Enviamos el mail
+        # todo, recuerda poner el mail que viene en la función en vez del tuyo personal al final del proyecto.
+        p = sub.Popen(("/bin/bash", "./scripts/sent_mail.sh", el_texto, "elektro108@gmail.com"),
+                      stdout=sub.PIPE, stderr=sub.PIPE)
+        salidas_mail, errores_mail = p.communicate()
+        if salidas_mail == "ok\n" and len(errores_mail) == 0:
+            # Send OK
+            enviado = True
+
+        return enviado
 
     ##################################################
     ##################################################
@@ -318,7 +379,6 @@ class GestorTagScript(object):
         :param p_id_grupo: El identificador del grupo
         :return: Los datos relativos a cada tag que posee el grupo
         """
-        # todo formatear la fechaCreacion a str
         bd = MySQLConnector.MySQLConnector()
         consulta = """SELECT IdTag,NombreTag,Descripcion,FechaCreacion,IdUsuario FROM Tag
                     WHERE IdTag IN (SELECT IdTag FROM Tag_Grupo WHERE IdGrupo=%s);
@@ -347,7 +407,6 @@ class GestorTagScript(object):
         :param p_id_usuario: El identificador del usuario
         :return: Los tags que tiene el usuario
         """
-        # todo formatear la fechaCreacion a str
         bd = MySQLConnector.MySQLConnector()
         consulta = "SELECT IdTag,NombreTag,Descripcion,FechaCreacion,IdUsuario FROM Tag WHERE IdUsuario=%s;", \
                    (p_id_usuario,)
@@ -406,8 +465,6 @@ class GestorTagScript(object):
         lista_scripts = self.obtener_scripts_tag(p_id_tag)
         bd = MySQLConnector.MySQLConnector()
         for script in lista_scripts:
-            # todo por alguna razón eso funciona pero borra parte de las aplicaciones anteriores.
-            # todo no le aplica a todos los alumnos. Algo no va bien.
             # Antes de añadir el Tag, vamos a ver si el grupo tenía ya un Script previamente aplicado que
             # pertenezca al grupo.
             consulta = "SELECT IdScript from Script_Grupo Where IdScript=%s AND IdGrupo=%s", (script['IdScript'],
