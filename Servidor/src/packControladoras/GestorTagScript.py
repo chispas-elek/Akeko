@@ -357,7 +357,6 @@ class GestorTagScript(object):
                         """ % (p_descripcion, p_ident_alumno, p_contrasena)
 
         # Enviamos el mail
-        # todo, recuerda poner el mail que viene en la función en vez del tuyo personal al final del proyecto.
         p = sub.Popen(("/bin/bash", "./scripts/sent_mail.sh", el_texto, "elektro108@gmail.com"),
                       stdout=sub.PIPE, stderr=sub.PIPE)
         salidas_mail, errores_mail = p.communicate()

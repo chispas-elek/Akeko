@@ -11,6 +11,7 @@ import json
 import socket
 import Decoder
 import ssl
+import time
 from Servidor.src.packControladoras import GestorUsuario
 from Servidor.src.packControladoras import GestorGrupo
 from Servidor.src.packControladoras import GestorAlumno
@@ -329,6 +330,8 @@ class ServerHandler(StreamRequestHandler):
                     resultado = False
                     break
 
+        # Éste time sleep ayuda a que el código se ejecute de manera correcta sin que los scripts de bash interfieran.
+        time.sleep(0.1)
         # Por último eliminamos el grupo del sistema.
         if resultado:
             datos_grupo = gestor_grupo.obtener_un_grupo(id_grupo)

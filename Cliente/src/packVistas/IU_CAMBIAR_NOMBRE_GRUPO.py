@@ -105,26 +105,57 @@ class CambiarNombreGrupo(QtWidgets.QDialog):
     def cambiar_nombre_grupo(self):
         # Obtenemos le nombre del grupoo y lo validamos
         nombre_grupo = self.ventana.lNombreGrupo.text()
-        if self.__mascara_filtrado(nombre_grupo):
-            # El nombre del grupo no existe por lo que podemos insertar los datos en la BD
-            controladora_main = CMain.CMain()
-            resultado = controladora_main.cambiar_nombre(self.id_grupo, nombre_grupo, self.lista_grupos)
-            # Si el resultado es correcto, mostramos una pantalla de confirmación. y cerramoas la interfaz anterior.
-            print "Resultado de la operación es %s" % resultado
-            if resultado is True:
-                # Las cosas han ido como deberian.
-                info_box = QMessageBox()
-                info_box.setIcon(1)
-                info_box.setWindowTitle("Cambiar Nombre Grupo")
-                info_box.setText("CORRECTO")
-                info_box.setInformativeText("Nombre del grupo cambiado correctamente.")
-                info_box.exec_()
-                self.iu_main.generar_combo_box()
-                self.close()
-            else:
-                print "El nombre del grupo no se ha actualizado"
+        if nombre_grupo == self.iu_main.ventana.cSelecionarGrupo.currentText():
+            # Los nombre de los grupos coinciden. Error
+            warm_box = QMessageBox()
+            warm_box.setIcon(2)
+            warm_box.setWindowTitle("Cambiar Nombre Grupo")
+            warm_box.setText("ATENCIÓN")
+            warm_box.setInformativeText("Has introducido el mismo nombre del grupo.")
+            warm_box.exec_()
+        elif nombre_grupo == "":
+            error_box_blank = QMessageBox()
+            error_box_blank.setIcon(3)
+            error_box_blank.setWindowTitle("Cambiar Nombre Grupo")
+            error_box_blank.setText("ERROR")
+            error_box_blank.setInformativeText("Introduce al menos un nombre para el grupo.")
+            error_box_blank.exec_()
         else:
-            print "Los caracteres del grupo introducidos son inválidos"
+            if self.__mascara_filtrado(nombre_grupo):
+                # El nombre del grupo no existe por lo que podemos insertar los datos en la BD
+                controladora_main = CMain.CMain()
+                resultado = controladora_main.cambiar_nombre(self.id_grupo, nombre_grupo, self.lista_grupos)
+                # Si el resultado es correcto, mostramos una pantalla de confirmación. y cerramoas la interfaz anterior.
+                print "Resultado de la operación es %s" % resultado
+                if resultado is True:
+                    # Las cosas han ido como deberian.
+                    info_box = QMessageBox()
+                    info_box.setIcon(1)
+                    info_box.setWindowTitle("Cambiar Nombre Grupo")
+                    info_box.setText("CORRECTO")
+                    info_box.setInformativeText("Nombre del grupo cambiado correctamente.")
+                    info_box.exec_()
+                    self.iu_main.generar_combo_box()
+                    self.close()
+                else:
+                    print "El nombre del grupo no se ha actualizado"
+                    error_box = QMessageBox()
+                    error_box.setIcon(3)
+                    error_box.setWindowTitle("Cambiar Nombre Grupo")
+                    error_box.setText("ERROR")
+                    error_box.setInformativeText("El nombre del grupo no se ha podido actualizar de manera correcta.")
+                    error_box.setDetailedText("El nombre del grupo no se ha podido actualizar de manera correcta. "
+                                                 "Ésto puede ser debido a que se ha introducido un nombre que ya existia "
+                                                 "con anteriorirdad o que ha habido algún error de conexión con el servidor.")
+                    error_box.exec_()
+            else:
+                print "Los caracteres del grupo introducidos son inválidos"
+                warm_box_2 = QMessageBox()
+                warm_box_2.setIcon(2)
+                warm_box_2.setWindowTitle("Cambiar Nombre Grupo")
+                warm_box_2.setText("ADVERTENCIA")
+                warm_box_2.setInformativeText("Los caracteres introducidos para el nuevo grupo, no son correctos.")
+                warm_box_2.exec_()
 
     def __mascara_filtrado(self, p_texto):
         """

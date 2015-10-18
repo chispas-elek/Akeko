@@ -300,9 +300,8 @@ class Main(QtWidgets.QMainWindow):
         id_grupo = self.ventana.cSelecionarGrupo.itemData(self.ventana.cSelecionarGrupo.currentIndex())
         nombre_grupo = self.ventana.cSelecionarGrupo.currentText()
         # Pasar todos los datos a la nueva interfaz
-        if self.window_cambiar_nombre_grupo is None:
-                self.window_cambiar_nombre_grupo = IU_CAMBIAR_NOMBRE_GRUPO.CambiarNombreGrupo\
-                    (self, id_grupo, nombre_grupo, self.lista_grupos)
+        self.window_cambiar_nombre_grupo = IU_CAMBIAR_NOMBRE_GRUPO.CambiarNombreGrupo\
+                                            (self, id_grupo, nombre_grupo, self.lista_grupos)
         self.window_cambiar_nombre_grupo.show()
 
 
