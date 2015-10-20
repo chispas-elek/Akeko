@@ -253,10 +253,18 @@ class MisTags(QtWidgets.QMainWindow):
         """
         # Obtener los datos del item
         item_seleccionado = self.ventana.listTagsUsuario.currentItem()
-        item_seleccionado_datos = item_seleccionado.data(QtCore.Qt.UserRole)
-        tag = item_seleccionado_datos[1]
-        self.window_modificar_tag = IU_GESTIONAR_TAG.GestionarTag(self.id_usuario, tag, self)
-        self.window_modificar_tag.show()
+        if item_seleccionado is not None:
+            item_seleccionado_datos = item_seleccionado.data(QtCore.Qt.UserRole)
+            tag = item_seleccionado_datos[1]
+            self.window_modificar_tag = IU_GESTIONAR_TAG.GestionarTag(self.id_usuario, tag, self)
+            self.window_modificar_tag.show()
+        else:
+            warm_box_modif = QMessageBox()
+            warm_box_modif.setIcon(2)
+            warm_box_modif.setWindowTitle("Mis Tags")
+            warm_box_modif.setText("ADVERTENCIA")
+            warm_box_modif.setInformativeText("Selecciona al menos un Tag antes de intentar modificar algo.")
+            warm_box_modif.exec_()
 
     def borrar_tag(self):
         """
@@ -284,23 +292,31 @@ class MisTags(QtWidgets.QMainWindow):
             # Obtener los datos del item
             # todo solvertar pequeño error al eliminar un tag
             item_seleccionado = self.ventana.listTagsUsuario.currentItem()
-            item_seleccionado_datos = item_seleccionado.data(QtCore.Qt.UserRole)
-            tag = item_seleccionado_datos[1]
-            resultado = self.controlador_mis_tags.eliminar_tag_usuario(tag.id_tag, self.id_usuario)
-            if resultado:
-                # El Tag se ha eliminado de forma exitosa
-                info_box = QMessageBox()
-                info_box.setIcon(1)
-                info_box.setWindowTitle("Borrado de un tag")
-                info_box.setText("CORRECTO")
-                info_box.setInformativeText("El Tag se ha borrado satisfactoriamente")
-                info_box.exec_()
-                self.cargar_datos()
+            if item_seleccionado is not None:
+                item_seleccionado_datos = item_seleccionado.data(QtCore.Qt.UserRole)
+                tag = item_seleccionado_datos[1]
+                resultado = self.controlador_mis_tags.eliminar_tag_usuario(tag.id_tag, self.id_usuario)
+                if resultado:
+                    # El Tag se ha eliminado de forma exitosa
+                    info_box = QMessageBox()
+                    info_box.setIcon(1)
+                    info_box.setWindowTitle("Borrado de un tag")
+                    info_box.setText("CORRECTO")
+                    info_box.setInformativeText("El Tag se ha borrado satisfactoriamente")
+                    info_box.exec_()
+                    self.cargar_datos()
+                else:
+                    # Ha ocurrido algún error
+                    error_box = QMessageBox()
+                    error_box.setIcon(3)
+                    error_box.setWindowTitle("Borrado de un tag")
+                    error_box.setText("Error")
+                    error_box.setInformativeText("Algo ha pasado al eliminar el Tag")
+                    error_box.exec_()
             else:
-                # Ha ocurrido algún error
-                error_box = QMessageBox()
-                error_box.setIcon(3)
-                error_box.setWindowTitle("Borrado de un tag")
-                error_box.setText("Error")
-                error_box.setInformativeText("Algo ha pasado al eliminar el Tag")
-                error_box.exec_()
+                warm_box_borrar = QMessageBox()
+                warm_box_borrar.setIcon(2)
+                warm_box_borrar.setWindowTitle("Mis Tags")
+                warm_box_borrar.setText("ADVERTENCIA")
+                warm_box_borrar.setInformativeText("Selecciona al menos un Tag antes de intentar modificar algo.")
+                warm_box_borrar.exec_()

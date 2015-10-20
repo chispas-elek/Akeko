@@ -475,6 +475,8 @@ class GestionarTag(QtWidgets.QWidget):
                                 info_box.exec_()
                                 self.iu_mis_tags.cargar_datos()
                                 self.close()
+                            elif exito is None:
+                                print "Mismo Nombre"
                             else:
                                 # Ha ocurido un error
                                 error_box = QMessageBox()

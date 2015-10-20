@@ -752,6 +752,7 @@ class ServerHandler(StreamRequestHandler):
             # Raisemos exception
             pass
 
+        # todo cambiar la nomeemclatura y hacer uso de éxito para devolver None en 1 caso especial.
         return resultado
 
     def obtener_historial(self, p_data):

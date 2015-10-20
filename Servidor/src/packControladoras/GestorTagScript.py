@@ -426,7 +426,7 @@ class GestorTagScript(object):
         # Primero se comprueba si el nombre del tag ya existe en el sistema.
         bd = MySQLConnector.MySQLConnector()
         exito = False
-        consulta1 = "SELECT IdTag FROM Tag WHERE NombreTag=%s", (p_nombre_tag,)
+        consulta1 = "SELECT IdTag FROM Tag WHERE NombreTag=%s AND IdUsuario=%s", (p_nombre_tag, p_id_usuario)
         respuesta_bd_1 = bd.execute(consulta1)
         if len(respuesta_bd_1) == 0:
             # No existe el nombre en la BD, procedeemos a insertar el TAG
@@ -436,7 +436,7 @@ class GestorTagScript(object):
             if respuesta_bd_2 == 1:
                 # Se ha insertado el tag correctamente, añadimos los Scripts
                 # Obtenemos le identificador que se le ha asociado a nuestro nuevo TAG
-                consulta3 = "SELECT IdTag FROM Tag WHERE NombreTag=%s", (p_nombre_tag,)
+                consulta3 = "SELECT IdTag FROM Tag WHERE NombreTag=%s AND IdUsuario=%s", (p_nombre_tag, p_id_usuario)
                 respuesta_bd_3 = bd.execute(consulta3)
                 # Recorremos la lista de script y vamos insertado uno a uno en la BD
                 for script in p_lista_scrip:
@@ -654,6 +654,7 @@ class GestorTagScript(object):
         :param p_descripcion: La nueva descripción del tag
         :param p_owner: El identificador del nuevo usuario del TAG
         :return: True o False indicando el cambio satisfactorio
+                None si el el owner destino del Tag, tiene un Tag con el mismo nombre.
         """
         exito = False
         # Comprobamos que le nombre del tag no exista en la BD
@@ -671,7 +672,8 @@ class GestorTagScript(object):
             else:
                 # YA existe el nombre del TAG
                 # Excep
-                pass
+                print "El usuario destino tiene un Tag con el mismo nombre"
+                exito = None
         else:
             # No existe el Tag asi que podemos actualizar sin miedo
             consulta_3 = "UPDATE Tag SET NombreTag=%s,Descripcion=%s,IdUsuario=%s WHERE IdTag=%s;", \
