@@ -147,8 +147,8 @@ class CMisTags(object):
                             })
 
         socket = ServerSender.ServerSender(lista_envio)
-        resultado = socket.enviar_datos()
-        return resultado
+        resultado, lista_scripts_no_aplicados = socket.enviar_datos()
+        return resultado, lista_scripts_no_aplicados
 
     def eliminar_tag_usuario(self, p_id_tag, p_id_usuario):
         """

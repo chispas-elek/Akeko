@@ -391,7 +391,19 @@ class Main(QtWidgets.QMainWindow):
 
         :return:
         """
-        self.quiero_cerrar = True
+        question_box = QMessageBox()
+        question_box.setIcon(2)
+        question_box.setWindowTitle("Cerrar sesión")
+        question_box.setText("¡¡Atención!!")
+        question_box.setInformativeText("¿Estás seguro de que quieres cerrar sesión y salir de la aplicación?")
+        # Creamos los botones de aceptar y cancelar.
+        question_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        question_box.setDefaultButton(QMessageBox.Cancel)
+        # Ejectuamos la interfaz y recogemos el resultado de la decisión
+        seleccion = question_box.exec_()
+        if seleccion == QMessageBox.Ok:
+            self.quiero_cerrar = True
+            self.close()
 
     def closeEvent(self, evnt):
         if self.quiero_cerrar:

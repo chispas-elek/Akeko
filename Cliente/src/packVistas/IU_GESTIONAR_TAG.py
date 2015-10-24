@@ -457,26 +457,55 @@ class GestionarTag(QtWidgets.QWidget):
                             # LLamamos a la función
                             owner = self.ventana.cOwner.itemData(self.ventana.cOwner.currentIndex())
 
-                            exito = self.controlador_mis_tags.modificar_tag(self.id_usuario, self.tag.id_tag,
-                                                                            self.ventana.lNombreTag.text(), owner,
-                                                                            self.ventana.lDescripcion.text(),
-                                                                            self.lista_disponble_previa,
-                                                                            lista_disponible_actual,
-                                                                            self.lista_en_el_tag_previa,
-                                                                            lista_en_el_tag_actual)
+                            exito, lista_scripts_no_aplicados = self.controlador_mis_tags.modificar_tag(self.id_usuario,
+                                                                                                        self.tag.id_tag,
+                                                                                                        self.ventana.lNombreTag.text(),
+                                                                                                        owner,
+                                                                                                        self.ventana.lDescripcion.text(),
+                                                                                                        self.lista_disponble_previa,
+                                                                                                        lista_disponible_actual,
+                                                                                                        self.lista_en_el_tag_previa,
+                                                                                                        lista_en_el_tag_actual)
 
                             if exito:
                                 # Se ha Modificado correctamente
-                                info_box = QMessageBox()
-                                info_box.setIcon(1)
-                                info_box.setWindowTitle("Modificar Tag actual")
-                                info_box.setText("CORRECTO")
-                                info_box.setInformativeText("Se ha modificado el Tag correctamente en el sistema")
-                                info_box.exec_()
+                                if len(lista_scripts_no_aplicados) != 0:
+                                    print "Algunos Scripts no han sido aplicados por colisión"
+                                    info_box_colision = QMessageBox()
+                                    info_box_colision.setIcon(1)
+                                    info_box_colision.setWindowTitle("Modificar Tag actual")
+                                    info_box_colision.setText("CORRECTO")
+                                    info_box_colision.setInformativeText("Se ha modificado el Tag correctamente, pero algunos "
+                                                                "Scripts no se han podido incluir debido a que existen "
+                                                                "incompatibilidades en el sistema")
+                                    info_box_colision.setDetailedText("Algunos Scripts no se han podido incluir en el "
+                                                                      "Tag debido a que existen aplicados actualmente "
+                                                                      "en algún grupo. Conviene revisar los TAgs de los "
+                                                                      "grupos para saber qué Scripts están afectado "
+                                                                      "dicha aplicación")
+                                    info_box_colision.exec_()
+                                else:
+                                    info_box = QMessageBox()
+                                    info_box.setIcon(1)
+                                    info_box.setWindowTitle("Modificar Tag actual")
+                                    info_box.setText("CORRECTO")
+                                    info_box.setInformativeText("Se ha modificado el Tag correctamente en el sistema")
+                                    info_box.exec_()
                                 self.iu_mis_tags.cargar_datos()
                                 self.close()
                             elif exito is None:
-                                print "Mismo Nombre"
+                                print "El nombre ya existe"
+                                warm_box_nombre = QMessageBox()
+                                warm_box_nombre.setIcon(2)
+                                warm_box_nombre.setWindowTitle("Modificar Tag actual")
+                                warm_box_nombre.setText("¡Atención!")
+                                warm_box_nombre.setInformativeText("El nombre del Tag ya existe para el destino.")
+                                warm_box_nombre.setDetailedText("Si has intentando donar el Tag y ves éste error es "
+                                                                "debido a que el usuario destino tiene un Tag con el "
+                                                                "mismo nombre que intengas aplicar. Si el Tag es para "
+                                                                "tu propio usaurio, significa que tienes un Tag con el "
+                                                                "mismo nombre ya aplicado.")
+                                warm_box_nombre.exec_()
                             else:
                                 # Ha ocurido un error
                                 error_box = QMessageBox()

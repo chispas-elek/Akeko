@@ -122,9 +122,9 @@ class GestorGrupo(object):
         bd = MySQLConnector.MySQLConnector()
         consulta = "SELECT * FROM Script_Grupo WHERE IdScript=%s and IdGrupo=%s", (p_id_script, p_id_grupo)
         respuesta_bd = bd.execute(consulta)
-        if len(consulta) != 0:
+        if len(respuesta_bd) != 0:
             existe = True
-        return respuesta_bd
+        return existe
 
     def obtener_un_grupo(self, p_id_grupo):
         """
@@ -137,3 +137,28 @@ class GestorGrupo(object):
         consulta = "SELECT IdGrupo,NombreGrupo,FechaCreacion,IdUsuario FROM Grupo WHERE IdGrupo=%s", (p_id_grupo, )
         respuesta_bd = bd.execute(consulta)
         return respuesta_bd
+
+    def tag_comptabile_grupo(self, p_lista_grupo, p_id_script):
+        """
+        Dada una lista de grupos afectados por un Tag, se va a comprobar si el script candidato no está introducido
+        en alguno de éstos grupos por otro Tag.
+
+        :param p_lista_grupo: La lista de los grupos afectados por el Tag a modificar
+        :param p_id_script: El identificador del script a comprobar
+        :return: True --> Se ha encontrado el script en algún grupo ya introducido por un Tag
+                False --> No se ha encontrado nada
+        """
+        encontrado = False
+        bd = MySQLConnector.MySQLConnector()
+        for grupo in p_lista_grupo:
+            # Recorremos cada grupo en busca del tag
+            consulta = """SELECT * FROM Tag_Script WHERE IdScript=%s AND IdTag IN (SELECT IdTag FROM Tag_Grupo WHERE
+                        IdGrupo=%s);
+                        """, (p_id_script, grupo['IdGrupo'])
+            resultado_bd = bd.execute(consulta)
+            if len(resultado_bd) != 0:
+                # Se ha encontrado un Script dentro de un Tag ya aplicado y que genera conflicto
+                encontrado = True
+                break
+
+        return encontrado

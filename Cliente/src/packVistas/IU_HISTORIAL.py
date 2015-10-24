@@ -350,9 +350,6 @@ class Historial(QtWidgets.QWidget):
         self.ventana.cTipoFiltro.addItem("Script", "nombre_script")
         self.ventana.cTipoFiltro.addItem("Tag", "nombre_tag")
         # self.ventana.cTipoFiltro.addItem("Acción", "accion")
-
-
-
         # Habilitamos el combobox y seleccionamos el primer criterio de la lista
         self.ventana.cTipoFiltro.setCurrentIndex(0)
         self.ventana.cTipoFiltro.blockSignals(False)

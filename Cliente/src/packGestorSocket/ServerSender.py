@@ -44,9 +44,9 @@ class ServerSender(object):
                 # Serializamos y enviamos
                 self.ssl_sock.send(json.dumps(self.datos_enviar))
                 # Recibo la respuesta del servidor y la devuelvo
-                result = Decoder.Decoder(self.ssl_sock.recv(8192))
+                #result = Decoder.Decoder(self.ssl_sock.recv(8192))
                 ##### BETA FUNCTION
-                #result = Decoder.Decoder(self._recv_timeout(self.ssl_sock))
+                result = Decoder.Decoder(self._recv_timeout(self.ssl_sock))
                 # Correcto, cerramos y devolvemos.
                 self.ssl_sock.close()
                 return result.decode_json()

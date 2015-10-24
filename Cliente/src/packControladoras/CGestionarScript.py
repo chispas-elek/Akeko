@@ -111,7 +111,6 @@ class CGestionarScript(object):
                         p_lista_aplicados_previa, p_lista_aplicados_actual):
 
         lista_envio = []
-        resultado = None
         # Lo primero es crear dos listas de elementos que contengan los tags y los scripts
         lista_cambios_s = []
         lista_cambios_t = []
@@ -120,10 +119,10 @@ class CGestionarScript(object):
         if lista_aplicados_filtrada is not None:
             # La lista se ha filtrado correctament
             # Vamos a comprobar qué script se han agregado
-            self._crear_lista_cambios(lista_cambios_s, lista_cambios_t, p_lista_disponibles_previa,
-                                      lista_aplicados_filtrada, True)
             self._crear_lista_cambios(lista_cambios_s, lista_cambios_t, p_lista_disponibles_actual,
                                       p_lista_aplicados_previa, False)
+            self._crear_lista_cambios(lista_cambios_s, lista_cambios_t, p_lista_disponibles_previa,
+                                      lista_aplicados_filtrada, True)
             # Si alguna de las listas tiene cambios, enviamos al servidor.
             if lista_cambios_s or lista_cambios_t:
                 # Preparamos el envio de los datos
@@ -166,6 +165,7 @@ class CGestionarScript(object):
                 tag = item_data[1]
                 lista_scripts_del_tag = self.obtener_scripts_tag(tag.id_tag)
                 if len(lista_filtrada) != 0:
+                    anadir = False
                     for filtrado in lista_filtrada:
                         filtrado_data = filtrado.data(QtCore.Qt.UserRole)
                         if filtrado_data[0] == "tag":
@@ -173,9 +173,9 @@ class CGestionarScript(object):
                             otro_tag = filtrado_data[1]
                             lista_scripts_del_otro_tag = self.obtener_scripts_tag(otro_tag.id_tag)
                             resultado = lista_scripts_del_otro_tag.cotejar_lista_s(lista_scripts_del_tag)
-                            if len(resultado) == lista_scripts_del_tag.obtener_tamano_lista():
+                            if len(resultado) == lista_scripts_del_otro_tag.obtener_tamano_lista():
                                 # No hay problema, no se repiten scripts
-                                lista_filtrada.append(item)
+                                anadir = True
                             else:
                                 print "El nuevo tag tiene scripts que ya contiene el que está en la lista de filtados"
                                 lista_filtrada = None
@@ -189,7 +189,9 @@ class CGestionarScript(object):
                                 # Elimino el script
                                 lista_filtrada.remove(filtrado)
                             # El tag siempre va a tener preferencia sobre el Scipt
-                            lista_filtrada.append(item)
+                            anadir = True
+                    if anadir:
+                        lista_filtrada.append(item)
                 else:
                     # La lista de filtrado, está vacía, inserto directamente
                     lista_filtrada.append(item)
@@ -275,7 +277,7 @@ class CGestionarScript(object):
                         if elemento_2_data[0] == "tag":
                             # El elemento es un tag
                             p_lista_cambios_t.append({'accion': 'borrar_tag',
-                                                        'id_tag': elemento_2_data[1].id_Tag})
+                                                        'id_tag': elemento_2_data[1].id_tag})
                         else:
                             # El elemento es un script
                             p_lista_cambios_s.append({'accion': 'borrar_script',

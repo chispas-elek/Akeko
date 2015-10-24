@@ -111,13 +111,22 @@ class GestorTagScript(object):
         :return:
         """
         exito = False
-        # Elimino la intención de la BD
-        actualizar_datos = self._eliminar_intencion(p_id_script, p_dni, p_id_usuario, p_id_grupo)
-        if actualizar_datos:
+        # Introducimos un control para evitar que el script sea borrado en caso de haber un Tag de por medio
+        bd = MySQLConnector.MySQLConnector()
+        consulta = """SELECT IdScript from Tag_Script WHERE IdScript=%s AND IdTag IN(SELECT IdTag FROM Tag_Grupo
+                    WHERE IdGrupo=%s)""", (p_id_script, p_id_grupo)
+        respuesta_bd = bd.execute(consulta)
+        if len(respuesta_bd) != 0:
+            # El script ha sido adoptado por el Tag no hacemos nada
             exito = True
         else:
-            # Error garrafal, añadir alguna excepcion en éste punto
-            pass
+            # Elimino la intención de la BD
+            actualizar_datos = self._eliminar_intencion(p_id_script, p_dni, p_id_usuario, p_id_grupo)
+            if actualizar_datos:
+                exito = True
+            else:
+                # Error garrafal, añadir alguna excepcion en éste punto
+                pass
 
         return exito
 
@@ -148,9 +157,15 @@ class GestorTagScript(object):
         """
         exito = False
         bd = MySQLConnector.MySQLConnector()
-        consulta = "DELETE FROM Script_Grupo WHERE IdGrupo=%s AND IdScript=%s;", (p_id_grupo, p_id_script)
+        # Comprobamos si no ha sido borrado o adoptado por un TAg
+        consulta = "SELECT * FROM Script_Grupo WHERE IdGrupo=%s AND IdScript=%s;", (p_id_grupo, p_id_script)
         respuesta_bd = bd.execute(consulta)
-        if respuesta_bd == 1:
+        if len(respuesta_bd):
+            consulta_2 = "DELETE FROM Script_Grupo WHERE IdGrupo=%s AND IdScript=%s;", (p_id_grupo, p_id_script)
+            respuesta_bd_2 = bd.execute(consulta_2)
+            if respuesta_bd_2 == 1:
+                exito = True
+        else:
             exito = True
 
         return exito
@@ -518,16 +533,16 @@ class GestorTagScript(object):
         :return:
         """
         exito = False
-        exito_s = False
+        exito_s = True
         bd = MySQLConnector.MySQLConnector()
-        ## Antes de añadir la intención, vamos a eliminar los posibles Script residuales.
+        # Antes de añadir la intención, vamos a eliminar los posibles Script residuales.
         # Obtenemos los tags del grupo actual
         lista_script = self.obtener_scripts_tag(p_id_tag)
         for script in lista_script:
             consulta_s = "SELECT IdScript from Script_Grupo Where IdScript=%s AND IdGrupo=%s", (script['IdScript'],
                                                                                                 p_id_grupo)
             repuesta_s = bd.execute(consulta_s)
-            if len(repuesta_s):
+            if len(repuesta_s) != 0:
                 # Este Script ya había sido aplicado. Vamos a eliminar la relación con el grupo
                 exito_s = self.eliminar_script_al_grupo(p_id_grupo, script['IdScript'])
                 if not exito_s:
@@ -617,9 +632,9 @@ class GestorTagScript(object):
         """
         Añade la relación entre un Tag y un Script
 
-        :param p_id_tag:
-        :param p_id_script:
-        :return:
+        :param p_id_tag: El identificador del Tag
+        :param p_id_script: El identificador del Script
+        :return: True o False dependiendo del éxito de la operación
         """
         exito = False
         bd = MySQLConnector.MySQLConnector()
@@ -634,7 +649,7 @@ class GestorTagScript(object):
         """
         Elimina la relación entre un Tag y un Script
 
-        :return:
+        :return: True o False dependiendo del éxito de la operación
         """
         exito = False
         bd = MySQLConnector.MySQLConnector()
@@ -681,7 +696,7 @@ class GestorTagScript(object):
             respuesta_bd_3 = bd.execute(consulta_3)
             if respuesta_bd_3 == 1:
                 # todo ejecutar Script de envío de correo electronico con mensaje al nuevo usuario
-                # Debemos obtener el mail del nuevo usuario y enviarle la informacion
+                # Debemos obtener el mail del nuevo usuario y enviarle la informacion)
                 exito = True
 
         return exito
