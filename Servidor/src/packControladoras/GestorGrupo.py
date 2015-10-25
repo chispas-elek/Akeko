@@ -46,7 +46,7 @@ class GestorGrupo(object):
         consulta1 = "INSERT INTO Grupo(NombreGrupo,IdUsuario) VALUES(%s,%s);", (p_nombre_grupo, p_id_usuario)
         respuesta_bd = bd.execute(consulta1)
         # Obtenemos el identificador del grupo
-        consulta2 = "SELECT IdGrupo FROM Grupo WHERE NombreGrupo=%s;", (p_nombre_grupo, )
+        consulta2 = "SELECT IdGrupo FROM Grupo WHERE NombreGrupo=%s AND IdUsuario=%s;", (p_nombre_grupo, p_id_usuario)
         respuesta_bd_2 = bd.execute(consulta2)
         id_grupo = int(respuesta_bd_2[0]['IdGrupo'])
         respuesta_bd_3 = 0

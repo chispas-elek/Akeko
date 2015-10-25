@@ -211,8 +211,7 @@ class Main(QtWidgets.QMainWindow):
 
         :return:
         """
-        if self.window_crear_grupo is None:
-            self.window_crear_grupo = IU_CREAR_GRUPO.CrearGrupo(self, self.id_usuario, self.lista_grupos)
+        self.window_crear_grupo = IU_CREAR_GRUPO.CrearGrupo(self, self.id_usuario, self.lista_grupos)
         self.window_crear_grupo.show()
 
     def mis_tags(self):
