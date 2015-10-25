@@ -172,6 +172,7 @@ class MisTags(QtWidgets.QMainWindow):
         self.ventana = Ui_MainWindow()
         self.ventana.setupUi(self)
         self.move(QtWidgets.QDesktopWidget().availableGeometry().center() - self.frameGeometry().center())
+        self.setWindowIcon(QtGui.QIcon('logo/Akeko_logo.png'))
 
         self.id_usuario = p_id_usuario
         self.controlador_mis_tags = CMisTags.CMisTags()

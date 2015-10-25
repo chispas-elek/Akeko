@@ -211,6 +211,7 @@ class GestionarTag(QtWidgets.QWidget):
         self.ventana = Ui_Form()
         self.ventana.setupUi(self)
         self.move(QtWidgets.QDesktopWidget().availableGeometry().center() - self.frameGeometry().center())
+        self.setWindowIcon(QtGui.QIcon('logo/Akeko_logo.png'))
 
         # Parámetros adicionales para los listWidget
         self.ventana.listDisponibles.setSortingEnabled(True)

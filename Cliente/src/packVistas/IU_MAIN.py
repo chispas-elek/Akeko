@@ -154,6 +154,7 @@ class Main(QtWidgets.QMainWindow):
         self.ventana = Ui_MainWindow()
         self.ventana.setupUi(self)
         self.move(QtWidgets.QDesktopWidget().availableGeometry().center() - self.frameGeometry().center())
+        self.setWindowIcon(QtGui.QIcon('logo/Akeko_logo.png'))
 
         # Modificamos las propiedades de la tabla para que no pueda ser editable y solo se pueda seleccionar 1 fila
         self.ventana.tListaAlumnos.setEditTriggers(QAbstractItemView.NoEditTriggers)

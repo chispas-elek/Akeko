@@ -118,6 +118,7 @@ class CrearGrupoAnadirAlumno(QtWidgets.QWidget):
         self.ventana = Ui_Form()
         self.ventana.setupUi(self)
         self.move(QtWidgets.QDesktopWidget().availableGeometry().center() - self.frameGeometry().center())
+        self.setWindowIcon(QtGui.QIcon('logo/Akeko_logo.png'))
 
         self.iu_crear_grupo = p_iu_crear_grupo
         self.lista_alumnos = p_lista_alumnos

@@ -225,6 +225,7 @@ class Historial(QtWidgets.QWidget):
         self.ventana = Ui_Form()
         self.ventana.setupUi(self)
         self.move(QtWidgets.QDesktopWidget().availableGeometry().center() - self.frameGeometry().center())
+        self.setWindowIcon(QtGui.QIcon('logo/Akeko_logo.png'))
 
         # Modificamos las propiedades de la tabla para que no pueda ser editable y solo se pueda seleccionar 1 fila
         self.ventana.tHistorial.setEditTriggers(QAbstractItemView.NoEditTriggers)

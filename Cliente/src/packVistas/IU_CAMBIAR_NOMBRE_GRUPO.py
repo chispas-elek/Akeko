@@ -91,6 +91,7 @@ class CambiarNombreGrupo(QtWidgets.QDialog):
         self.ventana = Ui_Dialog()
         self.ventana.setupUi(self)
         self.move(QtWidgets.QDesktopWidget().availableGeometry().center() - self.frameGeometry().center())
+        self.setWindowIcon(QtGui.QIcon('logo/Akeko_logo.png'))
 
         self.iu_main = p_iu_main
         self.id_grupo = p_id_grupo

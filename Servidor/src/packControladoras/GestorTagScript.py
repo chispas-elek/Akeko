@@ -372,7 +372,7 @@ class GestorTagScript(object):
                         """ % (p_descripcion, p_ident_alumno, p_contrasena)
 
         # Enviamos el mail
-        p = sub.Popen(("/bin/bash", "./scripts/sent_mail.sh", el_texto, "elektro108@gmail.com"),
+        p = sub.Popen(("/bin/bash", "./scripts/sent_mail.sh", el_texto, p_email_alumno),
                       stdout=sub.PIPE, stderr=sub.PIPE)
         salidas_mail, errores_mail = p.communicate()
         if salidas_mail == "ok\n" and len(errores_mail) == 0:
