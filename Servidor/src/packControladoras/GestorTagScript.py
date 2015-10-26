@@ -304,16 +304,16 @@ class GestorTagScript(object):
                                       stdout=sub.PIPE, stderr=sub.PIPE)
                         salidas, errores = p.communicate()
                         if len(salidas) != 0 and len(errores) == 0:
-                            print salidas
-                            salidas = salidas.split('\n', 2)
+                            salidas = salidas.split('\n', 3)
                             if salidas[0] == "borrado":
                                 # Se ha hecho una eliminación
-                                correcto = self._enviar_mail(respuesta_bd_2[0]['Email'], p_descripcion=salidas[1])
+                                correcto = self._enviar_mail(respuesta_bd_2[0]['Email'],
+                                                             p_servicio=salidas[1], p_direccion=salidas[2])
                             else:
                                 # El script se ha aplicado correctamente. Por lo tanto, enviaremos un mail con los cambios
                                 # hacemos un slipt del usuario y contraseña que nos deevuelve el script
                                 correcto = self._enviar_mail(respuesta_bd_2[0]['Email'], salidas[0], salidas[1],
-                                                             salidas[2])
+                                                             salidas[2], salidas[3])
                         else:
                             # El script no se ha podido aplicar bien, raise exception
                             print errores
@@ -326,7 +326,7 @@ class GestorTagScript(object):
 
         return correcto
 
-    def _enviar_mail(self, p_email_alumno, p_ident_alumno=None, p_contrasena=None, p_descripcion=None):
+    def _enviar_mail(self, p_email_alumno, p_ident_alumno=None, p_contrasena=None, p_servicio=None, p_direccion=None):
         """
         Contienen el texto que va a representar el cuerpo del Mail a enviar.
 
@@ -336,40 +336,26 @@ class GestorTagScript(object):
         :param p_descripcion: Descripción del script.
         :return: True o False dependiendo de si se ha enviado correctamente el mail
         """
+
+        # Para enviar el mail se abre un fichero que contiene un template predefinido y se carga el texto completo
+        # en una variable. Hacemos uso de dicha variable para reemplazar las partes que nos interesan por los valores
+        # deseados.
         enviado = False
         if p_ident_alumno is None:
             # Se ha eliminado un alumno
-            el_texto = """
-                        Hola.
-
-                        El acceso a tu usuario en: %s ha sido eliminado.
-
-                        Ya no podrás loguearte más haciendo uso de tu usuario y contraseña.
-
-                        Un saludo.
-
-
-                        PD: Éste mail ha sido enviado de manera automática, por favor, no responda a ésta dirección.
-
-                        """ % p_descripcion
+            fichero_mail = open('./edi/email_unreg.txt')
+            el_texto = fichero_mail.read()
+            el_texto = el_texto.replace('%servicio', p_servicio)
+            fichero_mail.close()
         else:
             # Se ha añadido un alumno
-            el_texto = """
-                        Hola.
-
-                        Se ha generado un acceso en: %s
-
-                        Tus datos para poder acceder a éste servicio, son los siguientes:
-
-                        --> Usuario: %s
-                        --> Contraseña: %s
-
-                        Un saludo.
-
-
-                        PD: Éste mail ha sido enviado de manera automática, por favor, no responda a ésta dirección.
-
-                        """ % (p_descripcion, p_ident_alumno, p_contrasena)
+            fichero_mail = open('./edi/email_reg.txt')
+            el_texto = fichero_mail.read()
+            el_texto = el_texto.replace('%servicio', p_servicio)
+            el_texto = el_texto.replace('%direccion', p_direccion)
+            el_texto = el_texto.replace('%usuario', p_ident_alumno)
+            el_texto = el_texto.replace('%contrasena', p_contrasena)
+            fichero_mail.close()
 
         # Enviamos el mail
         p = sub.Popen(("/bin/bash", "./scripts/sent_mail.sh", el_texto, p_email_alumno),

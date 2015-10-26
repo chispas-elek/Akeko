@@ -1,0 +1,14 @@
+Hola.
+
+Se ha generado un acceso en el servicio %servicio
+
+Tus datos para poder acceder a éste servicio, son los siguientes:
+
+    --> Dirección: %direccion
+    --> Usuario: %usuario
+    --> Contraseña: %contrasena
+
+Un saludo.
+
+
+PD: Éste mail ha sido enviado de manera automática, por favor, no responda a ésta dirección.

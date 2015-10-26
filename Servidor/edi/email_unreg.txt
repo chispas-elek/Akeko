@@ -1,0 +1,10 @@
+Hola.
+
+El acceso a tu usuario en el servicio %servicio ha sido eliminado.
+
+Ya no podrás loguearte más haciendo uso de tu usuario y contraseña.
+
+Un saludo.
+
+
+PD: Éste mail ha sido enviado de manera automática, por favor, no responda a ésta dirección.
