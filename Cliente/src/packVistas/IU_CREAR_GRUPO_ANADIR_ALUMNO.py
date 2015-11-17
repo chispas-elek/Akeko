@@ -71,7 +71,7 @@ class Ui_Form(object):
         self.horizontalLayout.addItem(spacerItem4)
         self.bCancelar = QtWidgets.QPushButton(Form)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/edit-delete.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/dialog-close.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.bCancelar.setIcon(icon1)
         self.bCancelar.setObjectName("bCancelar")
         self.horizontalLayout.addWidget(self.bCancelar)
@@ -89,16 +89,16 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Añadir un alumno"))
-        self.label.setText(_translate("Form", "&Dni:"))
+        self.label.setText(_translate("Form", "&Dni*:"))
         self.lDni.setToolTip(_translate("Form", "Dni del alumno"))
         self.lDni.setWhatsThis(_translate("Form", "El número de identificación personal (DNI) del alumno a añadir."))
-        self.label_2.setText(_translate("Form", "&Nombre:"))
+        self.label_2.setText(_translate("Form", "&Nombre*:"))
         self.lNombre.setToolTip(_translate("Form", "Nombre del alumno"))
         self.lNombre.setWhatsThis(_translate("Form", "El nombre del Alumno"))
-        self.label_3.setText(_translate("Form", "Ape&llidos:"))
+        self.label_3.setText(_translate("Form", "Ape&llidos*:"))
         self.lApellidos.setToolTip(_translate("Form", "Apellidos del alumno"))
         self.lApellidos.setWhatsThis(_translate("Form", "Los dos apellidos del alumno."))
-        self.label_4.setText(_translate("Form", "Email:"))
+        self.label_4.setText(_translate("Form", "Email*:"))
         self.lEmail.setToolTip(_translate("Form", "Email del alumno"))
         self.lEmail.setWhatsThis(_translate("Form", "El email que posee el alumno en la universidad por el cual le serán enviado los correos."))
         self.bAnadirAlumno.setToolTip(_translate("Form", "Añadir alumno al nuevo grupo"))
@@ -152,7 +152,13 @@ class CrearGrupoAnadirAlumno(QtWidgets.QWidget):
                 self.close()
             else:
                 print "El alumno ya estaba en la lista, no se añade"
-                # Mostrar una pantalla del error.
+                warm_box_2 = QMessageBox()
+                warm_box_2.setIcon(2)
+                warm_box_2.setWindowTitle("Añadir un alumno")
+                warm_box_2.setText("¡Atención!")
+                warm_box_2.setInformativeText("Ya existe otro alumno con el mismo Dni.")
+                warm_box_2.exec_()
+
         else:
             # Alguno de los datos no ha sido correctamente introducidos.
             warm_box = QMessageBox()

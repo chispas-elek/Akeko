@@ -1,17 +1,10 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'IU_CREAR_GRUPO.ui'
-#
-# Created by: PyQt5 UI code generator 5.4.2
-#
-# WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QAbstractItemView, QHeaderView, QTableWidgetItem
 from Cliente.src.packModelo import Alumno, ListaAlumno, ListaGrupo
-from sys import argv
 import IU_CREAR_GRUPO_NOMBRE, IU_CREAR_GRUPO_ANADIR_ALUMNO
-
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -37,12 +30,24 @@ class Ui_Form(object):
         self.tAlumnos.setColumnCount(4)
         self.tAlumnos.setRowCount(0)
         item = QtWidgets.QTableWidgetItem()
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/document-edit-decrypt.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        item.setIcon(icon)
         self.tAlumnos.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/format-text-subscript.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        item.setIcon(icon1)
         self.tAlumnos.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/format-text-superscript.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        item.setIcon(icon2)
         self.tAlumnos.setHorizontalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/mail-mark-read.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        item.setIcon(icon3)
         self.tAlumnos.setHorizontalHeaderItem(3, item)
         self.verticalLayout.addWidget(self.tAlumnos)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
@@ -50,19 +55,15 @@ class Ui_Form(object):
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem2)
         self.bAnadir = QtWidgets.QPushButton(Form)
-        self.bAnadir.setText("")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/list-add.svg"), QtGui.QIcon.Normal,
-                       QtGui.QIcon.Off)
-        self.bAnadir.setIcon(icon)
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/list-add.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.bAnadir.setIcon(icon4)
         self.bAnadir.setObjectName("bAnadir")
         self.horizontalLayout.addWidget(self.bAnadir)
         self.bEliminar = QtWidgets.QPushButton(Form)
-        self.bEliminar.setText("")
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/list-remove.svg"), QtGui.QIcon.Normal,
-                        QtGui.QIcon.Off)
-        self.bEliminar.setIcon(icon1)
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/list-remove.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.bEliminar.setIcon(icon5)
         self.bEliminar.setObjectName("bEliminar")
         self.horizontalLayout.addWidget(self.bEliminar)
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -73,19 +74,17 @@ class Ui_Form(object):
         spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem4)
         self.bCrear = QtWidgets.QPushButton(Form)
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/user-group-new.svg"),
-                        QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.bCrear.setIcon(icon2)
+        icon6 = QtGui.QIcon()
+        icon6.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/user-group-new.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.bCrear.setIcon(icon6)
         self.bCrear.setObjectName("bCrear")
         self.horizontalLayout_2.addWidget(self.bCrear)
         spacerItem5 = QtWidgets.QSpacerItem(100, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem5)
         self.bCancelar = QtWidgets.QPushButton(Form)
-        icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/dialog-close.svg"), QtGui.QIcon.Normal,
-                        QtGui.QIcon.Off)
-        self.bCancelar.setIcon(icon3)
+        icon7 = QtGui.QIcon()
+        icon7.addPixmap(QtGui.QPixmap("plasma-next-icons/Breeze/actions/toolbar/dialog-close.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.bCancelar.setIcon(icon7)
         self.bCancelar.setObjectName("bCancelar")
         self.horizontalLayout_2.addWidget(self.bCancelar)
         spacerItem6 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -114,9 +113,10 @@ class Ui_Form(object):
         item.setText(_translate("Form", "Apellidos"))
         item = self.tAlumnos.horizontalHeaderItem(3)
         item.setText(_translate("Form", "Email"))
+        self.bAnadir.setText(_translate("Form", "Añadir"))
+        self.bEliminar.setText(_translate("Form", "Eliminar"))
         self.bCrear.setText(_translate("Form", "Crear"))
         self.bCancelar.setText(_translate("Form", "Cancelar"))
-
 
 class CrearGrupo(QtWidgets.QWidget):
     # Definimos el constructor de la clase principal
@@ -301,4 +301,3 @@ class ErrorMalformedSource(Exception):
 
     def __str__(self):
         return "El fichero contiene una entrada inválida en la línea: " + str(self.valor)
-
