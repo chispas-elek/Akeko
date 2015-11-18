@@ -73,14 +73,12 @@ class ListaHistorial(object):
             if historial.accion == 1:
                 # Añadir
                 newitem_anadir = QTableWidgetItem("Añadir")
-                newitem_anadir.setIcon(QtGui.QIcon("/home/administrador/PycharmProjects/Akeko/Cliente/src/packVistas"
-                                                   "/plasma-next-icons/Breeze/actions/toolbar/list-add.svg"))
+                newitem_anadir.setIcon(QtGui.QIcon("plasma-next-icons/Breeze/actions/toolbar/list-add.svg"))
                 p_table_widged.setItem(i, 4, newitem_anadir)
             else:
                 # Eliminar
                 newitem_eliminar = QTableWidgetItem("Eliminar")
-                newitem_eliminar.setIcon(QtGui.QIcon("/home/administrador/PycharmProjects/Akeko/Cliente/src/packVistas"
-                                                     "/plasma-next-icons/Breeze/actions/toolbar/edit-delete.svg"))
+                newitem_eliminar.setIcon(QtGui.QIcon("plasma-next-icons/Breeze/actions/toolbar/edit-delete.svg"))
                 p_table_widged.setItem(i, 4, newitem_eliminar)
 
             newitem = QTableWidgetItem(historial.informacion)
