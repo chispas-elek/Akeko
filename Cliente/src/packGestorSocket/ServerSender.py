@@ -26,7 +26,7 @@ class ServerSender(object):
         # Creamos el Socket y le pasamos los parámetros básicos de conexión
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # todo descomentar ésto para darle a los sockets un timeout
-        #s.settimeout(10)
+        s.settimeout(10)
         # Creamos el socket SSL y le indicamos el certificado
         self.ssl_sock = ssl.wrap_socket(s,
                                         ca_certs="ssl/cacert.pem",
