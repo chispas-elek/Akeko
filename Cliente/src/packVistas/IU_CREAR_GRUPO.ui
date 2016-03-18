@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>750</width>
+    <height>501</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Crear Grupo</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Importar &amp;un fichero de alumnos(formato *.txt</string>
+       </property>
+       <property name="buddy">
+        <cstring>tOpenFile</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QToolButton" name="tOpenFile">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>30</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tAlumnos">
+     <column>
+      <property name="text">
+       <string>Dni</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>plasma-next-icons/Breeze/actions/toolbar/document-edit-decrypt.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/document-edit-decrypt.svg</iconset>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Nombre</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>plasma-next-icons/Breeze/actions/toolbar/format-text-subscript.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/format-text-subscript.svg</iconset>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Apellidos</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>plasma-next-icons/Breeze/actions/toolbar/format-text-superscript.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/format-text-superscript.svg</iconset>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Email</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>plasma-next-icons/Breeze/actions/toolbar/mail-mark-read.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/mail-mark-read.svg</iconset>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="bAnadir">
+       <property name="text">
+        <string>Añadir</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>plasma-next-icons/Breeze/actions/toolbar/list-add.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/list-add.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="bEliminar">
+       <property name="text">
+        <string>Eliminar</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>plasma-next-icons/Breeze/actions/toolbar/list-remove.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/list-remove.svg</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>10</width>
+       <height>30</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="bCrear">
+       <property name="text">
+        <string>Crear</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>plasma-next-icons/Breeze/actions/toolbar/user-group-new.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/user-group-new.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>100</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="bCancelar">
+       <property name="text">
+        <string>Cancelar</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>plasma-next-icons/Breeze/actions/toolbar/dialog-close.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/dialog-close.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>tOpenFile</tabstop>
+  <tabstop>tAlumnos</tabstop>
+  <tabstop>bAnadir</tabstop>
+  <tabstop>bEliminar</tabstop>
+  <tabstop>bCrear</tabstop>
+  <tabstop>bCancelar</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,8 +1,8 @@
 # -*- encoding: utf-8 -*-
 __author__ = 'Rubén Mulero'
 
-from Cliente.src.packGestorSocket import ServerSender
-from Cliente.src.packModelo import ListaGrupo, ListaAlumno
+from src.packGestorSocket import ServerSender
+from src.packModelo import ListaGrupo, ListaAlumno
 
 class Singleton(type):
 

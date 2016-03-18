@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>465</width>
+    <height>260</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Login</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="1">
+     <layout class="QFormLayout" name="formLayout">
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="lEditContrasena">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Contraseña de usuario del sistema&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="whatsThis">
+         <string>Se ingresa el nombre de usuario del sistema. Para tener uno, por favor, contacta con el administrador.</string>
+        </property>
+        <property name="inputMethodHints">
+         <set>Qt::ImhHiddenText|Qt::ImhNoPredictiveText</set>
+        </property>
+        <property name="maxLength">
+         <number>45</number>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="toolTip">
+         <string>Contraseña del usuario</string>
+        </property>
+        <property name="text">
+         <string>Contrase&amp;ña:</string>
+        </property>
+        <property name="buddy">
+         <cstring>lEditContrasena</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="lEditUsuario">
+        <property name="minimumSize">
+         <size>
+          <width>50</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nombre de usuario del sistema&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="whatsThis">
+         <string>Se ingresa el nombre de usuario del sistema. Para tener uno, por favor, contacta con el administrador.</string>
+        </property>
+        <property name="maxLength">
+         <number>45</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label">
+        <property name="toolTip">
+         <string>Nombre de usuario.</string>
+        </property>
+        <property name="text">
+         <string>&amp;Usuario: </string>
+        </property>
+        <property name="buddy">
+         <cstring>lEditUsuario</cstring>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="1" column="2">
+     <widget class="QPushButton" name="bLogin">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Acceder al sistema&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Login</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>plasma-next-icons/Breeze/actions/toolbar/document-encrypted.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/document-encrypted.svg</iconset>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>465</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuHerramientas">
+    <property name="title">
+     <string>Herramie&amp;ntas</string>
+    </property>
+    <addaction name="actionOpciones"/>
+   </widget>
+   <addaction name="menuHerramientas"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpciones">
+   <property name="icon">
+    <iconset>
+     <normaloff>plasma-next-icons/Breeze/actions/toolbar/configure-shortcuts.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/configure-shortcuts.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Opciones</string>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>lEditUsuario</tabstop>
+  <tabstop>lEditContrasena</tabstop>
+  <tabstop>bLogin</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

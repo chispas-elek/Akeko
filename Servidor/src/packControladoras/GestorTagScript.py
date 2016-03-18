@@ -3,7 +3,7 @@
 __author__ = 'Rubén Mulero'
 
 import subprocess as sub
-from Servidor.src.packGestorBD import MySQLConnector
+from src.packGestorBD import MySQLConnector
 
 
 class Singleton(type):

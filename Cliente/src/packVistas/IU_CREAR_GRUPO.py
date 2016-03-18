@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
+__author__ = "Rubén Mulero"
+
+# Created by: PyQt5 UI code generator 5.5
+#
+# WARNING! All changes made in this file will be lost!
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QAbstractItemView, QHeaderView, QTableWidgetItem
-from Cliente.src.packModelo import Alumno, ListaAlumno, ListaGrupo
+from src.packModelo import Alumno, ListaAlumno, ListaGrupo
 import IU_CREAR_GRUPO_NOMBRE, IU_CREAR_GRUPO_ANADIR_ALUMNO
 
 class Ui_Form(object):

@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 __author__ = 'Rubén Mulero'
 
-from Servidor.src.packGestorBD import MySQLConnector
+from src.packGestorBD import MySQLConnector
 
 class Singleton(type):
 

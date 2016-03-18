@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>872</width>
+    <height>686</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Gestionar Tag</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="4">
+      <widget class="QLabel" name="label_4">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+         <weight>75</weight>
+         <italic>true</italic>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Disponibles</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="3" column="3">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="1" column="0" rowspan="5">
+      <widget class="QListWidget" name="listEnElTag">
+       <property name="toolTip">
+        <string>Scripts dentro del Tag</string>
+       </property>
+       <property name="whatsThis">
+        <string>Contiene los Scripts que están o estarán contenidos en le Tag. Si el Tag es nuevo, ésta lista vendrá por defecto vacía.</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4" rowspan="5">
+      <widget class="QListWidget" name="listDisponibles">
+       <property name="toolTip">
+        <string>Scripts disponibles para el Tag</string>
+       </property>
+       <property name="whatsThis">
+        <string>Contiene los scripts disponibles para el Tag actual. Tanto si es para modificar uno como para crearlo. Desplazar éstos scripts al lado izquierdo para incluirlos en el Tag.</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+         <weight>75</weight>
+         <italic>true</italic>
+         <bold>true</bold>
+         <underline>false</underline>
+         <strikeout>false</strikeout>
+        </font>
+       </property>
+       <property name="text">
+        <string>En el tag</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="2">
+      <widget class="QPushButton" name="bEliminar">
+       <property name="toolTip">
+        <string>Eliminar un Script del Tag.</string>
+       </property>
+       <property name="text">
+        <string>Eliminar</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>plasma-next-icons/Breeze/actions/toolbar/arrow-right.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/arrow-right.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QPushButton" name="bAnadir">
+       <property name="toolTip">
+        <string>Añadir un Script al Tag</string>
+       </property>
+       <property name="text">
+        <string>Añadir</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>plasma-next-icons/Breeze/actions/toolbar/arrow-left.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/arrow-left.svg</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Información Avanzada</string>
+       </property>
+       <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>&amp;Nombre del &amp;Tag:</string>
+          </property>
+          <property name="buddy">
+           <cstring>lNombreTag</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="lNombreTag">
+          <property name="toolTip">
+           <string>Nombre del Tag a Introducir</string>
+          </property>
+          <property name="maxLength">
+           <number>20</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Owner del &amp;Tag:</string>
+          </property>
+          <property name="buddy">
+           <cstring>cOwner</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>&amp;Descripción:</string>
+          </property>
+          <property name="buddy">
+           <cstring>lDescripcion</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="lDescripcion">
+          <property name="toolTip">
+           <string>Descripción del Tag a introducir</string>
+          </property>
+          <property name="maxLength">
+           <number>150</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QComboBox" name="cOwner">
+          <property name="toolTip">
+           <string>Propietario del Tag. Por defecto, es el usuario que lo ha creado.</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+       <zorder>label_7</zorder>
+       <zorder>label_5</zorder>
+       <zorder>label</zorder>
+       <zorder>lNombreTag</zorder>
+       <zorder>lDescripcion</zorder>
+       <zorder>cOwner</zorder>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="title">
+        <string>Información del Script</string>
+       </property>
+       <layout class="QFormLayout" name="formLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>-Nombre Script:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="lNombreScript">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>-Descripción:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="lDescripcionScript">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="bAplicar">
+         <property name="text">
+          <string>Aplicar</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>plasma-next-icons/Breeze/actions/toolbar/dialog-ok-apply.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/dialog-ok-apply.svg</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Maximum</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>35</width>
+           <height>35</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="bCerrar">
+         <property name="text">
+          <string>Cerrar</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>plasma-next-icons/Breeze/actions/toolbar/window-close.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/window-close.svg</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>listEnElTag</tabstop>
+  <tabstop>listDisponibles</tabstop>
+  <tabstop>bAnadir</tabstop>
+  <tabstop>bEliminar</tabstop>
+  <tabstop>lNombreTag</tabstop>
+  <tabstop>lDescripcion</tabstop>
+  <tabstop>bAplicar</tabstop>
+  <tabstop>bCerrar</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

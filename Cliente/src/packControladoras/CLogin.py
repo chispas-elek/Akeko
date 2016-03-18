@@ -7,7 +7,7 @@ Python tiene muchas formas de hacer que una clase se instancie de forma única.
 En éste caso, se ha usado la instanciación por Metaclase.
 """
 
-from Cliente.src.packGestorSocket import ServerSender
+from src.packGestorSocket import ServerSender
 
 class Singleton(type):
 

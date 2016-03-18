@@ -7,7 +7,7 @@ produzcan, debido a las acciones de un usuario.
 
 """
 
-from Servidor.src.packGestorBD import MySQLConnector
+from src.packGestorBD import MySQLConnector
 
 
 class Singleton(type):

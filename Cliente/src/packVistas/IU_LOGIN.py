@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
+__author__ = "Rubén Mulero"
+
+# Created by: PyQt5 UI code generator 5.5
+#
+# WARNING! All changes made in this file will be lost!
+
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QLineEdit
-from Cliente.src.packControladoras import CLogin
+from src.packControladoras import CLogin
 import re
 import IU_MAIN
 

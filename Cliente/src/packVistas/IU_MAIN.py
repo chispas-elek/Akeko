@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
+__author__ = "Rubén Mulero"
+
+# Created by: PyQt5 UI code generator 5.5
+#
+# WARNING! All changes made in this file will be lost!
+
 
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QHeaderView, QMessageBox
-from Cliente.src.packControladoras import CMain
+from src.packControladoras import CMain
 import IU_CREAR_GRUPO, IU_CAMBIAR_NOMBRE_GRUPO, IU_GESTIONAR_SCRIPT, IU_MIS_TAGS, IU_HISTORIAL
-
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):

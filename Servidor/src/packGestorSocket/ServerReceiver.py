@@ -12,11 +12,12 @@ import socket
 import Decoder
 import ssl
 import time
-from Servidor.src.packControladoras import GestorUsuario
-from Servidor.src.packControladoras import GestorGrupo
-from Servidor.src.packControladoras import GestorAlumno
-from Servidor.src.packControladoras import GestorTagScript
-from Servidor.src.packControladoras import GestorHistorial
+import ConfigParser
+from src.packControladoras import GestorUsuario
+from src.packControladoras import GestorGrupo
+from src.packControladoras import GestorAlumno
+from src.packControladoras import GestorTagScript
+from src.packControladoras import GestorHistorial
 
 
 class MySSLTCPServer(TCPServer):
@@ -778,13 +779,34 @@ class ErrorAlumno(Exception):
     def __str__(self):
         return "Los datos del Alumno no son correcto. Dni: " + str(self.valor)
 
+class BadConnConf(Exception):
+    def __init__(self, p_server_name, p_host, p_ca_cert):
+        self.server_name = p_server_name
+        self.host = p_host
+        self.ca_cert = p_ca_cert
+
+    def __str__(self):
+        return "Los datos de la IP y del HOST no son correctos: \n El server es %s y el HOST es %s \n Y el cert está en %s" % (
+            self.server_name,
+            self.host, self.ca_cert)
+
+class MalformedConfig(Exception):
+    def __str__(self):
+        return "La configuración no es correcta o faltan parámetros."
+
 
 # Configuracion de los datos de escucha y ejecucion infinita del servidor.
 class ConfigServer(object):
-    def __init__(self, p_PORT, p_cert, p_key):
-        self._PORT = p_PORT
-        self._cert = p_cert
-        self._key = p_key
+    def __init__(self,):
+        # Obtener los valores del fichero de config
+        config = ConfigParser.ConfigParser()
+        config.readfp(open('./config/server.cfg'))
+        if 'server' in config.sections() and 'ssl' in config.sections():
+            self._PORT = int(config.get("server", "port") or '0')  # Parse a Int
+            self._cert = config.get("ssl", "ca_cert") or False
+            self._key = config.get("ssl", "key") or False
+        else:
+            raise MalformedConfig()
 
     def iniciar_servidor(self):
         try:

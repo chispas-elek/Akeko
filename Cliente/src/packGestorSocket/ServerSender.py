@@ -13,26 +13,32 @@ import socket
 import Decoder
 import time
 import ssl
+import ConfigParser
 
 
 class ServerSender(object):
-    # Definimos dos constantes y marcamos como internas
-    # todo Definir un archivo para cambiar el valor del server name
-    #__SERVER_NAME = 'chispas-rpi.no-ip.biz'
-    __SERVER_NAME = '192.168.0.10'
-    __PORT = 13373
-
     def __init__(self, p_datos_enviar):
-        # Creamos el Socket y le pasamos los parámetros básicos de conexión
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # todo descomentar ésto para darle a los sockets un timeout
-        s.settimeout(10)
-        # Creamos el socket SSL y le indicamos el certificado
-        self.ssl_sock = ssl.wrap_socket(s,
-                                        ca_certs="ssl/cacert.pem",
-                                        cert_reqs=ssl.CERT_REQUIRED,
-                                        ssl_version=ssl.PROTOCOL_TLSv1)
-        self.datos_enviar = p_datos_enviar
+        # Definir controles de apertura de fichero si no hay fichero salta error
+        config = ConfigParser.ConfigParser()
+        config.readfp(open('./config/client.cfg'))
+        if 'server' in config.sections() and 'ssl' in config.sections():
+            self.__SERVER_NAME = config.get("server", "server_name") or False
+            self.__PORT = int(config.get("server", "port") or '0')  # Parse a Int
+            ca_cert = config.get("ssl", "ca_cert") or False
+            if self.__SERVER_NAME and self.__PORT and ca_cert:
+                # Creamos el Socket y le pasamos los parámetros básicos de conexión
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.settimeout(10)
+                # Creamos el socket SSL y le indicamos el certificado
+                self.ssl_sock = ssl.wrap_socket(s,
+                                                ca_certs=ca_cert,
+                                                cert_reqs=ssl.CERT_REQUIRED,
+                                                ssl_version=ssl.PROTOCOL_TLSv1)
+                self.datos_enviar = p_datos_enviar
+            else:
+                raise BadConnConf(self.__SERVER_NAME, self.__PORT, ca_cert)
+        else:
+            raise MalformedConfig()
 
     # todo generar un parámetro optativo más para que ejecute la BETA en determinados casos puntuales
     def enviar_datos(self, intento=0):
@@ -47,7 +53,7 @@ class ServerSender(object):
                 # Recibo la respuesta del servidor y la devuelvo
                 result = Decoder.Decoder(self.ssl_sock.recv(8192))
                 ##### BETA FUNCTION
-                #result = Decoder.Decoder(self._recv_timeout(self.ssl_sock))
+                # result = Decoder.Decoder(self._recv_timeout(self.ssl_sock))
                 # Correcto, cerramos y devolvemos.
                 self.ssl_sock.close()
                 return result.decode_json()
@@ -108,3 +114,21 @@ class ServerSender(object):
 
         # Juntar todas las partes y realizar un string.
         return ''.join(total_data)
+
+
+# Personal Errors
+class BadConnConf(Exception):
+    def __init__(self, p_server_name, p_host, p_ca_cert):
+        self.server_name = p_server_name
+        self.host = p_host
+        self.ca_cert = p_ca_cert
+
+    def __str__(self):
+        return "Los datos de la IP y del HOST no son correctos: \n El server es %s y el HOST es %s \n Y el cert está en %s" % (
+            self.server_name,
+            self.host, self.ca_cert)
+
+
+class MalformedConfig(Exception):
+    def __str__(self):
+        return "La configuración no es correcta o faltan parámetros."

@@ -2,8 +2,8 @@
 __author__ = 'Rubén Mulero'
 
 
-from Cliente.src.packGestorSocket import ServerSender
-from Cliente.src.packModelo import ListaScript, ListaTag
+from src.packGestorSocket import ServerSender
+from src.packModelo import ListaScript, ListaTag
 from PyQt5 import QtCore
 
 

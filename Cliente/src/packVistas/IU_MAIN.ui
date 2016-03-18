@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>615</width>
+    <height>496</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Pantalla Principal</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QFormLayout" name="formLayout">
+      <property name="labelAlignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="formAlignment">
+       <set>Qt::AlignHCenter|Qt::AlignTop</set>
+      </property>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="cSelecionarGrupo"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Seleccionar grupo:</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QTableWidget" name="tListaAlumnos">
+      <property name="whatsThis">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tabla que contiene la información relativa al grupo que ha sido seleccionado actualmente.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <column>
+       <property name="text">
+        <string>Dni</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>plasma-next-icons/Breeze/actions/toolbar/document-edit-decrypt.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/document-edit-decrypt.svg</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Nombre</string>
+       </property>
+       <property name="toolTip">
+        <string extracomment=" "/>
+       </property>
+       <property name="whatsThis">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>plasma-next-icons/Breeze/actions/toolbar/format-text-subscript.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/format-text-subscript.svg</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Apellido</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>plasma-next-icons/Breeze/actions/toolbar/format-text-superscript.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/format-text-superscript.svg</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>E-Mail</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>plasma-next-icons/Breeze/actions/toolbar/mail-mark-read.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/mail-mark-read.svg</iconset>
+       </property>
+      </column>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="lNumeroAlumnos">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Número de alumnos en el grupo: XXXX</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="font">
+       <font>
+        <underline>false</underline>
+       </font>
+      </property>
+      <property name="title">
+       <string>Acciones del grupo</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="bGestionarScripts">
+         <property name="text">
+          <string>Gestionar scripts</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>plasma-next-icons/Breeze/actions/toolbar/user-group-properties.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/user-group-properties.svg</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="bCambiarNombre">
+         <property name="text">
+          <string>Cambiar nombre</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>plasma-next-icons/Breeze/actions/toolbar/configure-shortcuts.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/configure-shortcuts.svg</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="bEliminarGrupo">
+         <property name="text">
+          <string>Eliminar</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>plasma-next-icons/Breeze/actions/toolbar/edit-delete-shred.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/edit-delete-shred.svg</iconset>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>615</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuArchivo">
+    <property name="title">
+     <string>Ar&amp;chivo</string>
+    </property>
+    <addaction name="actionAnadirGrupo"/>
+   </widget>
+   <widget class="QMenu" name="menuHistorial">
+    <property name="title">
+     <string>Herramie&amp;ntas</string>
+    </property>
+    <addaction name="actionGestionar_Mis_Tags"/>
+    <addaction name="actionVerHistorial"/>
+   </widget>
+   <widget class="QMenu" name="menuCerrar_sesi_n">
+    <property name="title">
+     <string>&amp;Cerrar sesión</string>
+    </property>
+    <addaction name="actionCerrarSesion"/>
+   </widget>
+   <addaction name="menuArchivo"/>
+   <addaction name="menuHistorial"/>
+   <addaction name="menuCerrar_sesi_n"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionAnadirGrupo">
+   <property name="icon">
+    <iconset>
+     <normaloff>plasma-next-icons/Breeze/actions/toolbar/resource-group-new.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/resource-group-new.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Añadir nuevo grupo</string>
+   </property>
+  </action>
+  <action name="actionVerHistorial">
+   <property name="icon">
+    <iconset>
+     <normaloff>plasma-next-icons/Breeze/actions/toolbar/cartesian-plot-four-axes.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/cartesian-plot-four-axes.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Ver historial de &amp;cambios</string>
+   </property>
+  </action>
+  <action name="actionCerrarSesion">
+   <property name="icon">
+    <iconset>
+     <normaloff>plasma-next-icons/Breeze/actions/toolbar/application-exit.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/application-exit.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Cerrar la sesión actual</string>
+   </property>
+  </action>
+  <action name="actionGestionar_Mis_Tags">
+   <property name="icon">
+    <iconset>
+     <normaloff>plasma-next-icons/Breeze/actions/toolbar/milestone.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/milestone.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Gestionar Mis &amp;Tags</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

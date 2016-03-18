@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1044</width>
+    <height>866</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Historial</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QTableWidget" name="tHistorial">
+     <property name="whatsThis">
+      <string>En ésta tabla se muestran todos los cambios que han sufrito los alumnos de cada grupo dependiendo de las decisiones que haya seleccionado el usuario actual Cada columna representa una serie de datos para que el usuario pueda saber qué acciones ha realizado exáctamente y el porqué de cada cambio. La tabla tiene los siguientes elementos:
+
+-&gt; Script: Indica el script utilizado. Si está en blanco es porque ha sido usado un Tag en su lugar.
+-&gt; Tag: Indica el tag utilizado. Si está en blanc es porque ha sido usado un Script en su lugar.
+-&gt; Alumno: El nombre y apellidos del alumno afectado por el Script/Tag utilizados.
+-&gt; Grupo: El grupo por el cual pertenece el alumno.
+-&gt; Acción: La acción realizada. Puede ser añadir un Script/Tag, o eliminar.
+-&gt; Información: Muestra un texto que razona el porqué de la acción realizada.
+-&gt; Fecha: La fecha que registra la acción que se ha realizado.</string>
+     </property>
+     <column>
+      <property name="text">
+       <string>Script</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>plasma-next-icons/Breeze/actions/toolbar/irc-operator.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/irc-operator.svg</iconset>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Tag</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>plasma-next-icons/Breeze/actions/toolbar/get-hot-new-stuff.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/get-hot-new-stuff.svg</iconset>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Alumno</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>plasma-next-icons/Breeze/actions/toolbar/im-user.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/im-user.svg</iconset>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Grupo</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>plasma-next-icons/Breeze/actions/toolbar/user-group-new.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/user-group-new.svg</iconset>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Acción</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>plasma-next-icons/Breeze/actions/toolbar/checkbox.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/checkbox.svg</iconset>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Información</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>plasma-next-icons/Breeze/actions/toolbar/documentinfo.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/documentinfo.svg</iconset>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Fecha</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>plasma-next-icons/Breeze/actions/toolbar/view-calendar-day.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/view-calendar-day.svg</iconset>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="font">
+      <font>
+       <underline>false</underline>
+      </font>
+     </property>
+     <property name="title">
+      <string>Opciones de filtrado avanzado</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <spacer name="verticalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Buscar</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lBuscar">
+          <property name="toolTip">
+           <string>Introdce un texto de búsqueda.</string>
+          </property>
+          <property name="whatsThis">
+           <string>En éste campo se introduce las palabas claves que conforman el criterior de búsqueda a realizar. Es imperativo seleccionar en el desplegable continuo qué tipo de criterior se quiere aplicar</string>
+          </property>
+          <property name="maxLength">
+           <number>200</number>
+          </property>
+          <property name="clearButtonEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>50</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Filtrar</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cTipoFiltro">
+          <property name="toolTip">
+           <string>Selecciona un filtro determinado.</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>120</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>25</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Elegir fecha de filtrado:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>10</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Desde:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDateEdit" name="dateInicio">
+          <property name="toolTip">
+           <string>Fecha de inicio de la consulta</string>
+          </property>
+          <property name="whatsThis">
+           <string>Selecciona una fecha de inicio para iniciar la consulta. Por defecto obtendrá la fecha actual del sistema.
+
+Al pulsar sobre el desplegable se obtendrá un calendario que simplicifará el proceso para elegir la fecha. También se puede introducir la fecha de manera manual.</string>
+          </property>
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>100</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Hasta:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDateEdit" name="dateFin">
+          <property name="toolTip">
+           <string>Fecha de fin de la consulta</string>
+          </property>
+          <property name="whatsThis">
+           <string>Selecciona una fecha de fin para iniciar la consulta. Por defecto obtendrá la fecha actual del sistema.
+
+Al pulsar sobre el desplegable se obtendrá un calendario que simplicifará el proceso para elegir la fecha. También se puede introducir la fecha de manera manual.</string>
+          </property>
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_9">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>120</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_6">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>50</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <spacer name="horizontalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>600</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="bFiltrar">
+          <property name="toolTip">
+           <string>Filtrar los parámetros deseados.</string>
+          </property>
+          <property name="whatsThis">
+           <string>Permite aplicar todos los filtros seleccionados por el usuario. Al pulsar éste botón el sistema actualizará la tabla superior mostrando únicamente aquellos resultados que  coincidan con los criterios de búsqueda que haya seleccionado.</string>
+          </property>
+          <property name="text">
+           <string>Filtrar</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>plasma-next-icons/Breeze/actions/toolbar/view-filter.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/view-filter.svg</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_8">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>60</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="bLimpiarF">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Limpiar todos los filtros aplicados</string>
+          </property>
+          <property name="whatsThis">
+           <string>Limpia todos los campos de filtros que el usuario haya modificado y actualiza la tabla superior mostrando todas las entradas existentes.
+
+Éste botón sólo se habilita si se detecta que existe un filtro aplicado.</string>
+          </property>
+          <property name="text">
+           <string>Limpiar Filtros</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>plasma-next-icons/Breeze/actions/toolbar/edit-undo.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/edit-undo.svg</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_7">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>60</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>30</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="bCerrar">
+       <property name="text">
+        <string>Cerrar</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>plasma-next-icons/Breeze/actions/toolbar/window-close.svg</normaloff>plasma-next-icons/Breeze/actions/toolbar/window-close.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>lBuscar</tabstop>
+  <tabstop>cTipoFiltro</tabstop>
+  <tabstop>bFiltrar</tabstop>
+  <tabstop>bLimpiarF</tabstop>
+  <tabstop>bCerrar</tabstop>
+  <tabstop>tHistorial</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

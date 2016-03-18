@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
+__author__ = "Rubén Mulero"
 
-# Form implementation generated from reading ui file 'IU_CREAR_GRUPO_NOMBRE.ui'
-#
-# Created by: PyQt5 UI code generator 5.4.2
+# Created by: PyQt5 UI code generator 5.5
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
-from Cliente.src.packControladoras import CCrearGrupo
+from src.packControladoras import CCrearGrupo
 import re
 
 class Ui_Dialog(object):
